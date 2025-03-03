@@ -50,7 +50,7 @@ export const postUserRegister = async (user: Partial<UserDto>) => {
 
 export const postSellerRegister = async (seller: Partial<ISeller>): Promise<Response> => {
   try {
-    const res = await fetch(`https://elplac-production.up.railway.app/auth/register-seller`, {
+    const res = await fetch(`elplac-production-3a9f.up.railway.app/auth/register-seller`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
