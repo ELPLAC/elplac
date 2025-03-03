@@ -15,12 +15,12 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       "https://elplac-ruby.vercel.app", 
-      "http://localhost:3001"
-    ], 
-    methods: 'GET,POST,PUT,DELETE',
+      "http://localhost:3001", 
+    ],
+    methods: 'GET, POST, PUT, DELETE',
     allowedHeaders: 'Content-Type, Accept, Authorization',
-    credentials: true,
-  });
+    credentials: true, 
+  });  
   
   await app.listen(process.env.PORT);
 }
