@@ -26,7 +26,6 @@ import { ProductsModule } from '@products/products.module';
 
 import { AuthController } from '@auth/auth.controller';
 import { AuthService } from '@auth/auth.service';
-import { GoogleStrategy } from '@auth/auth.google.strategy';
 import { IsDniValidConstraint } from '@auth/auth.validator';
 
 dotenvConfig({ path: '.env' });
@@ -60,7 +59,6 @@ dotenvConfig({ path: '.env' });
     UsersService,
     UserRepository,
     SellerRepository,
-    GoogleStrategy,
     FairsService,
     FairsRepository,
     IsDniValidConstraint,

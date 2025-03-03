@@ -4,7 +4,7 @@ import { config as dotenvconfig } from 'dotenv';
 dotenvconfig({ path: '.env' });
 
 const client = new MercadoPagoConfig({
-  accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN,
+  accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN.trim(),
 });
 
 const preference = new Preference(client);

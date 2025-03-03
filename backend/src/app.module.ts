@@ -24,7 +24,6 @@ import { FileModule } from '@files/files.module';
 import { FileController } from '@files/files.controller';
 import { FileService } from '@files/files.service';
 import { UsersController } from '@users/users.controller';
-import { GoogleStrategy } from '@auth/auth.google.strategy';
 import { FairsService } from '@fairs/fairs.service';
 import { FairsRepository } from '@fairs/fairs.repository';
 import { SellerController } from '@sellers/seller.controller';
@@ -95,7 +94,6 @@ import { AppController } from 'app.controller';
     SellerRepository,
     FairsRepository,
     FileService,
-    GoogleStrategy,
     FairsService,
     SellerService,
     UserToSellerService,
