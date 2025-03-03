@@ -197,7 +197,8 @@ const Ticket: React.FC<TicketProps> = ({
                 disabled={
                   !fairSelectedPerUser ||
                   !salesChecked ||
-                  !categorySelected
+                  !categorySelected ||
+                  !termsChecked
                 }
               />
             </div>
