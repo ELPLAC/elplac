@@ -77,7 +77,7 @@ export const postUserLogin = async (
   user: IUserLogin & { rememberMe: boolean }
 ) => {
   try {
-    const res = await fetch(`https://elplac-production.up.railway.app/auth/login`, {
+    const res = await fetch(`elplac-production-3a9f.up.railway.app/auth/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -343,7 +343,7 @@ export const updateStatusUser = async (id: string, accessToken: string) => {
 
 export const getFair = async () => {
   try {
-    const res = await fetch(`${URL}/fairs/`, {
+    const res = await fetch(`${URL}/fairs`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -733,7 +733,7 @@ export const getProductRequestById = async (
 
 export const postCreateFair = async (fairData: FairDto, token: string) => {
   try {
-    const res = await fetch(`${URL}/fairs/`, {
+    const res = await fetch(`${URL}/fairs`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
