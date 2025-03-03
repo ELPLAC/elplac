@@ -54,7 +54,7 @@ export class PaymentsService {
           unit_price: fair.entryPriceSeller,
         },
       ],
-      notification_url: `elplac-production-3a9f.up.railway.app/payments/success/seller/?fairId=${fairId}&userId=${userId}&categoryId=${categoryId}&liquidation=${liquidation}`,
+      notification_url: `https://elplac-production-3a9f.up.railway.app/payments/success/seller/?fairId=${fairId}&userId=${userId}&categoryId=${categoryId}&liquidation=${liquidation}`,
       back_urls: {
         success: `https://elplac-ruby.vercel.app//dashboard/fairs`,
       },
@@ -137,7 +137,7 @@ export class PaymentsService {
           unit_price: fair.entryPriceBuyer,
         },
       ],
-      notification_url: `elplac-production-3a9f.up.railway.app/payments/success/buyer/?selectedHour=${registrationHour}&selectedDay=${registrationDay}&fairId=${fairId}&userId=${user.id}`,
+      notification_url: `https://elplac-production-3a9f.up.railway.app/payments/success/buyer/?selectedHour=${registrationHour}&selectedDay=${registrationDay}&fairId=${fairId}&userId=${user.id}`,
       back_urls: {
         success: `https://elplac-ruby.vercel.app//dashboard/profile`,
       },

@@ -76,13 +76,14 @@ export class AuthService {
 
       return res.redirect(redirectUrl);
     } catch (error) {
+      console.log(error);
       throw new UnauthorizedException('Token inválido o expirado');
     }
   }
 
   async sendEmailVerification(email: string, token: string) {
     try {
-      const url = `https://elplac-production.up.railway.app/auth/verify-email/${token}`;
+      const url = `https://elplac-production-3a9f.up.railway.app/auth/verify-email/${token}`;
   
       const htmlContent = `
         <td class="esd-stripe" align="center" background="https://ehserys.stripocdn.email/content/guids/CABINET_5c258a4c32f0353efed35594869ddf77f5d9197eca7f50e5ffd2d04a758e69ea/images/captura_de_pantalla_20240627_191221.png" style="background-image:url(https://ehserys.stripocdn.email/content/guids/CABINET_5c258a4c32f0353efed35594869ddf77f5d9197eca7f50e5ffd2d04a758e69ea/images/captura_de_pantalla_20240627_191221.png);background-repeat:repeat;background-position:center top">
@@ -214,7 +215,7 @@ export class AuthService {
   }
 
   async getFrontendUrl(): Promise<string> {
-    return process.env.FRONTEND_URL || 'https://elplac.vercel.app/';
+    return process.env.FRONTEND_URL || 'https://elplac-ruby.vercel.app';
   }
 
   async createJwtToken(user: any) {
@@ -236,7 +237,7 @@ export class AuthService {
   }
 
   async sendEmailResetPassword(email: string, token: string): Promise<void> {
-    const url = `https://elplac-production.up.railway.app/auth/reset-password/${token}`;
+    const url = `https://elplac-production-3a9f.up.railway.app/auth/reset-password/${token}`;
     const htmlContent = `
       <table class="esd-stripe" align="center" bgcolor="#cfe2f3" style="background-repeat:repeat">
         <tbody>
