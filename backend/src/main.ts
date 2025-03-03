@@ -13,7 +13,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
   app.enableCors({
-    origin: ["https://elplac-ruby.vercel.app/", "http://localhost:3001", "https://elplac-git-main-florencias-projects-5e0cb0aa.vercel.app"], 
+    origin: ["https://elplac-ruby.vercel.app", "http://localhost:3001", "https://elplac-ruby.vercel.app/"], 
     methods: 'GET,POST,PUT,DELETE',
     allowedHeaders: 'Content-Type, Accept, Authorization',
     credentials: true, 
