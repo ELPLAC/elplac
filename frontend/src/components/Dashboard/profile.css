@@ -1,0 +1,6 @@
+@media (max-width: 640px) {
+  .container-general-profile {
+      background-color: blue;
+      margin-top: 0px;
+  }
+}

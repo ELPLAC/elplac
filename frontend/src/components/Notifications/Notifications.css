@@ -1,0 +1,28 @@
+.custom-toast-error .Toastify__progress-bar {
+  background: #f00 !important;
+}
+
+.custom-toast-error {
+  padding: 0;
+  margin: 0;
+  border: none !important;
+}
+
+.custom-toast-with-header .Toastify__progress-bar {
+  background: #D9AB4D !important;
+}
+
+.custom-toast-with-header{
+  padding: 0;
+  margin: 0;
+}
+
+.custom-toast-success {
+  padding: 0;
+  margin: 0;
+  border: none !important;
+}
+
+.custom-toast-success .Toastify__progress-bar {
+  background: #D9AB4D !important;
+}

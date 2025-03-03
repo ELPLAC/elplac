@@ -1,0 +1,9 @@
+@media (max-width: 640px) {
+    .container {
+        background-color: blue;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 20px;
+    }
+  }

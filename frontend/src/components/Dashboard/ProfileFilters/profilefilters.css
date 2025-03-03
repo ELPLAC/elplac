@@ -1,0 +1,9 @@
+@media (max-width: 640px) {
+    .container-general {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        margin-left: 30px;
+        gap: 20px;
+    }
+  }

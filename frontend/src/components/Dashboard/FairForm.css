@@ -1,0 +1,81 @@
+/* Agrega esta clase en tu archivo de estilos o en tu archivo de configuración de Tailwind */
+
+.form-container {
+    display: grid;
+    grid-template-areas:
+      "generalTitle entriesTitle"
+      "generalForm entriesForm"
+      "fairDaysTitle categoriesTitle"
+      "fairDaysForm categoriesForm"
+      "submit submit";
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  
+  .general-section {
+    grid-area: generalTitle / generalForm;
+  }
+  
+  .entries-section {
+    grid-area: entriesTitle / entriesForm;
+  }
+  
+  .fairDays-section {
+    grid-area: fairDaysTitle / fairDaysForm;
+  }
+  
+  .categories-section {
+    grid-area: categoriesTitle / categoriesForm;
+  }
+  
+  .submit-button {
+    grid-area: submit;
+  }
+  
+
+  @media (max-width: 640px) {
+    .container-fair-form {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 20px;
+    }
+
+    .conteiner-active-fair {
+      flex-direction: column;
+      justify-content: center;
+      gap: 20px;
+      width: 100%;
+      height: 100%;
+      padding: 0;
+    }
+
+    .conteiner-active-fair p {
+      font-size: 15px;
+    }
+
+    .conteiner-active-fair h2 {
+      font-size: 20px;
+    }
+
+    .conteiner-active-fair a {
+      font-size: 15px;
+      width: 100%;
+      padding: 5px;
+    }
+
+    .conteiner-active-fair button {
+      font-size: 15px;
+      width: 100%;
+      padding: 5px;
+    }
+
+    .conteiner-active-fair h1 {
+      font-size: 20px;
+    }
+
+    .container-general {
+      background-color: burlywood;
+      padding: 0;
+    }
+  }

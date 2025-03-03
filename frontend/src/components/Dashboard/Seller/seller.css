@@ -1,0 +1,116 @@
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #F9FAFB;
+  }
+  
+  th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+
+  @media (max-width: 740px) {
+    table {
+      display: block;
+      width: 100%;
+      overflow-x: auto;
+    }
+  
+    thead {
+      display: none; 
+    }
+  
+    tbody, tr, td {
+      display: block;
+      width: 100%;
+    }
+  
+    tr {
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      padding: 10px;
+      border-radius: 10px;
+      background-color: #fff;
+    }
+  
+    td {
+      position: relative;
+      text-align: left;
+      padding-left: 50%;
+      padding-top: 10px;
+      padding-bottom: 10px;
+    }
+  
+    td::before {
+      content: attr(data-label);
+      font-weight: bold;
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      text-transform: uppercase;
+      color: #333;
+      font-size: 12px;
+    }
+  }
+  
+  @media (min-width: 741px) and (max-width: 1024px) {
+    table {
+      font-size: 14px;
+    }
+  
+    th, td {
+      padding: 10px;
+    }
+  
+    button {
+      font-size: 14px;
+      padding: 8px 12px;
+    }
+  }
+  
+  @media (min-width: 1025px) {
+    table {
+      font-size: 16px;
+    }
+  
+    th, td {
+      padding: 12px;
+    }
+  
+    button {
+      font-size: 16px;
+      padding: 10px 15px;
+    }
+  }
+
+@media (max-width: 741px) {
+    .container-r {
+        font-size: 15px;
+        width: 90%;
+        align-items: center;
+        margin: 0;
+        margin-bottom: 150px;
+    }
+
+    .btn-r {
+        font-size: 15px;
+        padding: 5px 10px;
+        border-radius: 5px;
+    }
+
+    .btn-r2 {
+        font-size: 15px;
+        padding: 5px 10px;
+        border-radius: 5px;
+        gap: 20px;
+        width: 90%;
+    }
+
+    .hazlick {
+        font-size: 20px;
+    }
+  }
+  
+  

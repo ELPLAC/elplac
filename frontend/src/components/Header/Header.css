@@ -1,0 +1,81 @@
+.innerShadowTitle {
+  font-weight: 800;
+  color: transparent;
+  text-shadow: 4px 4px 7px rgb(255, 255, 255, 0.4), 0 0 var(--secondary-darker);
+}
+
+.innerShadowTitleBlue {
+  font-weight: 800;
+  color: transparent;
+  text-shadow: 2px 1px 10px rgba(255, 255, 255, 0.363),
+    0 0 var(--primary-darker);
+}
+
+.innerShadowTitleOrange {
+  font-weight: 800;
+  color: transparent;
+  text-shadow: 2px 1px 10px rgba(255, 255, 255, 0.363),
+    0 0 var(--secondary-darker);
+}
+
+.innerShadowSubTitle {
+  font-weight: 600;
+  color: transparent;
+  text-shadow: 4px 4px 7px rgb(255, 255, 255, 0.4), 0 0 var(--secondary-darker);
+}
+
+.innerShadowDescription {
+  font-weight: 700;
+  color: transparent;
+  text-shadow: 4px 4px 7px rgb(255, 255, 255, 0.4), 0 0 var(--primary-dark);
+}
+
+
+.innerShadowTitleTerms {
+  font-weight: 800;
+  color: transparent;
+  text-shadow: 4px 4px 7px rgb(255, 255, 255, 0.4), 0 0 var(--primary-dark);
+}
+
+.innerShadowSubTitleTerms {
+  font-weight: 600;
+  color: transparent;
+  text-shadow: 4px 4px 7px rgb(255, 255, 255, 0.4), 0 0 var(--primary-dark);
+}
+
+.innerShadowDescriptionTerms {
+  font-weight: 700;
+  color: transparent;
+  text-shadow: 4px 4px 7px rgb(255, 255, 255, 0.4), 0 0 var(--secondary-darker);
+}
+
+.header {
+  background-color: #fffcf3; 
+  position: relative; 
+  z-index: 1;
+}
+
+.link-hover {
+  color: inherit; 
+  transition: color 0.3s ease; 
+}
+
+.link-hover:hover {
+  color: var(--secondary-default); 
+}
+
+.header-image {
+  margin-top: 5%; 
+  margin-left: 20%; 
+}
+
+.banderines-visible {
+  display: none;
+}
+
+@media (min-width: 1383px) {
+  .banderines-visible {
+    display: block;
+  }
+}
+

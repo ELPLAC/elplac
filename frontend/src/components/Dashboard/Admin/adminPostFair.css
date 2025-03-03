@@ -1,0 +1,110 @@
+.input-sku {
+    min-width: 70%; 
+    max-width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    resize: none; 
+    overflow: hidden; 
+    transition: height 0.3s ease; 
+    height: auto; 
+  }
+  
+  .input-sku:focus {
+    border-color: #5e5f60;
+    outline: none;
+  }
+  
+  
+  .dropdown-status {
+    min-width: 100px;
+    width: auto; 
+    padding: 0.5rem;
+  }
+  
+  .warning-container {
+    margin-top: 20px;
+    border: 1px solid red;
+    padding: 10px;
+    border-radius: 5px;
+    width: 30%;
+  }
+  
+  .warning-title {
+    color: red;
+  }
+  
+  .warning-list li {
+    color: red;
+  }
+
+  .warning-container-dup {
+    margin-top: 20px;
+    border: 1px solid #ffcc00; 
+    padding: 10px;
+    border-radius: 5px;
+    width: 30%;
+  }
+
+  .warning-title-dup {
+    color: #ff6600;
+  }
+
+  .warning-list-dup {
+    list-style-type: none;
+    padding-left: 0;
+  }
+  
+  .warning-list-dup li {
+    color: #ff6600; 
+  }
+
+  
+  .warning-duplicate li {
+    color: #ff6600; 
+  }
+
+  .warning-p-dup {
+    color: #ff6600;
+    font-size: 12px;
+  }
+
+
+  @media (max-width: 900px) {
+    .sidebaradm {
+      width: 100%;
+      height: auto;
+      justify-content: space-around;
+    }
+
+    .sidebaritems {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      margin-bottom: 40px;
+    }
+
+    .sidebaritemsdiv {
+      width: 150px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .dropdown {
+      display: flex;
+      flex-direction: column;
+      margin: auto;  
+    }
+    .drop {
+      width: 150px;
+    }
+    
+    .table {
+      width: 50%;
+      height: 600px;
+    }
+  }
+  
