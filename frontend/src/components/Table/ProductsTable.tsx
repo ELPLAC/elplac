@@ -169,12 +169,13 @@ const ProductsTable: React.FC<IProductRequestTableProps> = ({
     }
   
     try {
-      const response = await fetch(`${URL}/sellers/informSeller/${id}`, {
-        method: "GET",
+      const response = await fetch(`${URL}/sellers/informSellers`, {
+        method: "POST", 
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
+        body: JSON.stringify({ sellerIds: [id] }), 
       });
   
       if (!response.ok) {
@@ -196,6 +197,7 @@ const ProductsTable: React.FC<IProductRequestTableProps> = ({
       notify("ToastError", `Hubo un error`);
     }
   };
+  
   
 
   const checkRequest = async () => {
