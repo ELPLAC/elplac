@@ -28,7 +28,7 @@ const Ticket: React.FC<TicketProps> = ({
   const { token } = useAuth();
   const { userDtos } = useProfile();
   const [openModal, setOpenModal] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false); 
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fairSelectedPerUser = fairs.find((f) => f.name === name);
   const categorySelected = fairSelectedPerUser?.fairCategories.find(
@@ -37,6 +37,10 @@ const Ticket: React.FC<TicketProps> = ({
   const formattedDate = dateSelect
     ? formatDateToYYYYMMDD(new Date(dateSelect))
     : null;
+  console.log("fairSelectedPerUser:", fairSelectedPerUser);
+  console.log("salesChecked:", salesChecked);
+  console.log("categorySelected:", categorySelected);
+  console.log("termsChecked:", termsChecked);
 
   useEffect(() => {
     if (fairSelectedPerUser) {
@@ -63,12 +67,10 @@ const Ticket: React.FC<TicketProps> = ({
     }
   }, [fairSelectedPerUser, userDtos?.role]);
 
-
   const handleBuy = async () => {
     try {
       if (isSubmitting) return;
       setIsSubmitting(true);
-
 
       if (!fairSelectedPerUser || !token || !userDtos) {
         alert("Datos incompletos. Por favor revisa la información.");
@@ -118,7 +120,7 @@ const Ticket: React.FC<TicketProps> = ({
     } catch (error) {
       alert("Ocurrió un error. Por favor intenta de nuevo.");
     } finally {
-      setIsSubmitting(false); 
+      setIsSubmitting(false);
     }
   };
 
