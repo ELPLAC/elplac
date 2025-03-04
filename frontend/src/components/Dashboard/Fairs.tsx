@@ -82,16 +82,23 @@ const Fairs = () => {
                       options={categoriesArray?.map((c: FairCategories) => ({
                         id: c.id,
                         name: c.category?.name || "Categoría no disponible",
-                        displayName: `${c.category?.name} (${
-                          c.maxSellers > 0
-                            ? c.maxSellers + " cupos"
-                            : "Sin cupos"
-                        })`,
-                        disabled: c.maxSellers === 0,
                       }))}
                       onSelect={handleSelectCategory}
                       className="lg:w-full"
                     />
+
+                    <div className="mt-2">
+                      {categoriesArray?.map((c: FairCategories) => (
+                        <div key={c.id} className="text-sm text-gray-600">
+                          <p>
+                            {c.category?.name}:{" "}
+                            {c.maxSellers > 0
+                              ? `${c.maxSellers} cupos`
+                              : "Sin cupos"}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
 
                     <div className="text-center w-full mt-5">
                       <p className="text-primary-darker font-semibold text-lg">
