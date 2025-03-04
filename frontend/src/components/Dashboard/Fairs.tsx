@@ -81,13 +81,12 @@ const Fairs = () => {
                       value={selectedOptionCategory || "Elegí una opción"}
                       options={categoriesArray?.map((c: FairCategories) => ({
                         id: c.id,
-                        name: c.category
-                          ? `${c.category.name} (${
-                              c.maxSellers > 0
-                                ? c.maxSellers + " cupos"
-                                : "Sin cupos"
-                            })`
-                          : "Categoría no disponible",
+                        name: c.category?.name || "Categoría no disponible",
+                        displayName: `${c.category?.name} (${
+                          c.maxSellers > 0
+                            ? c.maxSellers + " cupos"
+                            : "Sin cupos"
+                        })`,
                         disabled: c.maxSellers === 0,
                       }))}
                       onSelect={handleSelectCategory}
