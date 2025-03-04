@@ -34,6 +34,7 @@ const useFairSelection = () => {
 
   const handleSelectCategory = (option: { id: string; name: string }) => {
     setSelectedOptionCategory(option.name);
+    console.log(option.name);
   };
 
   return {
