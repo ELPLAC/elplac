@@ -169,27 +169,32 @@ export class AuthService {
   
 
   async loginUser({ email, password }: LoginUserDto) {
-
     const user = await this.userService.findByEmail(email);
+  
     if (!user) {
-      throw new UnauthorizedException('Credenciales Invalidas');
+      throw new UnauthorizedException('Usuario inexistente');
     }
-
+  
+    if (user.status === false) {  
+      throw new UnauthorizedException('Debes confirmar tu cuenta');
+    }
+  
     const passwordValid = await bcrypt.compare(password, user.password);
-
+  
     if (!passwordValid) {
       throw new UnauthorizedException('Credenciales Invalidas');
     }
-
+  
     const payload = { id: user.id, email: user.email, role: user.role };
     const token = this.jwtService.sign(payload);
-
+  
     return {
       message: 'usuario logueado exitosamente',
       token,
       role: user.role,
     };
   }
+  
   
   async googleLogin(payload: any, role: string) {
     return runWithTryCatchBadRequestE(async () => {

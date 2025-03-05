@@ -147,7 +147,8 @@ export const notify = (
     | "ToastSuccess"
     | "ToastWithHeader"
     | "ToastChoose"
-    | "ToastDelete",
+    | "ToastDelete"
+    |  "ToastWarning",
   message: string,
   onAccept?: () => void,
   onCancel?: () => void,
