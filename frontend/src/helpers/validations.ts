@@ -13,7 +13,6 @@ export async function registerSellerValidations(
   const errors: IRegisterFormErrors = {};
   const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   const regexName = /^[a-zA-ZÀ-ÿ\s]+$/;
-  const regexPassword = /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&_\-])/;
   try {
 
     if (!values.name) {
@@ -77,10 +76,7 @@ export async function registerSellerValidations(
       errors.password = "La contraseña debe ser un texto";
     } else if (values.password.length < 8 || values.password.length > 15) {
       errors.password = "La contraseña debe tener entre 8 y 15 caracteres";
-    } else if (!regexPassword.test(values.password)) {
-      errors.password =
-        "La contraseña debe contener al menos una mayúscula, una minúscula, un número y un carácter especial";
-    }
+    } 
 
     if (!values.confirmPassword) {
       errors.confirmPassword = "Ingresa la contraseña otra vez";
@@ -99,7 +95,6 @@ export async function registerUserValidations(
   const errors: IRegisterFormErrors = {};
   const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   const regexName = /^[a-zA-ZÀ-ÿ\s]+$/;
-  const regexPassword = /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&_\-])/;
   try {
 
     if (!values.name) {
@@ -145,9 +140,6 @@ export async function registerUserValidations(
       errors.password = "La contraseña debe ser un texto";
     } else if (values.password.length < 8 || values.password.length > 15) {
       errors.password = "La contraseña debe tener entre 8 y 15 caracteres";
-    } else if (!regexPassword.test(values.password)) {
-      errors.password =
-        "La contraseña debe contener al menos una mayúscula, una minúscula, un número y un carácter especial";
     }
 
     if (!values.confirmPassword) {
@@ -171,7 +163,6 @@ export const loginValidations = (values: any) => {
     if (!values.password) {
       errors.password = "Ingresa la contraseña";
     }
-
     return errors;
   } catch (error: any) {
   }
