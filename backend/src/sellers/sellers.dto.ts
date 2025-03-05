@@ -43,14 +43,10 @@ export class RegisterSellerDto {
   phone: string;
 
   @IsNotEmpty()
-  @MinLength(8)
-  @MaxLength(30)
   @IsString()
   password: string;
 
   @IsNotEmpty()
-  @MinLength(8)
-  @MaxLength(30)
   @IsString()
   confirmPassword: string;
 
