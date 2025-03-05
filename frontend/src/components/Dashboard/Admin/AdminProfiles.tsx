@@ -203,7 +203,7 @@ const AdminProfiles = () => {
         <div className="w-full mb-20 mt-5 text-sm text-left rtl:text-right bg-[#f1fafa] rounded-lg p-6 text-primary-darker leading-relaxed color">
           <button
             onClick={() => setSelectedUser(null)}
-             className="px-2 py-0.5 bg-primary-darker text-white rounded hover:bg-primary-dark"
+            className="px-2 py-0.5 bg-primary-darker text-white rounded hover:bg-primary-dark"
           >
             X
           </button>
@@ -231,6 +231,9 @@ const AdminProfiles = () => {
               </p>
               <p>
                 <strong>DNI: </strong> {selectedUser.dni}
+              </p>
+              <p>
+                <strong>Instagram: </strong> {selectedUser.seller?.social_media}
               </p>
               <p>
                 <strong>Fecha de alta en la página:</strong>{" "}
