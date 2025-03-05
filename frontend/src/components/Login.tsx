@@ -45,7 +45,6 @@ export const Login = () => {
         router.push("/dashboard");
       }
     } catch (error: any) {
-      console.log("Error completo:", error); // Agregar log para depuración
     
       const errorMessage = error.message || "Datos Incorrectos";
     

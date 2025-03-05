@@ -72,6 +72,22 @@ const ToastError: React.FC<ToastWithButtonsProps> = ({ message }) => (
   </div>
 );
 
+const ToastWarning: React.FC<ToastWithButtonsProps> = ({ message }) => (
+  <div className="flex flex-col gap-10 p-0 m-0 relative">
+    <div className="absolute translate-x-[2px] -translate-y-5 h-[40px] w-[40px] p-0 m-0">
+      <Image
+        src={shoes}
+        alt="loginbanner"
+        layout="fill"
+        objectFit="cover"
+        objectPosition="0px 0px"
+      />
+    </div>
+    <div className="absolute translate-x-[30px] -translate-y-2 text-center text-primary-darker font-bold flex flex-col items-center justify-center h-3 w-full p-0 m-0">
+      {message}
+    </div>
+  </div>
+)
 const ToastRedirect: React.FC<ToastWithButtonsProps> = ({
   message,
   onAccept,
@@ -156,6 +172,27 @@ export const notify = (
   id?: number
 ) => {
   switch (type) {
+    case "ToastWarning":
+      toast(
+        <ToastWarning
+          message={message}
+          onAccept={() => toast.dismiss()}
+          onCancel={() => toast.dismiss()}
+        />,
+        {
+          position: "top-right",
+          className: "custom-toast-warning",
+          style: {
+            color: "#FFFFFF",
+            fontSize: "15px",
+            width: "300px",
+            border: "1px solid #343434",
+          },
+          autoClose: 8000,
+        }
+      );
+      break;
+
     case "ToastError":
       toast(
         <ToastError
