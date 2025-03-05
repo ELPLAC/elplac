@@ -201,16 +201,14 @@ const AdminProfiles = () => {
       </div>
       {selectedUser && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-h-[90vh] overflow-y-auto w-[90%] md:w-[70%] lg:w-[50%]">
-            <button
-              onClick={() => setSelectedUser(null)}
-              className="absolute top-2 right-2 px-3 py-1 bg-primary-darker text-white rounded hover:bg-primary-dark"
-            >
-              X
-            </button>
-            <h2 className="text-xl font-bold mb-2 mt-5">
-              Información del Usuario:
-            </h2>
+        <div className="bg-white p-6 rounded-lg shadow-lg max-h-[90vh] overflow-y-auto w-[90%] md:w-[70%] lg:w-[50%] relative">
+          <button
+            onClick={() => setSelectedUser(null)}
+            className="absolute top-2 right-2 px-2 py-0.5 bg-primary-darker text-white rounded hover:bg-primary-dark"
+          >
+            X
+          </button>
+          <h2 className="text-xl font-bold mb-2 mt-5">Información del Usuario:</h2>
             {selectedUser.role === "seller" && (
               <div>
                 <p>
