@@ -200,236 +200,245 @@ const AdminProfiles = () => {
         />
       </div>
       {selectedUser && (
-        <div className="w-full mb-20 mt-5 text-sm text-left rtl:text-right bg-[#f1fafa] rounded-lg p-6 text-primary-darker leading-relaxed color">
-          <button
-            onClick={() => setSelectedUser(null)}
-            className="px-2 py-0.5 bg-primary-darker text-white rounded hover:bg-primary-dark"
-          >
-            X
-          </button>
-          <h2 className="text-xl font-bold mb-2 mt-5">
-            Información del Usuario:
-          </h2>
-          {selectedUser.role === "seller" && (
-            <div>
-              <p>
-                <strong>Nombre: </strong> {selectedUser.name}{" "}
-                {selectedUser.lastname}
-              </p>
-              <p>
-                <strong>Email: </strong> {selectedUser.email}
-              </p>
-              <p>
-                <strong>Estado: </strong>{" "}
-                {selectedUser.statusGeneral === "active"
-                  ? "Inscripto a feria"
-                  : selectedUser.statusGeneral === "inactive"
-                  ? "No inscripto a feria"
-                  : selectedUser.statusGeneral === "blocked"
-                  ? "Usuario bloqueado"
-                  : "Estado desconocido"}
-              </p>
-              <p>
-                <strong>DNI: </strong> {selectedUser.dni}
-              </p>
-              <p>
-                <strong>Instagram: </strong> {selectedUser.seller?.social_media}
-              </p>
-              <p>
-                <strong>Fecha de alta en la página:</strong>{" "}
-                {new Date(selectedUser.registration_date).toLocaleDateString(
-                  "es-ES"
-                )}
-              </p>
-              <p>
-                <strong>Rol: </strong> Vendedor
-              </p>
-              <p>
-                <strong>SKU: </strong> {selectedUser.seller?.sku}
-              </p>
-              <h3 className="font-bold mt-2">
-                Información del registro en feria:
-              </h3>
-
-              {selectedUser.seller?.registrations &&
-              selectedUser.seller.registrations.length > 0 ? (
-                selectedUser.seller.registrations.map(
-                  (registration: any, index: number) => (
-                    <details
-                      key={`${registration.id}-${index}`}
-                      className="bg-white rounded shadow p-4 mb-4 border border-gray-200"
-                    >
-                      <summary className="font-medium text-primary-dark cursor-pointer">
-                        Feria: {registration?.fair?.name} - (
-                        {registration.fair?.isActive ? "Activa" : "Cerrada"})
-                      </summary>
-                      <div className="mt-2 pl-4">
-                        <p>
-                          <strong>Categoría: </strong>{" "}
-                          {registration.categoryFair?.category?.name}
-                        </p>
-                        <p>
-                          <strong>Valor de la entrada: </strong>$
-                          {registration.entryFee}
-                        </p>
-                        <p>
-                          <strong>Fecha en la que realizó el registro: </strong>{" "}
-                          {new Date(
-                            registration.registrationDate
-                          ).toLocaleDateString("es-ES")}
-                        </p>
-                        <h3 className="font-bold mt-2">Productos:</h3>
-                        <ul className="space-y-2">
-                          {selectedUser.seller?.products
-                            ?.filter(
-                              (product: any) =>
-                                product.fairCategory?.fair?.id ===
-                                registration.fair?.id
-                            )
-                            ?.map((product: any) => (
-                              <li
-                                key={product.id}
-                                className="flex flex-wrap gap-4 border-b pb-2"
-                              >
-                                <p className="flex items-center">
-                                  <strong className="mr-1">Marca:</strong>{" "}
-                                  {product.brand}
-                                </p>
-                                <p className="flex items-center">
-                                  <strong className="mr-1">Descripción:</strong>{" "}
-                                  {product.description}
-                                </p>
-                                <p className="flex items-center">
-                                  <strong className="mr-1">Precio:</strong> $
-                                  {product.price}
-                                </p>
-                                <p className="flex items-center">
-                                  <strong className="mr-1">Estado:</strong>{" "}
-                                  {product.status === "unsold"
-                                    ? "No vendido"
-                                    : product.status === "sold"
-                                    ? "Vendido"
-                                    : product.status === "soldOnClearance"
-                                    ? "Vendido en liquidación"
-                                    : product.status === "notAvailable"
-                                    ? "No entregado"
-                                    : product.status === "notAccepted"
-                                    ? "No aceptado"
-                                    : product.status === "categoryNotApply"
-                                    ? "No corresponde"
-                                    : product.status === "secondMark"
-                                    ? "Segunda marca"
-                                    : product.status === "accepted"
-                                    ? "Aceptado"
-                                    : "Estado desconocido"}
-                                </p>
-                                <p className="flex items-center">
-                                  <strong className="mr-1">SKU:</strong>{" "}
-                                  {product.code}
-                                </p>
-                              </li>
-                            ))}
-                        </ul>
-                      </div>
-                    </details>
-                  )
-                )
-              ) : (
-                <p className="text-center text-gray-500 mt-4">
-                  No hay registros aún.
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="w-11/12 md:w-3/4 lg:w-1/2 bg-[#f1fafa] rounded-lg p-6 text-primary-darker leading-relaxed relative">
+            <button
+              onClick={() => setSelectedUser(null)}
+              className="absolute top-2 right-2 px-3 py-1 bg-primary-darker text-white rounded hover:bg-primary-dark"
+            >
+              X
+            </button>
+            <h2 className="text-xl font-bold mb-2 mt-5">
+              Información del Usuario:
+            </h2>
+            {selectedUser.role === "seller" && (
+              <div>
+                <p>
+                  <strong>Nombre: </strong> {selectedUser.name}{" "}
+                  {selectedUser.lastname}
                 </p>
-              )}
-            </div>
-          )}
-
-          {selectedUser.role === "user" && (
-            <div>
-              <p>
-                <strong>Nombre: </strong> {selectedUser.name}{" "}
-                {selectedUser.lastname}
-              </p>
-              <p>
-                <strong>Email: </strong> {selectedUser.email}
-              </p>
-              <p>
-                <strong>Estado: </strong>{" "}
-                {selectedUser.statusGeneral === "active"
-                  ? "Inscripto a feria"
-                  : selectedUser.statusGeneral === "inactive"
-                  ? "No inscripto a feria"
-                  : selectedUser.statusGeneral === "blocked"
-                  ? "Usuario bloqueado"
-                  : "Estado desconocido"}
-              </p>
-              <p>
-                <strong>DNI: </strong> {selectedUser.dni}
-              </p>
-              <p>
-                <strong>Fecha de alta en la página:</strong>{" "}
-                {new Date(selectedUser.registration_date).toLocaleDateString(
-                  "es-ES"
-                )}
-              </p>
-              <p>
-                <strong>Rol: </strong> Comprador
-              </p>
-              <h3 className="font-bold mt-2">
-                Información del registro en feria:
-              </h3>
-
-              {selectedUser.registrations &&
-              selectedUser.registrations.length > 0 ? (
-                selectedUser.registrations.map(
-                  (registration: any, index: number) => (
-                    <details
-                      key={`${registration.id}-${index}`}
-                      className="bg-white rounded shadow p-4 mb-4 border border-gray-200"
-                    >
-                      <summary className="font-medium text-primary-dark cursor-pointer">
-                        Feria: {registration?.fair?.name} - (
-                        {registration.fair?.isActive ? "Activa" : "Cerrada"})
-                      </summary>
-                      <div className="mt-2 pl-4">
-                        <p>
-                          <strong>Valor de la entrada: </strong>{" "}
-                          {registration.entryFee === 0
-                            ? "Entrada gratuita"
-                            : `$${registration.entryFee}`}
-                        </p>
-                        <p>
-                          <strong>Fecha en la que realizó el registro: </strong>{" "}
-                          {new Date(
-                            registration.registrationDate
-                          ).toLocaleDateString("es-ES")}
-                        </p>
-                        <p>
-                          <strong>Fecha registrada para la feria: </strong>{" "}
-                          {new Date(
-                            registration.registrationDay
-                          ).toLocaleDateString("es-ES")}
-                        </p>
-                        <p>
-                          <strong>Hora registrada: </strong>{" "}
-                          {registration.registrationHour}
-                        </p>
-                      </div>
-                    </details>
-                  )
-                )
-              ) : (
-                <p className="text-center text-gray-500 mt-4">
-                  No hay registros aún.
+                <p>
+                  <strong>Email: </strong> {selectedUser.email}
                 </p>
-              )}
-            </div>
-          )}
-          {selectedUser.role === "admin" && (
-            <div>
-              <p>
-                <strong>Rol: </strong> Administrador
-              </p>
-            </div>
-          )}
+                <p>
+                  <strong>Estado: </strong>{" "}
+                  {selectedUser.statusGeneral === "active"
+                    ? "Inscripto a feria"
+                    : selectedUser.statusGeneral === "inactive"
+                    ? "No inscripto a feria"
+                    : selectedUser.statusGeneral === "blocked"
+                    ? "Usuario bloqueado"
+                    : "Estado desconocido"}
+                </p>
+                <p>
+                  <strong>DNI: </strong> {selectedUser.dni}
+                </p>
+                <p>
+                  <strong>Instagram: </strong>{" "}
+                  {selectedUser.seller?.social_media}
+                </p>
+                <p>
+                  <strong>Fecha de alta en la página:</strong>{" "}
+                  {new Date(selectedUser.registration_date).toLocaleDateString(
+                    "es-ES"
+                  )}
+                </p>
+                <p>
+                  <strong>Rol: </strong> Vendedor
+                </p>
+                <p>
+                  <strong>SKU: </strong> {selectedUser.seller?.sku}
+                </p>
+                <h3 className="font-bold mt-2">
+                  Información del registro en feria:
+                </h3>
+
+                {selectedUser.seller?.registrations &&
+                selectedUser.seller.registrations.length > 0 ? (
+                  selectedUser.seller.registrations.map(
+                    (registration: any, index: number) => (
+                      <details
+                        key={`${registration.id}-${index}`}
+                        className="bg-white rounded shadow p-4 mb-4 border border-gray-200"
+                      >
+                        <summary className="font-medium text-primary-dark cursor-pointer">
+                          Feria: {registration?.fair?.name} - (
+                          {registration.fair?.isActive ? "Activa" : "Cerrada"})
+                        </summary>
+                        <div className="mt-2 pl-4">
+                          <p>
+                            <strong>Categoría: </strong>{" "}
+                            {registration.categoryFair?.category?.name}
+                          </p>
+                          <p>
+                            <strong>Valor de la entrada: </strong>$
+                            {registration.entryFee}
+                          </p>
+                          <p>
+                            <strong>
+                              Fecha en la que realizó el registro:{" "}
+                            </strong>{" "}
+                            {new Date(
+                              registration.registrationDate
+                            ).toLocaleDateString("es-ES")}
+                          </p>
+                          <h3 className="font-bold mt-2">Productos:</h3>
+                          <ul className="space-y-2">
+                            {selectedUser.seller?.products
+                              ?.filter(
+                                (product: any) =>
+                                  product.fairCategory?.fair?.id ===
+                                  registration.fair?.id
+                              )
+                              ?.map((product: any) => (
+                                <li
+                                  key={product.id}
+                                  className="flex flex-wrap gap-4 border-b pb-2"
+                                >
+                                  <p className="flex items-center">
+                                    <strong className="mr-1">Marca:</strong>{" "}
+                                    {product.brand}
+                                  </p>
+                                  <p className="flex items-center">
+                                    <strong className="mr-1">
+                                      Descripción:
+                                    </strong>{" "}
+                                    {product.description}
+                                  </p>
+                                  <p className="flex items-center">
+                                    <strong className="mr-1">Precio:</strong> $
+                                    {product.price}
+                                  </p>
+                                  <p className="flex items-center">
+                                    <strong className="mr-1">Estado:</strong>{" "}
+                                    {product.status === "unsold"
+                                      ? "No vendido"
+                                      : product.status === "sold"
+                                      ? "Vendido"
+                                      : product.status === "soldOnClearance"
+                                      ? "Vendido en liquidación"
+                                      : product.status === "notAvailable"
+                                      ? "No entregado"
+                                      : product.status === "notAccepted"
+                                      ? "No aceptado"
+                                      : product.status === "categoryNotApply"
+                                      ? "No corresponde"
+                                      : product.status === "secondMark"
+                                      ? "Segunda marca"
+                                      : product.status === "accepted"
+                                      ? "Aceptado"
+                                      : "Estado desconocido"}
+                                  </p>
+                                  <p className="flex items-center">
+                                    <strong className="mr-1">SKU:</strong>{" "}
+                                    {product.code}
+                                  </p>
+                                </li>
+                              ))}
+                          </ul>
+                        </div>
+                      </details>
+                    )
+                  )
+                ) : (
+                  <p className="text-center text-gray-500 mt-4">
+                    No hay registros aún.
+                  </p>
+                )}
+              </div>
+            )}
+
+            {selectedUser.role === "user" && (
+              <div>
+                <p>
+                  <strong>Nombre: </strong> {selectedUser.name}{" "}
+                  {selectedUser.lastname}
+                </p>
+                <p>
+                  <strong>Email: </strong> {selectedUser.email}
+                </p>
+                <p>
+                  <strong>Estado: </strong>{" "}
+                  {selectedUser.statusGeneral === "active"
+                    ? "Inscripto a feria"
+                    : selectedUser.statusGeneral === "inactive"
+                    ? "No inscripto a feria"
+                    : selectedUser.statusGeneral === "blocked"
+                    ? "Usuario bloqueado"
+                    : "Estado desconocido"}
+                </p>
+                <p>
+                  <strong>DNI: </strong> {selectedUser.dni}
+                </p>
+                <p>
+                  <strong>Fecha de alta en la página:</strong>{" "}
+                  {new Date(selectedUser.registration_date).toLocaleDateString(
+                    "es-ES"
+                  )}
+                </p>
+                <p>
+                  <strong>Rol: </strong> Comprador
+                </p>
+                <h3 className="font-bold mt-2">
+                  Información del registro en feria:
+                </h3>
+
+                {selectedUser.registrations &&
+                selectedUser.registrations.length > 0 ? (
+                  selectedUser.registrations.map(
+                    (registration: any, index: number) => (
+                      <details
+                        key={`${registration.id}-${index}`}
+                        className="bg-white rounded shadow p-4 mb-4 border border-gray-200"
+                      >
+                        <summary className="font-medium text-primary-dark cursor-pointer">
+                          Feria: {registration?.fair?.name} - (
+                          {registration.fair?.isActive ? "Activa" : "Cerrada"})
+                        </summary>
+                        <div className="mt-2 pl-4">
+                          <p>
+                            <strong>Valor de la entrada: </strong>{" "}
+                            {registration.entryFee === 0
+                              ? "Entrada gratuita"
+                              : `$${registration.entryFee}`}
+                          </p>
+                          <p>
+                            <strong>
+                              Fecha en la que realizó el registro:{" "}
+                            </strong>{" "}
+                            {new Date(
+                              registration.registrationDate
+                            ).toLocaleDateString("es-ES")}
+                          </p>
+                          <p>
+                            <strong>Fecha registrada para la feria: </strong>{" "}
+                            {new Date(
+                              registration.registrationDay
+                            ).toLocaleDateString("es-ES")}
+                          </p>
+                          <p>
+                            <strong>Hora registrada: </strong>{" "}
+                            {registration.registrationHour}
+                          </p>
+                        </div>
+                      </details>
+                    )
+                  )
+                ) : (
+                  <p className="text-center text-gray-500 mt-4">
+                    No hay registros aún.
+                  </p>
+                )}
+              </div>
+            )}
+            {selectedUser.role === "admin" && (
+              <div>
+                <p>
+                  <strong>Rol: </strong> Administrador
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>
