@@ -201,7 +201,7 @@ const AdminProfiles = () => {
       </div>
       {selectedUser && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="w-11/12 md:w-3/4 lg:w-1/2 bg-[#f1fafa] rounded-lg p-6 text-primary-darker leading-relaxed relative">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-h-[90vh] overflow-y-auto w-[90%] md:w-[70%] lg:w-[50%]">
             <button
               onClick={() => setSelectedUser(null)}
               className="absolute top-2 right-2 px-3 py-1 bg-primary-darker text-white rounded hover:bg-primary-dark"
