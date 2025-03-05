@@ -45,9 +45,10 @@ export const Login = () => {
         router.push("/dashboard");
       }
     } catch (error: any) {
-      console.log("Error del backend:", error.response);
-      const errorMessage = error.response?.data?.message || "Datos Incorrectos";
-  
+      console.log("Error completo:", error); // Agregar log para depuración
+    
+      const errorMessage = error.message || "Datos Incorrectos";
+    
       if (errorMessage === "Usuario inexistente") {
         notify("ToastError", "El usuario no existe");
       } else if (errorMessage === "Debes confirmar tu cuenta") {
@@ -55,7 +56,8 @@ export const Login = () => {
       } else {
         notify("ToastError", "Datos Incorrectos");
       }
-    } finally {
+    }
+    finally {
       setIsLoading(false);
     }
   };
