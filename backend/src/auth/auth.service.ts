@@ -1,4 +1,6 @@
 import {
+  HttpException,
+  HttpStatus,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -172,29 +174,28 @@ export class AuthService {
     const user = await this.userService.findByEmail(email);
   
     if (!user) {
-      throw new UnauthorizedException('Usuario inexistente');
+      throw new HttpException({ message: "Usuario inexistente" }, HttpStatus.UNAUTHORIZED);
     }
   
-    if (user.status === false) {  
-      throw new UnauthorizedException('Debes confirmar tu cuenta');
+    if (user.status === false) {
+      throw new HttpException({ message: "Debes confirmar tu cuenta" }, HttpStatus.UNAUTHORIZED);
     }
   
     const passwordValid = await bcrypt.compare(password, user.password);
   
     if (!passwordValid) {
-      throw new UnauthorizedException('Credenciales Invalidas');
+      throw new HttpException({ message: "Credenciales Invalidas" }, HttpStatus.UNAUTHORIZED);
     }
   
     const payload = { id: user.id, email: user.email, role: user.role };
     const token = this.jwtService.sign(payload);
   
     return {
-      message: 'usuario logueado exitosamente',
+      message: "usuario logueado exitosamente",
       token,
       role: user.role,
     };
   }
-  
   
   async googleLogin(payload: any, role: string) {
     return runWithTryCatchBadRequestE(async () => {

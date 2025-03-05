@@ -45,6 +45,7 @@ export const Login = () => {
         router.push("/dashboard");
       }
     } catch (error: any) {
+      console.log("Error del backend:", error.response);
       const errorMessage = error.response?.data?.message || "Datos Incorrectos";
   
       if (errorMessage === "Usuario inexistente") {
