@@ -45,7 +45,7 @@ export class RegisterSellerDto {
   @IsNotEmpty()
   @MinLength(8)
   @MaxLength(30)
-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&_\-]).{8,15}$/, {
+  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,15}$/, {
     message: 'El password es muy debil',
   })
   @IsString()
