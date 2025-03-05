@@ -28,6 +28,10 @@ const Fairs = () => {
 
   const activeArray = [activeFair];
 
+  const isCuposDisponibles = categoriesArray?.some(
+    (c: FairCategories) => c.maxSellers > 0
+  );
+
   const handleCheckboxChangeTerms = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -79,10 +83,12 @@ const Fairs = () => {
                     </h2>
                     <Dropdown
                       value={selectedOptionCategory || "Elegí una opción"}
-                      options={categoriesArray?.map((c: FairCategories) => ({
-                        id: c.id,
-                        name: c.category?.name || "Categoría no disponible",
-                      }))}
+                      options={categoriesArray
+                        ?.filter((c: FairCategories) => c.maxSellers > 0)
+                        .map((c: FairCategories) => ({
+                          id: c.id,
+                          name: c.category?.name || "Categoría no disponible",
+                        }))}
                       onSelect={handleSelectCategory}
                       className="lg:w-full"
                     />
