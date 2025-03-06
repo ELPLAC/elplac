@@ -15,14 +15,10 @@ import { Type } from 'class-transformer';
 
 export class RegisterUserDto {
   @IsNotEmpty()
-  @MinLength(3)
-  @MaxLength(25)
   @IsString()
   name: string;
 
   @IsNotEmpty()
-  @MinLength(3)
-  @MaxLength(25)
   @IsString()
   lastname: string;
 
@@ -66,49 +62,24 @@ export class LoginUserDto {
 
 export class ResetPasswordDto {
   @IsNotEmpty()
-  @MinLength(8)
-  @MaxLength(15)
-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&_\-]).{8,15}$/, {
-    message: 'La contraseña es muy debil',
-  })
   @IsString()
   password: string;
 
   @IsNotEmpty()
-  @MinLength(8)
-  @MaxLength(15)
-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&_\-]).{8,15}$/, {
-    message: 'La contraseña es muy debil',
-  })
   @IsString()
   confirmPassword: string;
 }
 
 export class UpdatePasswordDto {
   @IsNotEmpty()
-  @MinLength(8)
-  @MaxLength(15)
-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&_\-]).{8,15}$/, {
-    message: 'La contraseña es muy debil',
-  })
   @IsString()
   current_password: string;
 
   @IsNotEmpty()
-  @MinLength(8)
-  @MaxLength(15)
-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&_\-]).{8,15}$/, {
-    message: 'La contraseña es muy debil',
-  })
   @IsString()
   newPassword: string;
 
   @IsNotEmpty()
-  @MinLength(8)
-  @MaxLength(15)
-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&_\-]).{8,15}$/, {
-    message: 'La contraseña es muy debil',
-  })
   @IsString()
   confirmNewPassword: string;
 }

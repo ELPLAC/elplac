@@ -12,14 +12,10 @@ import { IsDniValidConstraint } from '@auth/auth.validator';
 
 export class RegisterSellerDto {
   @IsNotEmpty()
-  @MinLength(3)
-  @MaxLength(25)
   @IsString()
   name: string;
 
   @IsNotEmpty()
-  @MinLength(3)
-  @MaxLength(25)
   @IsString()
   lastname: string;
 
@@ -33,8 +29,6 @@ export class RegisterSellerDto {
   email: string;
 
   @IsString()
-  @MinLength(3)
-  @MaxLength(25)
   @IsOptional()
   address?: string;
 

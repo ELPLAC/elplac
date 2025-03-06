@@ -43,12 +43,11 @@ const RegisterSeller: React.FC = () => {
       dni: "",
       email: "",
       phone: "",
-      address: "", 
+      address: "",
       password: "",
       confirmPassword: "",
-      social_media: "", 
+      social_media: "",
       id: "",
-
     },
     onSubmit: signUpSeller,
     validate: registerSellerValidations,
@@ -122,7 +121,7 @@ const RegisterSeller: React.FC = () => {
               label="Dirección"
               type="text"
               placeholder="Av. Siempreviva 123"
-              {...getProps("address")} 
+              {...getProps("address")}
             />
           </div>
         </div>
@@ -132,7 +131,7 @@ const RegisterSeller: React.FC = () => {
               label="Instagram"
               type="text"
               placeholder="juan.gomez"
-              {...getProps("social_media")} 
+              {...getProps("social_media")}
             />
           </div>
         </div>
@@ -155,17 +154,15 @@ const RegisterSeller: React.FC = () => {
           </Label>
         </div>
         <div className="flex justify-center">
-        <button
-          type="submit"
-          className={`bg-primary-dark w-32 h-9 my-3 rounded-3xl text-center text-white text-base font-bold  ${
-            isLoading || !isChecked 
-              ? "opacity-50 cursor-not-allowed"
-              : ""
-          }`}
-          disabled={isLoading || !isChecked }
-        >
-          {isLoading ? "Registrando..." : "Registrarse"}
-        </button>
+          <button
+            type="submit"
+            className={`bg-primary-dark w-32 h-9 my-3 rounded-3xl text-center text-white text-base font-bold  ${
+              isLoading || !isChecked ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            disabled={isLoading || !isChecked}
+          >
+            {isLoading ? "Registrando..." : "Registrarse"}
+          </button>
         </div>
       </form>
     </div>
@@ -173,3 +170,5 @@ const RegisterSeller: React.FC = () => {
 };
 
 export default RegisterSeller;
+
+
