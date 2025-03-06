@@ -3,9 +3,6 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  Matches,
-  MaxLength,
-  MinLength,
   Validate,
 } from 'class-validator';
 import { IsDniValidConstraint } from '@auth/auth.validator';

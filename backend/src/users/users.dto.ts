@@ -4,9 +4,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  Matches,
   MaxLength,
-  MinLength,
   Validate,
 } from 'class-validator';
 import { Role } from '@users/roles/roles.enum';
