@@ -28,5 +28,7 @@ export class AppService implements OnModuleInit {
     };
 
     await this.userService.findByEmail(admin.email)
+
+    console.log("administrador creado exitosamente: ", admin);
   }  
 }
