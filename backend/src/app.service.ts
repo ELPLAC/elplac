@@ -27,7 +27,11 @@ export class AppService implements OnModuleInit {
       profile_picture: process.env.ADMIN_PROFILE_PICTURE,
     };
 
-    await this.userService.findByEmail(admin.email)
+   const existAdmin = await this.userService.findByEmail(admin.email)
+
+   if (!existAdmin) {
+      await this.userService.registerUser(admin);
+    }
 
     console.log("administrador creado exitosamente: ", admin);
   }  
