@@ -42,7 +42,7 @@ export class User {
   @Column({ default: new Date() })
   registration_date: Date;
 
-  @Column({ default: false })
+  @Column({ default: true })
   status: boolean;
 
   @Column({ default: UserStatusGeneral.INACTIVE })
