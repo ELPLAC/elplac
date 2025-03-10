@@ -14,40 +14,41 @@ const compareDates = (date1: Date, date2: Date) => {
 function TimeRange() {
   const { fairs, dateSelect, setTimeSelect } = useFair();
   const [schedulesTurns, setSchedulesTurns] = useState<BuyerCapacity[]>([]);
+  const [horarioSeleccionado, setHorarioSeleccionado] = useState<string>("");
+
+  console.log("dateSelect", dateSelect);
+  console.log("schedulesTurns", schedulesTurns);
 
   useEffect(() => {
     if (fairs && dateSelect) {
       const selectedFair = fairs.find((f: IFair) =>
-        f.fairDays.some(
-          (day: FairDay) => compareDates(new Date(day.day), dateSelect)
-        )
+        f.fairDays.some((day: FairDay) => compareDates(new Date(day.day), dateSelect))
       );
+
+      console.log("selectedFair", selectedFair);
 
       if (selectedFair) {
         const fairDay = selectedFair.fairDays.find(
           (day: FairDay) => compareDates(new Date(day.day), dateSelect)
         );
 
+        console.log("fairDay", fairDay);
+
         if (fairDay) {
+          const buyerCapacities = fairDay.buyerCapacities;
+          console.log("capacidad de usuarios: ", buyerCapacities);
           setSchedulesTurns(fairDay.buyerCapacities); 
         }
       }
     }
   }, [fairs, dateSelect]);
 
-  useEffect(() => {
-  }, [schedulesTurns]);
-
-  const [horarioSeleccionado, setHorarioSeleccionado] = useState<string>("");
-
-  const options = [...schedulesTurns].reverse().map((hc) => ({
-    id: hc.hour,
-    name: `${
-      hc.capacity === 0
-        ? "Agotado"
-        : `${hc.hour}hs: disponibles (${hc.capacity})`
-    }`,
-  }));
+  const options = schedulesTurns.length
+    ? [...schedulesTurns].reverse().map((hc) => ({
+        id: hc.hour,
+        name: `${hc.capacity === 0 ? "Agotado" : `${hc.hour}hs: disponibles (${hc.capacity})`}`,
+      }))
+    : [{ id: "", name: "No hay horarios disponibles" }];
 
   const handleHorarioSelect = (option: { id: string; name: string }) => {
     const selectedHorario = schedulesTurns.find((hc) => hc.hour === option.id);

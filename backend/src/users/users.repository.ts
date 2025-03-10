@@ -316,10 +316,9 @@ export class UserRepository {
   
   async cancelUserFair(fairId: string, userId: string) {
     try {
-      const existingRegistration =
-        await this.userFairRegistrationRepository.findOne({
-          where: { user: { id: userId }, fair: { id: fairId } },
-        });
+      const existingRegistration = await this.userFairRegistrationRepository.findOne({
+        where: { user: { id: userId }, fair: { id: fairId } },
+      });
   
       if (!existingRegistration) {
         throw new NotFoundException('No se encontró una inscripción para cancelar');
@@ -335,17 +334,28 @@ export class UserRepository {
       const fairDay = fair.fairDays.find((day) =>
         isSameDay(day.day, existingRegistration.registrationDay),
       );
+  
       if (fairDay) {
         const buyerCapacity = fairDay.buyerCapacities.find(
           (buyerCap) => buyerCap.hour === existingRegistration.registrationHour,
         );
+  
         if (buyerCapacity) {
-          buyerCapacity.capacity += 1;
+          buyerCapacity.capacity += 1;  
           await this.buyerCapacityRepository.save(buyerCapacity);
         }
       }
   
       await this.userFairRegistrationRepository.remove(existingRegistration);
+  
+      const user = await this.userRepository.findOne({
+        where: { id: userId },
+      });
+  
+      if (!user) throw new NotFoundException('Usuario no encontrado');
+  
+      user.statusGeneral = UserStatusGeneral.INACTIVE;
+      await this.userRepository.save(user);
   
       return {
         status: 'success',
@@ -354,9 +364,7 @@ export class UserRepository {
     } catch (error) {
       throw error;
     }
-  }  
-
-
+  }
 
   async sendEmailInscriptionFair(email: string, token: string, fair: Fair): Promise<void> {
     const url = `${process.env.FRONTEND_URL}/fair/${token}`;

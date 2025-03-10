@@ -21,9 +21,15 @@ const ProfileFairs: React.FC<ProfileFairsProps> = ({
   const [modalOpen, setModalOpen] = useState(false);
   const { token } = useAuth();
 
+  
   const fairFilter = fairs?.find(
     (f: IFair | undefined) => f?.id === activeFair?.id
   );
+  console.log("feria activa", activeFair);
+
+  console.log("feria disponible", fairFilter);
+  
+  console.log("dias de feria", fairFilter?.fairDays);
 
   const isUserInactive = userDtos?.statusGeneral === "inactive";
 
