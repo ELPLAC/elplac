@@ -239,7 +239,7 @@ export const postForgotPassword = async (email: string) => {
       throw new Error("Este email no está registrado en nuestra base de datos");
     }
 
-    const res = await fetch(`${URL}0/auth/forgot-password`, {
+    const res = await fetch(`${URL}/auth/forgot-password`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
