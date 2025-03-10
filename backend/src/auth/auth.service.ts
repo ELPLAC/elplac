@@ -243,7 +243,7 @@ export class AuthService {
   }
 
   async sendEmailResetPassword(email: string, token: string): Promise<void> {
-    const url = `https://elplac-production-3a9f.up.railway.app/auth/reset-password/${token}`;
+    const url = `https://elplac-ruby.vercel.app/auth/reset-password/${token}`;
     const htmlContent = `
       <table class="esd-stripe" align="center" bgcolor="#cfe2f3" style="background-repeat:repeat">
         <tbody>
