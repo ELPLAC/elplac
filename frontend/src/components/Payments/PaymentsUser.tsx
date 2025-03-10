@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { initMercadoPago, Wallet } from "@mercadopago/sdk-react";
 import { PaymentsUserProps } from "@/types";
-import { URL, MERCADOPAGO_PUBLIC_KEY } from "../../../envs";
+import { URL } from "../../../envs";
 
 export default function PaymentsUser({
   userId,

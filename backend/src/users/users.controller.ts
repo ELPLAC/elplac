@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   InternalServerErrorException,
   Param,
+  Patch,
   Post,
   Put,
   UseGuards,
@@ -33,7 +35,7 @@ export class UsersController {
   }
 
   @Get('uniquedata')
-  async getUserByEmailAndDni(): Promise<{userInfo: User[]}> {
+  async getUserByEmailAndDni(): Promise<{ userInfo: User[] }> {
     return await this.usersService.getUserByEmailAndDni();
   }
 
@@ -42,28 +44,67 @@ export class UsersController {
   async updatePassword(
     @Param('id') id: string,
     @Body() data: UpdatePasswordDto,
-  ):Promise<string> {
+  ): Promise<string> {
     return await this.usersService.updatePassword(id, data);
   }
 
   @UseGuards(AuthGuard)
   @Post(':userId/register/fair/:fairId')
-async registerUserFair(
-  @Param('fairId') fairId: string,
-  @Param('userId') userId: string,
-  @Body() selectedHour: RegisterUserFairDto,
-) {
-  try {
-    const result = await this.usersService.registerUserFair(
-      fairId,
-      userId,
-      selectedHour,
-    );
-    return result; 
-  } catch (error) {
-    throw new InternalServerErrorException('Hubo un error al procesar la inscripción');
+  async registerUserFair(
+    @Param('fairId') fairId: string,
+    @Param('userId') userId: string,
+    @Body() selectedHour: RegisterUserFairDto,
+  ) {
+    try {
+      const result = await this.usersService.registerUserFair(
+        fairId,
+        userId,
+        selectedHour,
+      );
+      return result;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'Hubo un error al procesar la inscripción',
+      );
+    }
   }
-}
+
+  @UseGuards(AuthGuard)
+  @Patch(':userId/reschedule/fair/:fairId')
+  async rescheduleUserFair(
+    @Param('fairId') fairId: string,
+    @Param('userId') userId: string,
+    @Body() selectedHour: RegisterUserFairDto,
+  ) {
+    try {
+      const result = await this.usersService.rescheduleUserFair(
+        fairId,
+        userId,
+        selectedHour,
+      );
+      return result;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'Hubo un error al reprogramar el turno',
+      );
+    }
+  }
+
+  @UseGuards(AuthGuard)
+  @Delete(':userId/cancel/fair/:fairId')
+  async cancelUserFair(
+    @Param('fairId') fairId: string,
+    @Param('userId') userId: string,
+  ) {
+    try {
+      const result = await this.usersService.cancelUserFair(fairId, userId);
+      return result;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'Hubo un error al cancelar el turno',
+      );
+    }
+  }
 
   @UseGuards(AuthGuard)
   @Get(':id')
@@ -73,9 +114,12 @@ async registerUserFair(
 
   @UseGuards(AuthGuard)
   @Put('changeRole/:id')
-  async changeRole(@Param('id') id: string, @Body('role') role: Role): Promise<{message: string,}> {
+  async changeRole(
+    @Param('id') id: string,
+    @Body('role') role: Role,
+  ): Promise<{ message: string }> {
     await this.usersService.changeRole(id, role);
-    return {message: "Tu rol ha sido cambiado"}
+    return { message: 'Tu rol ha sido cambiado' };
   }
 
   @UseGuards(AuthGuard)
@@ -83,7 +127,7 @@ async registerUserFair(
   async updateUser(
     @Param('id') id: string,
     @Body() user: Partial<RegisterUserDto>,
-  ):Promise<string> {
+  ): Promise<string> {
     return await this.usersService.updateUser(id, user);
   }
 

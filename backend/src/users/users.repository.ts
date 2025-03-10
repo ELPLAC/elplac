@@ -240,6 +240,124 @@ export class UserRepository {
     }
   }
 
+  async rescheduleUserFair(
+    fairId: string,
+    userId: string,
+    newSchedule: RegisterUserFairDto,
+  ) {
+    try {
+      const { selectedHour, selectedDay } = newSchedule;
+  
+      const existingRegistration =
+        await this.userFairRegistrationRepository.findOne({
+          where: { user: { id: userId }, fair: { id: fairId } },
+        });
+  
+      if (!existingRegistration) {
+        throw new NotFoundException(
+          'No se encontró una inscripción para reprogramar',
+        );
+      }
+  
+      const fair = await this.fairRepository.findOne({
+        where: { id: fairId },
+        relations: ['fairDays', 'fairDays.buyerCapacities'],
+      });
+  
+      if (!fair) throw new NotFoundException('Feria no encontrada');
+  
+      const newFairDay = fair.fairDays.find((day) =>
+        isSameDay(day.day, selectedDay),
+      );
+      if (!newFairDay)
+        throw new BadRequestException('Día de feria no válido');
+  
+      const newBuyerCapacity = newFairDay.buyerCapacities.find(
+        (buyerCap) => buyerCap.hour === selectedHour,
+      );
+      if (!newBuyerCapacity || newBuyerCapacity.capacity <= 0) {
+        throw new BadRequestException('No hay cupos disponibles en esta hora');
+      }
+  
+      const oldFairDay = fair.fairDays.find((day) =>
+        isSameDay(day.day, existingRegistration.registrationDay),
+      );
+      if (oldFairDay) {
+        const oldBuyerCapacity = oldFairDay.buyerCapacities.find(
+          (buyerCap) => buyerCap.hour === existingRegistration.registrationHour,
+        );
+        if (oldBuyerCapacity) {
+          oldBuyerCapacity.capacity += 1;
+          await this.buyerCapacityRepository.save(oldBuyerCapacity);
+        }
+      }
+  
+      newBuyerCapacity.capacity -= 1;
+      await this.buyerCapacityRepository.save(newBuyerCapacity);
+  
+      existingRegistration.registrationDay = selectedDay;
+      existingRegistration.registrationHour = selectedHour;
+      await this.userFairRegistrationRepository.save(existingRegistration);
+  
+      return {
+        status: 'success',
+        message: 'Turno reprogramado exitosamente',
+        data: {
+          userId,
+          fairId,
+          selectedHour,
+          selectedDay,
+        },
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+  
+  async cancelUserFair(fairId: string, userId: string) {
+    try {
+      const existingRegistration =
+        await this.userFairRegistrationRepository.findOne({
+          where: { user: { id: userId }, fair: { id: fairId } },
+        });
+  
+      if (!existingRegistration) {
+        throw new NotFoundException('No se encontró una inscripción para cancelar');
+      }
+  
+      const fair = await this.fairRepository.findOne({
+        where: { id: fairId },
+        relations: ['fairDays', 'fairDays.buyerCapacities'],
+      });
+  
+      if (!fair) throw new NotFoundException('Feria no encontrada');
+  
+      const fairDay = fair.fairDays.find((day) =>
+        isSameDay(day.day, existingRegistration.registrationDay),
+      );
+      if (fairDay) {
+        const buyerCapacity = fairDay.buyerCapacities.find(
+          (buyerCap) => buyerCap.hour === existingRegistration.registrationHour,
+        );
+        if (buyerCapacity) {
+          buyerCapacity.capacity += 1;
+          await this.buyerCapacityRepository.save(buyerCapacity);
+        }
+      }
+  
+      await this.userFairRegistrationRepository.remove(existingRegistration);
+  
+      return {
+        status: 'success',
+        message: 'Inscripción cancelada exitosamente',
+      };
+    } catch (error) {
+      throw error;
+    }
+  }  
+
+
+
   async sendEmailInscriptionFair(email: string, token: string, fair: Fair): Promise<void> {
     const url = `${process.env.FRONTEND_URL}/fair/${token}`;
     const user = await this.findByEmail(email);

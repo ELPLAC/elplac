@@ -32,7 +32,6 @@ const SellerProducts = () => {
   const [visibleProducts, setVisibleProducts] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isOpen, setIsOpen] = useState(false);
   const [isFirstModalOpen, setIsFirstModalOpen] = useState(false);
   const [isSecondModalOpen, setIsSecondModalOpen] = useState(false);
 

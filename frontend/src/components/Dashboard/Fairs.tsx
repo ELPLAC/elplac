@@ -28,10 +28,6 @@ const Fairs = () => {
 
   const activeArray = [activeFair];
 
-  const isCuposDisponibles = categoriesArray?.some(
-    (c: FairCategories) => c.maxSellers > 0
-  );
-
   const handleCheckboxChangeTerms = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {

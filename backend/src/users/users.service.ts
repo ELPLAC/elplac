@@ -51,6 +51,18 @@ export class UsersService {
     );
   }
 
+  async rescheduleUserFair(
+    fairId: string,
+    userId: string,
+    selectedHour: RegisterUserFairDto,
+  ) {
+    return await this.userRepository.rescheduleUserFair(fairId, userId, selectedHour);
+  }
+
+  async cancelUserFair(fairId: string, userId: string) {
+    return await this.userRepository.cancelUserFair(fairId, userId);
+  }
+
   async getUserById(id: string): Promise<User> {
     return runWithTryCatchNotFoundE(async () => {
       return await this.userRepository.getUserById(id);
