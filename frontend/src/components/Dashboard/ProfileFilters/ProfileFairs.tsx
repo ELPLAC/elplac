@@ -19,8 +19,9 @@ const ProfileFairs: React.FC<ProfileFairsProps> = ({
   const { activeFair } = useFair();
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
-  const [isReScheduling, setIsReScheduling] = useState(false); // Estado para saber si estamos reprogramando
+  const [isReScheduling, setIsReScheduling] = useState(false); 
   const { token } = useAuth();
+
 
   const fairFilter = fairs?.find(
     (f: IFair | undefined) => f?.id === activeFair?.id
@@ -36,7 +37,6 @@ const ProfileFairs: React.FC<ProfileFairsProps> = ({
     try {
       setLoading(true);
 
-      // Realizamos el mismo fetch para eliminar el turno
       const response = await fetch(
         `https://elplac-production-3a9f.up.railway.app/users/${userDtos?.id}/cancel/fair/${activeFair?.id}`,
         {
@@ -47,16 +47,17 @@ const ProfileFairs: React.FC<ProfileFairsProps> = ({
         }
       );
 
-      if (!response.ok) throw new Error("Error al cancelar o reprogramar turno");
+      if (!response.ok) throw new Error("Error");
 
       if (isReScheduling) {
         notify("ToastSuccess", "Elije un nuevo turno");
       } else {
         notify("ToastSuccess", "Turno cancelado exitosamente");
       }
+      window.location.reload();
     } catch (error) {
       console.error(error);
-      notify("ToastError", "Error al cancelar o reprogramar turno");
+      notify("ToastError", "Error");
     } finally {
       setLoading(false);
     }
@@ -165,7 +166,7 @@ const ProfileFairs: React.FC<ProfileFairsProps> = ({
                             className="w-1/2 px-4 py-3 text-lg font-semibold text-white bg-red-500 hover:bg-red-600 rounded-lg transition-all"
                             disabled={loading}
                           >
-                            {loading ? (isReScheduling ? "Reprogramando..." : "Cancelando...") : (isReScheduling ? "REPROGRAMAR" : "CANCELAR")}
+                            {loading ? (isReScheduling ? "Volviendo..." : "Cancelando...") : (isReScheduling ? "REPROGRAMAR" : "CANCELAR")}
                           </button>
                         </div>
                       </div>
