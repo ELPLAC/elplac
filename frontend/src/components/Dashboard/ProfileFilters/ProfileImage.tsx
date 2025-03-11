@@ -40,3 +40,4 @@ const ProfileImage: React.FC<IProfileImage> = ({
 };
 
 export default ProfileImage
+
