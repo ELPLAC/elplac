@@ -39,19 +39,19 @@ const SellerProducts = () => {
     (registration: any) => registration.seller.id === userDtos?.seller?.id
   );
   const sellerCategoryFair = fairSeller?.categoryFair;
-
+  
   const maxProducts = sellerCategoryFair?.maxProductsSeller ?? 0;
   const minProducts = sellerCategoryFair?.minProductsSeller ?? 0;
-  const hasReachedMinProducts =
-    products.length + submittedProducts.length >= minProducts;
-
-  const remainingProducts = activeFair?.sellerRegistrations
-    ? maxProducts - (products.length + submittedProducts.length)
-    : 0;
-
-  const isProductValid = remainingProducts > 0;
-
   const userId = userDtos?.seller?.id;
+  
+  const totalProducts = products.length + submittedProducts.length;
+  
+  const hasReachedMinProducts = totalProducts >= minProducts;
+  
+  const remainingProducts = maxProducts - totalProducts;
+  
+  const isProductValid = totalProducts < maxProducts;  
+  
 
   useEffect(() => {
     if (userId) {
@@ -113,88 +113,87 @@ const SellerProducts = () => {
   const postProductsReq = async () => {
     let hasError = false;
     const newErrors: Record<string, string> = {};
+    
+    const totalProducts = products.length + submittedProducts.length;
 
-    if (products.length < minProducts) {
-      setError(`Debes cargar al menos ${minProducts} productos para enviar.`);
-      notify(
-        "ToastError",
-        `Debes cargar al menos ${minProducts} productos para enviar.`
-      );
-      return;
+    if (totalProducts < minProducts) {
+        setError(`Debes cargar al menos ${minProducts} productos para enviar.`);
+        notify("ToastError", `Debes cargar al menos ${minProducts} productos para enviar.`);
+        return;
     }
-    if (maxProducts > 0 && products.length > maxProducts) {
-      setError(`No puedes enviar más de ${maxProducts} productos.`);
-      notify("ToastError", `No puedes enviar más de ${maxProducts} productos.`);
-      return;
+    if (maxProducts > 0 && totalProducts > maxProducts) {
+        setError(`No puedes enviar más de ${maxProducts} productos en total.`);
+        notify("ToastError", `No puedes enviar más de ${maxProducts} productos en total.`);
+        return;
     }
-
+    
     const productsToSend: Partial<ProductProps>[] = products.map((product) => {
-      const { id, ...rest } = product;
-      let numericPrice: number | undefined;
-
-      if (typeof product.price === "string") {
-        numericPrice = parseFloat(
-          (product.price as string).replace(/[^\d.-]/g, "")
-        );
-        if (isNaN(numericPrice) || numericPrice <= 0) {
-          newErrors[`${product.id}-price`] =
-            "El precio debe ser un número válido y mayor a 0";
-          hasError = true;
+        const { id, ...rest } = product;
+        let numericPrice: number | undefined;
+        
+        if (typeof product.price === "string") {
+            numericPrice = parseFloat(product.price.replace(/[^\d.-]/g, ""));
+            if (isNaN(numericPrice) || numericPrice <= 0) {
+                newErrors[`${product.id}-price`] = "El precio debe ser un número válido y mayor a 0";
+                hasError = true;
+            }
+        } else if (typeof product.price === "number") {
+            numericPrice = product.price;
+            if (numericPrice <= 0) {
+                newErrors[`${product.id}-price`] = "El precio debe ser mayor a 0";
+                hasError = true;
+            }
+        } else {
+            newErrors[`${product.id}-price`] = "El precio es obligatorio";
+            hasError = true;
         }
-      } else if (typeof product.price === "number") {
-        numericPrice = product.price;
-        if (numericPrice <= 0) {
-          newErrors[`${product.id}-price`] = "El precio debe ser mayor a 0";
-          hasError = true;
+
+        if (!product.size.trim()) {
+            newErrors[`${product.id}-size`] = "Este campo es obligatorio";
+            hasError = true;
         }
-      } else {
-        newErrors[`${product.id}-price`] = "El precio es obligatorio";
-        hasError = true;
-      }
+        if (!product.brand.trim()) {
+            newErrors[`${product.id}-brand`] = "Este campo es obligatorio";
+            hasError = true;
+        }
+        if (!product.description.trim()) {
+            newErrors[`${product.id}-description`] = "Este campo es obligatorio";
+            hasError = true;
+        }
 
-      if (!product.size.trim()) {
-        newErrors[`${product.id}-size`] = "Este campo es obligatorio";
-        hasError = true;
-      }
-      if (!product.brand.trim()) {
-        newErrors[`${product.id}-brand`] = "Este campo es obligatorio";
-        hasError = true;
-      }
-      if (!product.description.trim()) {
-        newErrors[`${product.id}-description`] = "Este campo es obligatorio";
-        hasError = true;
-      }
-
-      return {
-        ...rest,
-        price: numericPrice,
-        ifUnsold: product.ifUnsold,
-      };
+        return {
+            ...rest,
+            price: numericPrice,
+            ifUnsold: product.ifUnsold,
+        };
     });
 
     if (hasError) {
-      setErrors(newErrors);
-      return;
+        setErrors(newErrors);
+        return;
     }
 
     try {
-      await createProductRequest(
-        token,
-        infoToPost.sellerId,
-        productsToSend as ProductProps[],
-        infoToPost.fairId
-      );
+        await createProductRequest(
+            token,
+            infoToPost.sellerId,
+            productsToSend as ProductProps[],
+            infoToPost.fairId
+        );
 
-      localStorage.removeItem(`savedProducts-${userId}`);
-      setProducts([]);
-
-      setSubmittedProducts(products);
-      setVisibleStep("RESUMEN");
-      setError(null);
+        localStorage.removeItem(`savedProducts-${userId}`);
+        
+        setSubmittedProducts((prev) => [...prev, ...products]);
+        
+        setProducts([]);
+        
+        setVisibleStep("RESUMEN");
+        setError(null);
     } catch (error: any) {
-      setError("Hubo un problema al enviar los productos.");
+        setError("Hubo un problema al enviar los productos.");
     }
-  };
+};
+
 
   const handleInputChange = (
     id: number,

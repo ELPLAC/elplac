@@ -219,7 +219,7 @@ export interface ProductProps {
   id: number;
   brand: string;
   description: string;
-  price: number;
+  price: string | number;
   size: string;
   liquidation: string;
   status?: productsStatusEnum;
