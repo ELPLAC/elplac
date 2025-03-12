@@ -297,36 +297,31 @@ const SellerProducts = () => {
   };
 
   useEffect(() => {
-    setIsLoading(true); // Activa el loading
+    setIsLoading(true); 
   
-    const checkRegistration = () => {
-      if (
-        sellerDtos?.status !== "active" ||
-        !sellerDtos?.registrations ||
-        sellerDtos.registrations.length === 0 ||
-        !sellerDtos.registrations.some(
-          (registration) => registration.fair.id === activeFair?.id
-        )
-      ) {
-        setVisibleProducts(true);
-      } else {
-        setVisibleProducts(false);
-      }
-      setIsLoading(false); 
-    };
+    const timer = setTimeout(() => {
+      const checkRegistration = () => {
+        if (
+          sellerDtos?.status !== "active" ||
+          !sellerDtos?.registrations ||
+          sellerDtos.registrations.length === 0 ||
+          !sellerDtos.registrations.some(
+            (registration) => registration.fair.id === activeFair?.id
+          )
+        ) {
+          setVisibleProducts(true);
+        } else {
+          setVisibleProducts(false);
+        }
+        setIsLoading(false);
+      };
   
-    checkRegistration();
+      checkRegistration();
+    }, 300); 
+  
+    return () => clearTimeout(timer);
   }, [activeFair, sellerDtos]);
   
-  if (isLoading) {
-    return (
-      <div className="w-full flex-col h-full flex items-center justify-center font-bold gap-4 p-4 sm:p-6">
-        <h2 className="text-primary-darker text-3xl text-center sm:text-4xl">
-          Cargando...
-        </h2>
-      </div>
-    );
-  }
   
 
   return (
