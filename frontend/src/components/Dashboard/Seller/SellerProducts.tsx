@@ -42,12 +42,16 @@ const SellerProducts = () => {
   const sellerCategoryFair = fairSeller?.categoryFair;
 
   const maxProducts = sellerCategoryFair?.maxProductsSeller ?? 0;
-  const minProducts = sellerCategoryFair?.minProductsSeller ?? 0;
-  const userId = userDtos?.seller?.id;
-  const totalProducts = products.length + submittedProducts.length;
-  const hasReachedMinProducts = totalProducts >= minProducts;
-  const remainingProducts = maxProducts - totalProducts;
-  const isProductValid = totalProducts < maxProducts;  
+const minProducts = sellerCategoryFair?.minProductsSeller ?? 0;
+const userId = userDtos?.seller?.id;
+
+const productsLengthSeller = userDtos?.seller?.products?.length ?? 0;
+const productInLocalStorage = JSON.parse(localStorage.getItem(`savedProducts-${userId}`) || "[]").length ?? 0;
+
+const totalProducts = productsLengthSeller + productInLocalStorage;
+const hasReachedMinProducts = totalProducts >= minProducts;
+const remainingProducts = maxProducts - totalProducts;
+const isProductValid = totalProducts < maxProducts;
 
   useEffect(() => {
     if (userId) {
