@@ -297,8 +297,8 @@ const SellerProducts = () => {
   };
 
   useEffect(() => {
-    setIsLoading(true);
-
+    setIsLoading(true); // Activa el loading
+  
     const checkRegistration = () => {
       if (
         sellerDtos?.status !== "active" ||
@@ -312,11 +312,22 @@ const SellerProducts = () => {
       } else {
         setVisibleProducts(false);
       }
-      setIsLoading(false);
+      setIsLoading(false); 
     };
-
+  
     checkRegistration();
   }, [activeFair, sellerDtos]);
+  
+  if (isLoading) {
+    return (
+      <div className="w-full flex-col h-full flex items-center justify-center font-bold gap-4 p-4 sm:p-6">
+        <h2 className="text-primary-darker text-3xl text-center sm:text-4xl">
+          Cargando...
+        </h2>
+      </div>
+    );
+  }
+  
 
   return (
     <div className="bg-secondary-lighter h-full flex flex-col items-center">
