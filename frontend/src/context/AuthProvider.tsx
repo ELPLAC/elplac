@@ -7,8 +7,8 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 const AuthContext = createContext<IAuthContext | undefined>(undefined);
 
 export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
-  const [token, setToken] = useState<string>(() => localStorage.getItem("token") || "");
-  const [roleAuth, setRoleAuth] = useState<string>(() => localStorage.getItem("role") || "");
+  const [token, setToken] = useState<string>("");
+  const [roleAuth, setRoleAuth] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
   const router = useRouter();
   const pathname = usePathname();
@@ -51,8 +51,10 @@ export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
   const logout = () => {
     setRoleAuth("");
     setToken("");
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
+    if (typeof window !== "undefined") { 
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+    }
   };
 
   return (
