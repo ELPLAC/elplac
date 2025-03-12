@@ -34,24 +34,24 @@ const SellerProducts = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isFirstModalOpen, setIsFirstModalOpen] = useState(false);
   const [isSecondModalOpen, setIsSecondModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const fairSeller = activeFair?.sellerRegistrations.find(
     (registration: any) => registration.seller.id === userDtos?.seller?.id
   );
   const sellerCategoryFair = fairSeller?.categoryFair;
-  
+
   const maxProducts = sellerCategoryFair?.maxProductsSeller ?? 0;
   const minProducts = sellerCategoryFair?.minProductsSeller ?? 0;
   const userId = userDtos?.seller?.id;
-  
+
   const totalProducts = products.length + submittedProducts.length;
-  
+
   const hasReachedMinProducts = totalProducts >= minProducts;
-  
+
   const remainingProducts = maxProducts - totalProducts;
-  
-  const isProductValid = totalProducts < maxProducts;  
-  
+
+  const isProductValid = totalProducts < maxProducts;
 
   useEffect(() => {
     if (userId) {
@@ -113,87 +113,93 @@ const SellerProducts = () => {
   const postProductsReq = async () => {
     let hasError = false;
     const newErrors: Record<string, string> = {};
-    
+
     const totalProducts = products.length + submittedProducts.length;
 
     if (totalProducts < minProducts) {
-        setError(`Debes cargar al menos ${minProducts} productos para enviar.`);
-        notify("ToastError", `Debes cargar al menos ${minProducts} productos para enviar.`);
-        return;
+      setError(`Debes cargar al menos ${minProducts} productos para enviar.`);
+      notify(
+        "ToastError",
+        `Debes cargar al menos ${minProducts} productos para enviar.`
+      );
+      return;
     }
     if (maxProducts > 0 && totalProducts > maxProducts) {
-        setError(`No puedes enviar más de ${maxProducts} productos en total.`);
-        notify("ToastError", `No puedes enviar más de ${maxProducts} productos en total.`);
-        return;
+      setError(`No puedes enviar más de ${maxProducts} productos en total.`);
+      notify(
+        "ToastError",
+        `No puedes enviar más de ${maxProducts} productos en total.`
+      );
+      return;
     }
-    
+
     const productsToSend: Partial<ProductProps>[] = products.map((product) => {
-        const { id, ...rest } = product;
-        let numericPrice: number | undefined;
-        
-        if (typeof product.price === "string") {
-            numericPrice = parseFloat(product.price.replace(/[^\d.-]/g, ""));
-            if (isNaN(numericPrice) || numericPrice <= 0) {
-                newErrors[`${product.id}-price`] = "El precio debe ser un número válido y mayor a 0";
-                hasError = true;
-            }
-        } else if (typeof product.price === "number") {
-            numericPrice = product.price;
-            if (numericPrice <= 0) {
-                newErrors[`${product.id}-price`] = "El precio debe ser mayor a 0";
-                hasError = true;
-            }
-        } else {
-            newErrors[`${product.id}-price`] = "El precio es obligatorio";
-            hasError = true;
-        }
+      const { id, ...rest } = product;
+      let numericPrice: number | undefined;
 
-        if (!product.size.trim()) {
-            newErrors[`${product.id}-size`] = "Este campo es obligatorio";
-            hasError = true;
+      if (typeof product.price === "string") {
+        numericPrice = parseFloat(product.price.replace(/[^\d.-]/g, ""));
+        if (isNaN(numericPrice) || numericPrice <= 0) {
+          newErrors[`${product.id}-price`] =
+            "El precio debe ser un número válido y mayor a 0";
+          hasError = true;
         }
-        if (!product.brand.trim()) {
-            newErrors[`${product.id}-brand`] = "Este campo es obligatorio";
-            hasError = true;
+      } else if (typeof product.price === "number") {
+        numericPrice = product.price;
+        if (numericPrice <= 0) {
+          newErrors[`${product.id}-price`] = "El precio debe ser mayor a 0";
+          hasError = true;
         }
-        if (!product.description.trim()) {
-            newErrors[`${product.id}-description`] = "Este campo es obligatorio";
-            hasError = true;
-        }
+      } else {
+        newErrors[`${product.id}-price`] = "El precio es obligatorio";
+        hasError = true;
+      }
 
-        return {
-            ...rest,
-            price: numericPrice,
-            ifUnsold: product.ifUnsold,
-        };
+      if (!product.size.trim()) {
+        newErrors[`${product.id}-size`] = "Este campo es obligatorio";
+        hasError = true;
+      }
+      if (!product.brand.trim()) {
+        newErrors[`${product.id}-brand`] = "Este campo es obligatorio";
+        hasError = true;
+      }
+      if (!product.description.trim()) {
+        newErrors[`${product.id}-description`] = "Este campo es obligatorio";
+        hasError = true;
+      }
+
+      return {
+        ...rest,
+        price: numericPrice,
+        ifUnsold: product.ifUnsold,
+      };
     });
 
     if (hasError) {
-        setErrors(newErrors);
-        return;
+      setErrors(newErrors);
+      return;
     }
 
     try {
-        await createProductRequest(
-            token,
-            infoToPost.sellerId,
-            productsToSend as ProductProps[],
-            infoToPost.fairId
-        );
+      await createProductRequest(
+        token,
+        infoToPost.sellerId,
+        productsToSend as ProductProps[],
+        infoToPost.fairId
+      );
 
-        localStorage.removeItem(`savedProducts-${userId}`);
-        
-        setSubmittedProducts((prev) => [...prev, ...products]);
-        
-        setProducts([]);
-        
-        setVisibleStep("RESUMEN");
-        setError(null);
+      localStorage.removeItem(`savedProducts-${userId}`);
+
+      setSubmittedProducts((prev) => [...prev, ...products]);
+
+      setProducts([]);
+
+      setVisibleStep("RESUMEN");
+      setError(null);
     } catch (error: any) {
-        setError("Hubo un problema al enviar los productos.");
+      setError("Hubo un problema al enviar los productos.");
     }
-};
-
+  };
 
   const handleInputChange = (
     id: number,
@@ -291,18 +297,25 @@ const SellerProducts = () => {
   };
 
   useEffect(() => {
-    if (
-      sellerDtos?.status !== "active" ||
-      !sellerDtos?.registrations || 
-      sellerDtos.registrations.length === 0 || 
-      !sellerDtos.registrations.some(
-        (registration) => registration.fair.id === activeFair?.id
-      ) 
-    ) {
-      setVisibleProducts(true); 
-    } else {
-      setVisibleProducts(false); 
-    }
+    setIsLoading(true);
+
+    const checkRegistration = () => {
+      if (
+        sellerDtos?.status !== "active" ||
+        !sellerDtos?.registrations ||
+        sellerDtos.registrations.length === 0 ||
+        !sellerDtos.registrations.some(
+          (registration) => registration.fair.id === activeFair?.id
+        )
+      ) {
+        setVisibleProducts(true);
+      } else {
+        setVisibleProducts(false);
+      }
+      setIsLoading(false);
+    };
+
+    checkRegistration();
   }, [activeFair, sellerDtos]);
 
   return (
@@ -315,29 +328,38 @@ const SellerProducts = () => {
           <Sidebar userRole={userDtos?.role} />
         </div>
         <div className="bg-secondary-lighter col-span-6 sm:col-span-7 lg:h-[100vh] w-full container-r">
-          {visibleProducts && (
+          {isLoading ? (
             <div className="w-full flex-col h-full flex items-center justify-center font-bold gap-4 p-4 sm:p-6">
               <h2 className="text-primary-darker text-3xl text-center sm:text-4xl">
-                ¡No podés cargar productos todavía!
+                Cargando...
               </h2>
-              <h2 className="text-primary-darker text-xl text-center sm:text-2xl">
-                Primero debes registrarte en la feria...
-              </h2>
-              <Link
-                href="/dashboard/fairs"
-                className="flex items-center rounded-md shadow-lg bg-secondary-light gap-2 p-2 sm:p-4"
-              >
-                <PiCoatHanger
-                  className="w-10 h-10"
-                  style={{ color: "#2f8083" }}
-                  size={40}
-                />
-                <h2 className="text-primary-darker text-xl sm:text-2xl">
-                  Ir a Ferias
-                </h2>
-              </Link>
             </div>
+          ) : (
+            visibleProducts && (
+              <div className="w-full flex-col h-full flex items-center justify-center font-bold gap-4 p-4 sm:p-6">
+                <h2 className="text-primary-darker text-3xl text-center sm:text-4xl">
+                  ¡No podés cargar productos todavía!
+                </h2>
+                <h2 className="text-primary-darker text-xl text-center sm:text-2xl">
+                  Primero debes registrarte en la feria...
+                </h2>
+                <Link
+                  href="/dashboard/fairs"
+                  className="flex items-center rounded-md shadow-lg bg-secondary-light gap-2 p-2 sm:p-4"
+                >
+                  <PiCoatHanger
+                    className="w-10 h-10"
+                    style={{ color: "#2f8083" }}
+                    size={40}
+                  />
+                  <h2 className="text-primary-darker text-xl sm:text-2xl">
+                    Ir a Ferias
+                  </h2>
+                </Link>
+              </div>
+            )
           )}
+
           {!visibleProducts && (
             <div className="mx-5 flex flex-col items-center max-h-[100vh] w-full">
               <div className="mt-5 w-full flex flex-col sm:flex-row justify-between gap-4 sm:gap-6">
