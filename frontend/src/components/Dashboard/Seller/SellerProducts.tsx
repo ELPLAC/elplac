@@ -44,32 +44,37 @@ const SellerProducts = () => {
   const maxProducts = sellerCategoryFair?.maxProductsSeller ?? 0;
   const minProducts = sellerCategoryFair?.minProductsSeller ?? 0;
   const userId = userDtos?.seller?.id;
-
   const totalProducts = products.length + submittedProducts.length;
-
   const hasReachedMinProducts = totalProducts >= minProducts;
-
   const remainingProducts = maxProducts - totalProducts;
-
-  const isProductValid = totalProducts < maxProducts;
+  const isProductValid = totalProducts < maxProducts;  
 
   useEffect(() => {
     if (userId) {
-      try {
-        const savedProducts = localStorage.getItem(`savedProducts-${userId}`);
-        if (savedProducts) {
-          setProducts(JSON.parse(savedProducts));
-          console.log(
-            "Productos cargados desde localStorage:",
-            JSON.parse(savedProducts)
-          );
+      const fetchProducts = async () => {
+        try {
+          const savedProducts = localStorage.getItem(`savedProducts-${userId}`);
+          if (savedProducts) {
+            setProducts(JSON.parse(savedProducts));
+            console.log("Productos cargados desde localStorage:", JSON.parse(savedProducts));
+          } else {
+            const data = await getProductsBySeller(userDtos?.seller?.id, token);
+            if (data) {
+              setProducts(data.products || []);
+            } else {
+              setError("No se pudieron cargar los productos.");
+            }
+          }
+        } catch (error) {
+          console.error("Error al cargar productos:", error);
+          setError("Hubo un problema al cargar los productos.");
         }
-      } catch (error) {
-        console.error("Error al cargar productos del localStorage:", error);
-        localStorage.removeItem(`savedProducts-${userId}`);
-      }
+      };
+  
+      fetchProducts();
     }
-  }, [userId]);
+  }, [userId, token, userDtos?.seller?.id]);
+  
 
   useEffect(() => {
     if (userId) {
@@ -317,7 +322,7 @@ const SellerProducts = () => {
       };
   
       checkRegistration();
-    }, 5000); 
+    }, 3000); 
   
     return () => clearTimeout(timer);
   }, [activeFair, sellerDtos]);
