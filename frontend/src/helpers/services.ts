@@ -77,25 +77,45 @@ export const postUserLogin = async (
   user: IUserLogin & { rememberMe: boolean }
 ) => {
   try {
-    const res = await fetch(`https://elplac-production-3a9f.up.railway.app/auth/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(user),
-    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000); 
+
+    const res = await fetch(
+      "https://elplac-production-3a9f.up.railway.app/auth/login",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user),
+        signal: controller.signal, 
+      }
+    );
+
+    clearTimeout(timeout);
 
     if (!res.ok) {
-      const errorData = await res.json();
-      throw new Error(errorData.message || "Error en la solicitud");
-    }
-    const data = await res.json();
+      let errorMessage = "Error en la solicitud";
 
-    return data;
+      try {
+        const errorData = await res.json();
+        errorMessage = errorData.message || errorMessage;
+      } catch (err) {
+        errorMessage = "Error en el servidor";
+      }
+
+      throw new Error(errorMessage);
+    }
+
+    return await res.json();
   } catch (error: any) {
+    if (error.name === "AbortError") {
+      throw new Error("Tiempo de espera agotado, intenta nuevamente");
+    }
     throw error;
   }
 };
+
 
 export const getUser = async (token: string, id: string) => {
   try {

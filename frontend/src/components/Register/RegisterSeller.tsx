@@ -88,12 +88,12 @@ const RegisterSeller: React.FC = () => {
             placeholder="40500300"
             {...getProps("dni")}
           />
-          <Input
-            label="Email"
-            type="email"
-            placeholder="juan@gmail.com"
-            {...getProps("email")}
-          />
+         <Input
+              label="Instagram"
+              type="text"
+              placeholder="juan.gomez"
+              {...getProps("social_media")}
+            />
         </div>
         <div className="flex gap-4">
           <Input
@@ -125,14 +125,14 @@ const RegisterSeller: React.FC = () => {
             />
           </div>
         </div>
-        <div className="flex gap-4">
+        <div className="flex gap-8">
           <div>
-            <Input
-              label="Instagram"
-              type="text"
-              placeholder="juan.gomez"
-              {...getProps("social_media")}
-            />
+          <Input
+            label="Email"
+            type="email"
+            placeholder="juan@gmail.com"
+            {...getProps("email")}
+          />
           </div>
         </div>
         <div className="flex items-center gap-2 my-6">

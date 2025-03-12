@@ -22,46 +22,35 @@ export const Login = () => {
 
   const signIn = async (user: IUserLogin & { rememberMe: boolean }) => {
     setIsLoading(true);
+    localStorage.removeItem("token");  
+    
     try {
       const res = await postUserLogin(user);
-  
-      if (user.rememberMe) {
+      
+      if (res.token) {
         localStorage.setItem("token", res.token);
         setToken(res.token);
+        localStorage.setItem("role", res.role);
+        setRoleAuth(res.role);
       }
-  
-      localStorage.setItem("token", res.token);
-      setToken(res.token);
-      localStorage.setItem("role", res.role);
-      setRoleAuth(res.role);
-      const decoded = decodeJWT(res.token);
   
       formik.resetForm();
       notify("ToastSuccess", "¡Sesión iniciada!");
   
-      if (decoded && decoded.role === "admin") {
+      const decoded = decodeJWT(res.token);
+  
+      if (decoded?.role === "admin") {
         router.push("/admin");
-      } else if (decoded && (decoded.role === "user" || decoded.role === "seller")) {
+      } else {
         router.push("/dashboard");
       }
     } catch (error: any) {
-    
-      const errorMessage = error.message || "Datos Incorrectos";
-    
-      if (errorMessage === "Usuario inexistente") {
-        notify("ToastError", "El usuario no existe");
-      } else if (errorMessage === "Debes confirmar tu cuenta") {
-        notify("ToastWarning", "Debes confirmar tu cuenta antes de iniciar sesión");
-      } else {
-        notify("ToastError", "Datos Incorrectos");
-      }
-    }
-    finally {
+      notify("ToastError", "Datos Incorrectos");
+    } finally {
       setIsLoading(false);
     }
   };
   
-
   const formik = useFormik({
     initialValues: {
       email: "",

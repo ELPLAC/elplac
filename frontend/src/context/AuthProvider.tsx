@@ -1,24 +1,30 @@
-// AuthProvider.tsx
 "use client";
 import { isTokenExpired } from "@/helpers/auth";
 import { IAuthContext, IAuthProviderProps } from "@/types";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 const AuthContext = createContext<IAuthContext | undefined>(undefined);
 
 export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
-  const [token, setToken] = useState<string>("");
-  const [roleAuth, setRoleAuth] = useState<string>("");
+  const [token, setToken] = useState<string>(() => localStorage.getItem("token") || "");
+  const [roleAuth, setRoleAuth] = useState<string>(() => localStorage.getItem("role") || "");
   const [loading, setLoading] = useState<boolean>(true);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const verifyToken = async () => {
       if (typeof window !== "undefined") {
-        const storageToken: string | null = localStorage.getItem("token");
-        const storageRole: string | null = localStorage.getItem("role");
+        const storageToken = localStorage.getItem("token");
+        const storageRole = localStorage.getItem("role");
+
         if (storageToken && storageRole) {
+          if (isTokenExpired(storageToken)) { 
+            logout(); 
+            router.push("/login");
+            return;
+          }
           setToken(storageToken);
           setRoleAuth(storageRole);
         }
@@ -27,18 +33,20 @@ export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
     };
 
     verifyToken();
-  }, []);
+  }, [router]);
+
   useEffect(() => {
     const interval = setInterval(() => {
       if (token && isTokenExpired(token)) {
         logout();
-        router.push("/login");
+        if (pathname !== "/login") {
+          router.push("/login");
+        }
       }
     }, 300000);
 
     return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token]);
+  }, [token, pathname, router]);
 
   const logout = () => {
     setRoleAuth("");
@@ -49,7 +57,8 @@ export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ token, setToken, logout, loading, roleAuth, setRoleAuth }}>
+      value={{ token, setToken, logout, loading, roleAuth, setRoleAuth }}
+    >
       {children}
     </AuthContext.Provider>
   );
