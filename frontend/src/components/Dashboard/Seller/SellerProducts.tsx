@@ -293,12 +293,16 @@ const SellerProducts = () => {
 
   useEffect(() => {
     if (
-      sellerDtos?.registrations?.length === 0 ||
-      sellerDtos?.registrations?.every(
-        (registration) => registration.fair.id !== activeFair?.id
-      )
+      sellerDtos?.status !== "active" ||
+      !sellerDtos?.registrations || 
+      sellerDtos.registrations.length === 0 || 
+      !sellerDtos.registrations.some(
+        (registration) => registration.fair.id === activeFair?.id
+      ) 
     ) {
-      setVisibleProducts(true);
+      setVisibleProducts(true); 
+    } else {
+      setVisibleProducts(false); 
     }
   }, [activeFair, sellerDtos]);
 
