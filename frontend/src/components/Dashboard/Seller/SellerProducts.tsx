@@ -317,7 +317,7 @@ const SellerProducts = () => {
       };
   
       checkRegistration();
-    }, 300); 
+    }, 5000); 
   
     return () => clearTimeout(timer);
   }, [activeFair, sellerDtos]);
