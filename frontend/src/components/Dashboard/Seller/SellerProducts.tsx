@@ -45,6 +45,27 @@ const SellerProducts = () => {
   const maxProducts = sellerCategoryFair?.maxProductsSeller ?? 0;
   const minProducts = sellerCategoryFair?.minProductsSeller ?? 0;
 
+  const fetchProductCount = useCallback(async () => {
+    try {
+      console.log("Llamando a fetchProductCount...");
+      const data = await getProductsBySeller(userId, token);
+      if (data && data.products) {
+        console.log("Cantidad de productos obtenidos de la API:", data.products.length);
+        setProductsCountDB(data.products.length);
+      }
+    } catch (error) {
+      console.error("Error al obtener la cantidad de productos:", error);
+      setError("Hubo un problema al obtener la cantidad de productos.");
+    }
+  }, [userId, token]);
+
+  useEffect(() => {
+    if (activeFair && userId && token) {
+      fetchProductCount();
+    }
+  }, [activeFair, userId, token, fetchProductCount]);
+
+
   useEffect(() => {
     if (userId) {
       const savedProducts = localStorage.getItem(`savedProducts-${userId}`);
@@ -93,8 +114,7 @@ const SellerProducts = () => {
 
   console.log("totalProducts:", totalProducts, "minProducts:", minProducts);
 
-console.log("productos de base de datos: ", productsCountDB);
-
+  console.log("productos de base de datos: ", productsCountDB);
 
   const infoToPost = {
     sellerId: userDtos?.seller?.id ?? "",
@@ -169,26 +189,16 @@ console.log("productos de base de datos: ", productsCountDB);
     }
 
     try {
-      const res = await createProductRequest(
+      await createProductRequest(
         token,
         infoToPost.sellerId,
         productsToSend as ProductProps[],
         infoToPost.fairId
       );
-
-      if(!res){
-        setError("Hubo un problema al enviar los productos.");
-        return; 
-      }
-
-      const data = await getProductsBySeller(userId, token);
-      setProductsCountDB(data.products.length);
-      console.log("Productos obtenidos:", data);
-
+      await fetchProductCount();
 
       localStorage.removeItem(`savedProducts-${userId}`);
       setProducts([]);
-
 
       setVisibleStep("RESUMEN");
       setError(null);
