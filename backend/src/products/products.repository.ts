@@ -38,8 +38,9 @@ export class ProductsRepository {
     const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
   
     try {
+      // Conectar y comenzar la transacción
       await queryRunner.connect();
-      await queryRunner.startTransaction();
+      await queryRunner.startTransaction();  // Asegúrate de que esto sea llamado antes de cualquier consulta
   
       // Verificar si el vendedor existe y está activo
       const seller = await queryRunner.manager.findOne(Seller, {
@@ -135,17 +136,17 @@ export class ProductsRepository {
   
       return newProductRequest.id;
     } catch (error) {
-      // Si ocurre un error, hacer rollback y lanzar el error
-      await queryRunner.rollbackTransaction();
       console.error('Error al crear productos:', error);
+      if (queryRunner.isTransactionActive) {
+        // Solo hacemos rollback si la transacción está activa
+        await queryRunner.rollbackTransaction();
+      }
       throw error;
     } finally {
       // Liberar el queryRunner después de terminar
       await queryRunner.release();
     }
-  }
-  
-  
+  }    
 
   async informAdminEmail(sellerId: string): Promise<void> {
     const seller = await this.sellerRepository.findOne({ where: { id: sellerId } });
