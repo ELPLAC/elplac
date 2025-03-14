@@ -42,16 +42,18 @@ const SellerProducts = () => {
   const sellerCategoryFair = fairSeller?.categoryFair;
 
   const maxProducts = sellerCategoryFair?.maxProductsSeller ?? 0;
-const minProducts = sellerCategoryFair?.minProductsSeller ?? 0;
-const userId = userDtos?.seller?.id;
+  const minProducts = sellerCategoryFair?.minProductsSeller ?? 0;
+  const userId = userDtos?.seller?.id;
 
-const productsLengthSeller = userDtos?.seller?.products?.length ?? 0;
-const productInLocalStorage = JSON.parse(localStorage.getItem(`savedProducts-${userId}`) || "[]").length ?? 0;
+  const productsLengthSeller = userDtos?.seller?.products?.length ?? 0;
+  const productInLocalStorage =
+    JSON.parse(localStorage.getItem(`savedProducts-${userId}`) || "[]")
+      .length ?? 0;
 
-const totalProducts = productsLengthSeller + productInLocalStorage;
-const hasReachedMinProducts = totalProducts >= minProducts;
-const remainingProducts = maxProducts - totalProducts;
-const isProductValid = totalProducts < maxProducts;
+  const totalProducts = productsLengthSeller + productInLocalStorage;
+  const hasReachedMinProducts = totalProducts >= minProducts;
+  const remainingProducts = maxProducts - totalProducts;
+  const isProductValid = totalProducts < maxProducts;
 
   useEffect(() => {
     if (userId) {
@@ -60,7 +62,10 @@ const isProductValid = totalProducts < maxProducts;
           const savedProducts = localStorage.getItem(`savedProducts-${userId}`);
           if (savedProducts) {
             setProducts(JSON.parse(savedProducts));
-            console.log("Productos cargados desde localStorage:", JSON.parse(savedProducts));
+            console.log(
+              "Productos cargados desde localStorage:",
+              JSON.parse(savedProducts)
+            );
           } else {
             const data = await getProductsBySeller(userDtos?.seller?.id, token);
             if (data) {
@@ -74,11 +79,10 @@ const isProductValid = totalProducts < maxProducts;
           setError("Hubo un problema al cargar los productos.");
         }
       };
-  
+
       fetchProducts();
     }
   }, [userId, token, userDtos?.seller?.id]);
-  
 
   useEffect(() => {
     if (userId) {
@@ -123,16 +127,20 @@ const isProductValid = totalProducts < maxProducts;
     let hasError = false;
     const newErrors: Record<string, string> = {};
 
-    const totalProducts = products.length + submittedProducts.length;
+    const savedSubmittedProducts = JSON.parse(
+      localStorage.getItem(`submittedProducts-${userId}`) || "[]"
+    );
 
-    // if (totalProducts < minProducts) {
-    //   setError(`Debes cargar al menos ${minProducts} productos para enviar.`);
-    //   notify(
-    //     "ToastError",
-    //     `Debes cargar al menos ${minProducts} productos para enviar.`
-    //   );
-    //   return;
-    // }
+    const totalProducts = products.length + savedSubmittedProducts.length;
+
+    if (totalProducts < minProducts) {
+      setError(`Debes cargar al menos ${minProducts} productos para enviar.`);
+      notify(
+        "ToastError",
+        `Debes cargar al menos ${minProducts} productos para enviar.`
+      );
+      return;
+    }
     if (maxProducts > 0 && totalProducts > maxProducts) {
       setError(`No puedes enviar más de ${maxProducts} productos en total.`);
       notify(
@@ -190,19 +198,14 @@ const isProductValid = totalProducts < maxProducts;
     }
 
     try {
-      await createProductRequest(
-        token,
-        infoToPost.sellerId,
-        productsToSend as ProductProps[],
-        infoToPost.fairId
-      );
-
-      localStorage.removeItem(`savedProducts-${userId}`);
-
-      setSubmittedProducts((prev) => [...prev, ...products]);
-
+      await createProductRequest(token, infoToPost.sellerId, productsToSend as ProductProps[], infoToPost.fairId);
+  
+      const updatedSubmittedProducts = [...savedSubmittedProducts, ...products];
+      localStorage.setItem(`submittedProducts-${userId}`, JSON.stringify(updatedSubmittedProducts));
+  
+      setSubmittedProducts(updatedSubmittedProducts);
       setProducts([]);
-
+  
       setVisibleStep("RESUMEN");
       setError(null);
     } catch (error: any) {
@@ -306,8 +309,8 @@ const isProductValid = totalProducts < maxProducts;
   };
 
   useEffect(() => {
-    setIsLoading(true); 
-  
+    setIsLoading(true);
+
     const timer = setTimeout(() => {
       const checkRegistration = () => {
         if (
@@ -324,14 +327,12 @@ const isProductValid = totalProducts < maxProducts;
         }
         setIsLoading(false);
       };
-  
+
       checkRegistration();
-    }, 3000); 
-  
+    }, 3000);
+
     return () => clearTimeout(timer);
   }, [activeFair, sellerDtos]);
-  
-  
 
   return (
     <div className="bg-secondary-lighter h-full flex flex-col items-center">
