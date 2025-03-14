@@ -33,13 +33,8 @@ export class ProductsRepository {
     sellerId: string,
     fairId: string
   ) {
-    const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
-  
-    await queryRunner.connect();
     try {
-      await queryRunner.startTransaction(); // 🔥 Asegurar que la transacción se inicie correctamente
-  
-      const seller = await queryRunner.manager.findOne(Seller, {
+      const seller = await this.dataSource.manager.findOne(Seller, {
         where: { id: sellerId },
         relations: { products: true },
       });
@@ -50,7 +45,7 @@ export class ProductsRepository {
         );
       }
   
-      const searchFair = await queryRunner.manager.findOne(Fair, {
+      const searchFair = await this.dataSource.manager.findOne(Fair, {
         where: { id: fairId },
       });
   
@@ -58,7 +53,7 @@ export class ProductsRepository {
         throw new NotFoundException("Feria inactiva");
       }
   
-      const fairSeller = await queryRunner.manager.findOne(
+      const fairSeller = await this.dataSource.manager.findOne(
         SellerFairRegistration,
         {
           where: { seller, fair: searchFair },
@@ -70,11 +65,11 @@ export class ProductsRepository {
         throw new NotFoundException("Vendedor no registrado en la feria");
       }
   
-      const foundCategory = await queryRunner.manager.findOne(Category, {
+      const foundCategory = await this.dataSource.manager.findOne(Category, {
         where: { id: fairSeller.categoryFair.category.id },
       });
   
-      const fairCategory = await queryRunner.manager.findOne(FairCategory, {
+      const fairCategory = await this.dataSource.manager.findOne(FairCategory, {
         where: { fair: searchFair, category: foundCategory },
       });
   
@@ -98,7 +93,7 @@ export class ProductsRepository {
         const number = (seller.products?.length ?? 0) + arrayProducts.length + 1;
         productEntity.code = `${seller.sku}-${number}`;
   
-        const savedProduct = await queryRunner.manager.save(
+        const savedProduct = await this.dataSource.manager.save(
           Product,
           productEntity
         );
@@ -113,24 +108,19 @@ export class ProductsRepository {
       productRequest.category = foundCategory.name;
       productRequest.products = arrayProducts;
   
-      const newProductRequest = await queryRunner.manager.save(
+      const newProductRequest = await this.dataSource.manager.save(
         ProductRequest,
         productRequest
       );
-  
-      await queryRunner.commitTransaction(); // ✅ Confirmar la transacción después de todas las operaciones
   
       await this.informAdminEmail(sellerId);
   
       return newProductRequest.id;
     } catch (error) {
-      await queryRunner.rollbackTransaction(); // 🚨 Asegurar rollback en caso de error
+      console.error("Error en createProducts:", error);
       throw new InternalServerErrorException("Error al crear productos.");
-    } finally {
-      await queryRunner.release(); // ✅ Liberar el queryRunner para evitar bloqueos
     }
   }
-  
 
   async informAdminEmail(sellerId: string): Promise<void> {
     const seller = await this.sellerRepository.findOne({ where: { id: sellerId } });
