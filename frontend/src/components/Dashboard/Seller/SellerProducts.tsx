@@ -23,54 +23,35 @@ import { notify } from "@/components/Notifications/Notifications";
 const SellerProducts = () => {
   const { token } = useAuth();
   const { userDtos, sellerDtos } = useProfile();
-  const [products, setProducts] = useState<ProductProps[]>([]);
   const { activeFair } = useFair();
+
+  const [products, setProducts] = useState<ProductProps[]>([]);
+  const [productsCountDB, setProductsCountDB] = useState<number>(0);
   const [visibleStep, setVisibleStep] = useState<string>("TIPS");
-  const [visibleProducts, setVisibleProducts] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isFirstModalOpen, setIsFirstModalOpen] = useState(false);
   const [isSecondModalOpen, setIsSecondModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [visibleProducts, setVisibleProducts] = useState<boolean>(false);
 
-
-  const fairSeller = activeFair?.sellerRegistrations.find(
-    (registration: any) => registration.seller.id === userDtos?.seller?.id
-  );
-  const sellerCategoryFair = fairSeller?.categoryFair;
   const userId = userDtos?.seller?.id;
 
-  //maximo de productos
+  const fairSeller = activeFair?.sellerRegistrations.find(
+    (registration: any) => registration.seller.id === userId
+  );
+
+  const sellerCategoryFair = fairSeller?.categoryFair;
+
   const maxProducts = sellerCategoryFair?.maxProductsSeller ?? 0;
 
-  //minimo de productos
   const minProducts = sellerCategoryFair?.minProductsSeller ?? 0;
-// Verificar si se ha alcanzado el mínimo
-const savedProducts = Number(localStorage.getItem(`savedProducts-${userId}`)) || 0;
-const hasReachedMinProducts = (products.length + savedProducts) >= minProducts;
-
-// Verificar si se ha alcanzado el máximo
-const remainingProducts = activeFair?.sellerRegistrations
-  ? Math.max(0, maxProducts - (products.length + savedProducts))
-  : 0;
-
-  const isProductValid = remainingProducts > 0;
-
 
   useEffect(() => {
     if (userId) {
-      try {
-        const savedProducts = localStorage.getItem(`savedProducts-${userId}`);
-        if (savedProducts) {
-          setProducts(JSON.parse(savedProducts));
-          console.log(
-            "Productos cargados desde localStorage:",
-            JSON.parse(savedProducts)
-          );
-        }
-      } catch (error) {
-        console.error("Error al cargar productos del localStorage:", error);
-        localStorage.removeItem(`savedProducts-${userId}`);
+      const savedProducts = localStorage.getItem(`savedProducts-${userId}`);
+      if (savedProducts) {
+        setProducts(JSON.parse(savedProducts));
       }
     }
   }, [userId]);
@@ -78,36 +59,56 @@ const remainingProducts = activeFair?.sellerRegistrations
   useEffect(() => {
     if (userId) {
       localStorage.setItem(`savedProducts-${userId}`, JSON.stringify(products));
-      console.log("Guardando en localStorage:", products);
     }
   }, [products, userId]);
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchProductCount = async () => {
       try {
-        const savedProducts = localStorage.getItem(`savedProducts-${userId}`);
-        if (savedProducts) {
-          console.log(
-            "Usando productos desde localStorage, no llamamos a la API."
-          );
-          return;
-        }
-
-        const data = await getProductsBySeller(userDtos?.seller?.id, token);
-        if (data) {
-          setProducts(data.products || []);
-        } else {
-          setError("No se pudieron cargar los productos.");
+        const data = await getProductsBySeller(userId, token);
+        if (data && data.products) {
+          setProductsCountDB(data.products.length);
         }
       } catch (error) {
-        setError("Hubo un problema al cargar los productos.");
+        setError("Hubo un problema al obtener la cantidad de productos.");
       }
     };
 
-    if (activeFair && userDtos?.seller?.id && token) {
-      fetchProducts();
+    if (activeFair && userId && token) {
+      fetchProductCount();
     }
-  }, [activeFair, userDtos?.seller?.id, token, userId]);
+  }, [activeFair, userId, token]);
+
+  useEffect(() => {
+    setIsLoading(true);
+
+    const timer = setTimeout(() => {
+      const checkRegistration = () => {
+        if (
+          sellerDtos?.status !== "active" ||
+          !sellerDtos?.registrations ||
+          sellerDtos.registrations.length === 0 ||
+          !sellerDtos.registrations.some(
+            (registration) => registration.fair.id === activeFair?.id
+          )
+        ) {
+          setVisibleProducts(true);
+        } else {
+          setVisibleProducts(false);
+        }
+        setIsLoading(false);
+      };
+
+      checkRegistration();
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [activeFair, sellerDtos]);
+
+  const totalProducts = products.length + productsCountDB;
+  const remainingProducts = Math.max(0, maxProducts - totalProducts);
+  const hasReachedMinProducts = totalProducts >= minProducts;
+  const isProductValid = remainingProducts > 0;
 
   const infoToPost = {
     sellerId: userDtos?.seller?.id ?? "",
@@ -118,7 +119,7 @@ const remainingProducts = activeFair?.sellerRegistrations
     let hasError = false;
     const newErrors: Record<string, string> = {};
 
-    if (products.length < minProducts) {
+    if (totalProducts < minProducts) {
       setError(`Debes cargar al menos ${minProducts} productos para enviar.`);
       notify(
         "ToastError",
@@ -126,7 +127,7 @@ const remainingProducts = activeFair?.sellerRegistrations
       );
       return;
     }
-    if (maxProducts > 0 && products.length > maxProducts) {
+    if (maxProducts > 0 && totalProducts > maxProducts) {
       setError(`No puedes enviar más de ${maxProducts} productos.`);
       notify("ToastError", `No puedes enviar más de ${maxProducts} productos.`);
       return;
@@ -191,6 +192,11 @@ const remainingProducts = activeFair?.sellerRegistrations
 
       localStorage.removeItem(`savedProducts-${userId}`);
       setProducts([]);
+
+      const data = await getProductsBySeller(userId, token);
+      if (data && data.products) {
+        setProductsCountDB(data.products.length);
+      }
 
       setVisibleStep("RESUMEN");
       setError(null);
@@ -273,7 +279,7 @@ const remainingProducts = activeFair?.sellerRegistrations
   const liquidationSelected = fairSeller?.liquidation ? "Si" : "No Aplica";
 
   const handleAddProduct = () => {
-    if (products.length >= maxProducts) {
+    if (totalProducts >= maxProducts) {
       setError(`No podés agregar más de ${maxProducts} productos.`);
       return;
     }
@@ -287,38 +293,8 @@ const remainingProducts = activeFair?.sellerRegistrations
       size: "",
     };
 
-    setProducts((prev) => {
-      const updatedProducts = [...prev, newProduct];
-      console.log("Productos después de agregar:", updatedProducts);
-      return updatedProducts;
-    });
+    setProducts((prev) => [...prev, newProduct]);
   };
-
-  useEffect(() => {
-    setIsLoading(true);
-
-    const timer = setTimeout(() => {
-      const checkRegistration = () => {
-        if (
-          sellerDtos?.status !== "active" ||
-          !sellerDtos?.registrations ||
-          sellerDtos.registrations.length === 0 ||
-          !sellerDtos.registrations.some(
-            (registration) => registration.fair.id === activeFair?.id
-          )
-        ) {
-          setVisibleProducts(true);
-        } else {
-          setVisibleProducts(false);
-        }
-        setIsLoading(false);
-      };
-
-      checkRegistration();
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, [activeFair, sellerDtos]);
 
   return (
     <div className="bg-secondary-lighter h-full flex flex-col items-center">
@@ -330,7 +306,7 @@ const remainingProducts = activeFair?.sellerRegistrations
           <Sidebar userRole={userDtos?.role} />
         </div>
         <div className="bg-secondary-lighter col-span-6 sm:col-span-7 lg:h-[100vh] w-full container-r">
-        {isLoading ? (
+          {isLoading ? (
             <div className="w-full flex-col h-full flex items-center justify-center font-bold gap-4 p-4 sm:p-6">
               <h2 className="text-primary-darker text-3xl text-center sm:text-4xl">
                 Cargando...
@@ -454,18 +430,14 @@ const remainingProducts = activeFair?.sellerRegistrations
                   {!isProductValid && (
                     <div className="bg-red-200 text-red-800 p-2 rounded mb-4">
                       {remainingProducts > 0
-                        ? `podés agregar ${
-                            maxProducts - remainingProducts
-                          } productos más.`
+                        ? `Podés agregar ${remainingProducts} productos más.`
                         : `No podés agregar más de ${maxProducts} productos.`}
                     </div>
                   )}
 
                   {!hasReachedMinProducts && (
                     <div className="bg-yellow-200 text-yellow-800 p-2 rounded mb-4">
-                      Te falta agregar al menos{" "}
-                      {minProducts -
-                        (hasReachedMinProducts ? remainingProducts : 0)}{" "}
+                      Te falta agregar al menos {minProducts - totalProducts}{" "}
                       producto(s) para cumplir con el mínimo de {minProducts}.
                     </div>
                   )}
@@ -669,7 +641,7 @@ const remainingProducts = activeFair?.sellerRegistrations
                   <div className="flex flex-col items-center mt-5 space-y-4 mr-10">
                     <button
                       onClick={handleAddProduct}
-                      disabled={remainingProducts <= 0}
+                      disabled={totalProducts >= maxProducts}
                       className="text-lg text-white bg-primary-dark hover:bg-primary-light py-3 px-6 font-semibold shadow-lg hover:shadow-xl transition-all w-full sm:w-auto btn-r"
                     >
                       + Agregar producto
@@ -732,6 +704,7 @@ const remainingProducts = activeFair?.sellerRegistrations
                                 postProductsReq();
                                 setIsSecondModalOpen(false);
                               }}
+                              disabled={products.length === 0}
                               className="w-1/2 px-4 py-3 text-lg font-semibold text-white bg-primary-dark hover:bg-primary-light rounded-lg transition-all"
                             >
                               Enviar
