@@ -148,10 +148,6 @@ const SellerProducts = () => {
     const productsToSend: ProductProps[] = products.map((product) => {
       const { id, price, ...rest } = product;
     
-      if (id === undefined) {
-        product.id = 0; // O el valor adecuado
-      }
-    
       let validPrice: string | number;
     
       if (price === undefined) {
@@ -189,7 +185,7 @@ const SellerProducts = () => {
         token,
         infoToPost.sellerId,
         productsToSend,
-        activeFair?.id ?? "0" 
+        infoToPost.fairId
       );
       
   

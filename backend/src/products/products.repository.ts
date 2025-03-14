@@ -33,6 +33,7 @@ export class ProductsRepository {
     sellerId: string,
     fairId: string,
   ) {
+    console.log("products:", products);
     const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
 
     await queryRunner.connect();
@@ -43,7 +44,7 @@ export class ProductsRepository {
         where: { id: sellerId },
         relations: { products: true },
       });
-
+      console.log("seller:", seller);
       if (!seller || seller.status === SellerStatus.NO_ACTIVE) {
         throw new NotFoundException(
           'Vendedor no autorizado a cargar los productos',
@@ -53,6 +54,7 @@ export class ProductsRepository {
       const searchFair = await queryRunner.manager.findOne(Fair, {
         where: { id: fairId },
       });
+      console.log("searchFair:", searchFair);
 
       if (!searchFair || searchFair.isActive === false) {
         throw new NotFoundException('Feria inactiva');
@@ -65,6 +67,8 @@ export class ProductsRepository {
           relations: ['categoryFair', 'categoryFair.category'],
         },
       );
+
+      console.log("fairSeller:", fairSeller);
 
       if (!fairSeller) {
         throw new NotFoundException('Vendedor no registrado en la feria');
