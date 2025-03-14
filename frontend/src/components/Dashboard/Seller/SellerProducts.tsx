@@ -79,12 +79,10 @@ const SellerProducts = () => {
     }
   }, [activeFair, userId, token, fetchProductCount]);
 
-  // Recalcular cuando productsCountDB cambie
   useEffect(() => {
     console.log("Actualizando productsCountDB a:", productsCountDB);
   }, [productsCountDB]);
 
-  // Verificar si el usuario es activo y si puede ver los productos
   useEffect(() => {
     setIsLoading(true);
 
@@ -117,6 +115,8 @@ const SellerProducts = () => {
   const isProductValid = totalProducts < maxProducts;
 
   console.log("totalProducts:", totalProducts, "minProducts:", minProducts);
+
+console.log("productos de base de datos: ", productsCountDB);
 
 
   const infoToPost = {
