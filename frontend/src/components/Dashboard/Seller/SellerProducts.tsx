@@ -4,7 +4,7 @@ import { useAuth } from "@/context/AuthProvider";
 import { useProfile } from "@/context/ProfileProvider";
 import { createProductRequest, getProductsBySeller } from "@/helpers/services";
 import { ProductProps } from "@/types";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Navbar from "@/components/Navbar";
 import Sidebar from "../SidebarDashboard";
 import Tips from "./Tips";
@@ -42,9 +42,7 @@ const SellerProducts = () => {
   );
 
   const sellerCategoryFair = fairSeller?.categoryFair;
-
   const maxProducts = sellerCategoryFair?.maxProductsSeller ?? 0;
-
   const minProducts = sellerCategoryFair?.minProductsSeller ?? 0;
 
   useEffect(() => {
@@ -62,23 +60,26 @@ const SellerProducts = () => {
     }
   }, [products, userId]);
 
-  useEffect(() => {
-    const fetchProductCount = async () => {
-      try {
-        const data = await getProductsBySeller(userId, token);
-        if (data && data.products) {
-          setProductsCountDB(data.products.length);
-        }
-        console.log("Productos obtenidos:", data);
-      } catch (error) {
-        setError("Hubo un problema al obtener la cantidad de productos.");
+  const fetchProductCount = useCallback(async () => {
+    try {
+      const data = await getProductsBySeller(userId, token);
+      if (data && data.products) {
+        setProductsCountDB(data.products.length);
       }
-    };
+    } catch (error) {
+      setError("Hubo un problema al obtener la cantidad de productos.");
+    }
+  }, [userId, token]);
 
+  useEffect(() => {
     if (activeFair && userId && token) {
       fetchProductCount();
     }
-  }, [activeFair, userId, token]);
+  }, [activeFair, userId, token, fetchProductCount]);
+
+  useEffect(() => {
+    setProductsCountDB(productsCountDB);
+  }, [productsCountDB]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -190,28 +191,16 @@ const SellerProducts = () => {
         productsToSend as ProductProps[],
         infoToPost.fairId
       );
+      await fetchProductCount();
 
       localStorage.removeItem(`savedProducts-${userId}`);
       setProducts([]);
 
-      await fetchProductCount();
 
       setVisibleStep("RESUMEN");
       setError(null);
     } catch (error: any) {
       setError("Hubo un problema al enviar los productos.");
-    }
-  };
-
-  const fetchProductCount = async () => {
-    try {
-      const data = await getProductsBySeller(userId, token);
-      if (data && data.products) {
-        setProductsCountDB(data.products.length);
-      }
-      console.log("Productos obtenidos:", data);
-    } catch (error) {
-      setError("Hubo un problema al obtener la cantidad de productos.");
     }
   };
 
