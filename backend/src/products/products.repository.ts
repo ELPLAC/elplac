@@ -34,54 +34,49 @@ export class ProductsRepository {
     fairId: string,
   ) {
     console.log("products:", products);
+  
     const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
   
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-  
     try {
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+  
+      // Verificar si el vendedor existe y está activo
       const seller = await queryRunner.manager.findOne(Seller, {
         where: { id: sellerId },
         relations: { products: true },
       });
       console.log("seller:", seller);
       if (!seller || seller.status === SellerStatus.NO_ACTIVE) {
-        throw new NotFoundException(
-          'Vendedor no autorizado a cargar los productos',
-        );
+        throw new NotFoundException('Vendedor no autorizado a cargar los productos');
       }
   
+      // Verificar si la feria existe y está activa
       const searchFair = await queryRunner.manager.findOne(Fair, {
         where: { id: fairId },
       });
       console.log("searchFair:", searchFair);
-  
-      if (!searchFair || searchFair.isActive === false) {
+      if (!searchFair || !searchFair.isActive) {
         throw new NotFoundException('Feria inactiva');
       }
   
-      const fairSeller = await queryRunner.manager.findOne(
-        SellerFairRegistration,
-        {
-          where: { seller, fair: searchFair },
-          relations: ['categoryFair', 'categoryFair.category'],
-        },
-      );
-  
+      // Verificar si el vendedor está registrado en la feria
+      const fairSeller = await queryRunner.manager.findOne(SellerFairRegistration, {
+        where: { seller, fair: searchFair },
+        relations: ['categoryFair', 'categoryFair.category'],
+      });
       console.log("fairSeller:", fairSeller);
-  
       if (!fairSeller) {
         throw new NotFoundException('Vendedor no registrado en la feria');
       }
   
+      // Verificar la categoría de la feria
       const foundCategory = await queryRunner.manager.findOne(Category, {
         where: { id: fairSeller.categoryFair.category.id },
       });
-  
       const fairCategory = await queryRunner.manager.findOne(FairCategory, {
         where: { fair: searchFair, category: foundCategory },
       });
-  
       if (!fairCategory) {
         throw new NotFoundException('Categoría de la feria no encontrada');
       }
@@ -89,6 +84,7 @@ export class ProductsRepository {
       const liquidation = fairSeller.liquidation;
       const arrayProducts: Product[] = [];
   
+      // Procesar los productos
       for (const product of products) {
         const productEntity = new Product();
         productEntity.brand = product.brand;
@@ -99,6 +95,7 @@ export class ProductsRepository {
         productEntity.fairCategory = fairCategory;
         productEntity.seller = seller;
   
+        // Generar el código único del producto
         const number = seller.products?.length + 1;
         productEntity.code = `${seller.sku}-${number}`;
   
@@ -106,19 +103,21 @@ export class ProductsRepository {
         const existingProduct = await queryRunner.manager.findOne(Product, {
           where: { code: productEntity.code },
         });
-  
         if (existingProduct) {
           console.log(`Producto con código ${productEntity.code} ya existe.`);
-          continue;  // Omitir este producto si ya existe
+          continue; // Omitir este producto si ya existe
         }
   
+        // Guardar el nuevo producto
         const savedProduct = await queryRunner.manager.save(Product, productEntity);
-  
         seller.products.push(savedProduct);
         arrayProducts.push(savedProduct);
       }
   
+      // Guardar cambios en el vendedor
       await queryRunner.manager.save(Seller, seller);
+  
+      // Crear la solicitud de productos
       const productRequest = new ProductRequest();
       productRequest.seller = seller;
       productRequest.fair = searchFair;
@@ -128,18 +127,24 @@ export class ProductsRepository {
   
       const newProductRequest = await queryRunner.manager.save(ProductRequest, productRequest);
   
+      // Confirmar la transacción
       await queryRunner.commitTransaction();
   
+      // Informar por email al administrador
       await this.informAdminEmail(sellerId);
   
       return newProductRequest.id;
     } catch (error) {
+      // Si ocurre un error, hacer rollback y lanzar el error
       await queryRunner.rollbackTransaction();
+      console.error('Error al crear productos:', error);
       throw error;
     } finally {
+      // Liberar el queryRunner después de terminar
       await queryRunner.release();
     }
   }
+  
   
 
   async informAdminEmail(sellerId: string): Promise<void> {
