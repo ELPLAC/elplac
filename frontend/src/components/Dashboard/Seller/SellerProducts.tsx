@@ -131,8 +131,7 @@ const SellerProducts = () => {
     let hasError = false;
     const newErrors: Record<string, string> = {};
 
-    const totalProducts = submittedProducts.length + products.length + (localStorage.getItem(`savedProducts-${userId}`) ? JSON.parse(localStorage.getItem(`savedProducts-${userId}`) || "[]").length : 0);
-    console.log("totalProducts:", totalProducts);
+    const totalProducts = productsLengthSeller + productInLocalStorage;    console.log("totalProducts:", totalProducts);
     console.log("cantidad de productos totales:", totalProducts.length);
     if (totalProducts < minProducts) {
       setError(`Debes cargar al menos ${minProducts} productos para enviar.`);
