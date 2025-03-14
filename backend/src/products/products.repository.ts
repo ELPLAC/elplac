@@ -38,11 +38,9 @@ export class ProductsRepository {
     const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
   
     try {
-      // Conectar y comenzar la transacción
       await queryRunner.connect();
-      await queryRunner.startTransaction();  // Asegúrate de que esto sea llamado antes de cualquier consulta
+      await queryRunner.startTransaction(); 
   
-      // Verificar si el vendedor existe y está activo
       const seller = await queryRunner.manager.findOne(Seller, {
         where: { id: sellerId },
         relations: { products: true },
@@ -52,7 +50,6 @@ export class ProductsRepository {
         throw new NotFoundException('Vendedor no autorizado a cargar los productos');
       }
   
-      // Verificar si la feria existe y está activa
       const searchFair = await queryRunner.manager.findOne(Fair, {
         where: { id: fairId },
       });
@@ -61,7 +58,6 @@ export class ProductsRepository {
         throw new NotFoundException('Feria inactiva');
       }
   
-      // Verificar si el vendedor está registrado en la feria
       const fairSeller = await queryRunner.manager.findOne(SellerFairRegistration, {
         where: { seller, fair: searchFair },
         relations: ['categoryFair', 'categoryFair.category'],
@@ -71,7 +67,6 @@ export class ProductsRepository {
         throw new NotFoundException('Vendedor no registrado en la feria');
       }
   
-      // Verificar la categoría de la feria
       const foundCategory = await queryRunner.manager.findOne(Category, {
         where: { id: fairSeller.categoryFair.category.id },
       });
@@ -85,7 +80,6 @@ export class ProductsRepository {
       const liquidation = fairSeller.liquidation;
       const arrayProducts: Product[] = [];
   
-      // Procesar los productos
       for (const product of products) {
         const productEntity = new Product();
         productEntity.brand = product.brand;
@@ -96,29 +90,24 @@ export class ProductsRepository {
         productEntity.fairCategory = fairCategory;
         productEntity.seller = seller;
   
-        // Generar el código único del producto
         const number = seller.products?.length + 1;
         productEntity.code = `${seller.sku}-${number}`;
   
-        // Verificar si el producto ya existe antes de guardarlo
         const existingProduct = await queryRunner.manager.findOne(Product, {
           where: { code: productEntity.code },
         });
         if (existingProduct) {
           console.log(`Producto con código ${productEntity.code} ya existe.`);
-          continue; // Omitir este producto si ya existe
+          continue; 
         }
   
-        // Guardar el nuevo producto
         const savedProduct = await queryRunner.manager.save(Product, productEntity);
         seller.products.push(savedProduct);
         arrayProducts.push(savedProduct);
       }
   
-      // Guardar cambios en el vendedor
       await queryRunner.manager.save(Seller, seller);
   
-      // Crear la solicitud de productos
       const productRequest = new ProductRequest();
       productRequest.seller = seller;
       productRequest.fair = searchFair;
@@ -128,22 +117,18 @@ export class ProductsRepository {
   
       const newProductRequest = await queryRunner.manager.save(ProductRequest, productRequest);
   
-      // Confirmar la transacción
       await queryRunner.commitTransaction();
   
-      // Informar por email al administrador
       await this.informAdminEmail(sellerId);
   
       return newProductRequest.id;
     } catch (error) {
       console.error('Error al crear productos:', error);
       if (queryRunner.isTransactionActive) {
-        // Solo hacemos rollback si la transacción está activa
         await queryRunner.rollbackTransaction();
       }
       throw error;
     } finally {
-      // Liberar el queryRunner después de terminar
       await queryRunner.release();
     }
   }    
