@@ -131,19 +131,19 @@ const SellerProducts = () => {
     let hasError = false;
     const newErrors: Record<string, string> = {};
 
-    if (totalProducts.length < minProducts) {
-      setError(`Debes cargar al menos ${minProducts} productos para enviar.`);
-      notify(
-        "ToastError",
-        `Debes cargar al menos ${minProducts} productos para enviar.`
-      );
-      return;
-    }
-    if (maxProducts > 0 && products.length > maxProducts) {
-      setError(`No puedes enviar más de ${maxProducts} productos.`);
-      notify("ToastError", `No puedes enviar más de ${maxProducts} productos.`);
-      return;
-    }
+     if (totalProducts.length < minProducts) {
+       setError(`Debes cargar al menos ${minProducts} productos para enviar.`);
+       notify(
+         "ToastError",
+         `Debes cargar al menos ${minProducts} productos para enviar.`
+       );
+       return;
+     }
+     if (maxProducts > 0 && products.length > maxProducts) {
+       setError(`No puedes enviar más de ${maxProducts} productos.`);
+       notify("ToastError", `No puedes enviar más de ${maxProducts} productos.`);
+       return;
+     }
 
     const productsToSend: Partial<ProductProps>[] = products.map((product) => {
       const { id, ...rest } = product;
