@@ -125,14 +125,14 @@ const isProductValid = totalProducts < maxProducts;
 
     const totalProducts = products.length + submittedProducts.length;
 
-    if (totalProducts < minProducts) {
-      setError(`Debes cargar al menos ${minProducts} productos para enviar.`);
-      notify(
-        "ToastError",
-        `Debes cargar al menos ${minProducts} productos para enviar.`
-      );
-      return;
-    }
+    // if (totalProducts < minProducts) {
+    //   setError(`Debes cargar al menos ${minProducts} productos para enviar.`);
+    //   notify(
+    //     "ToastError",
+    //     `Debes cargar al menos ${minProducts} productos para enviar.`
+    //   );
+    //   return;
+    // }
     if (maxProducts > 0 && totalProducts > maxProducts) {
       setError(`No puedes enviar más de ${maxProducts} productos en total.`);
       notify(
