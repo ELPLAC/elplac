@@ -209,6 +209,7 @@ const SellerProducts = () => {
       if (data && data.products) {
         setProductsCountDB(data.products.length);
       }
+      console.log("Productos obtenidos:", data);
     } catch (error) {
       setError("Hubo un problema al obtener la cantidad de productos.");
     }
