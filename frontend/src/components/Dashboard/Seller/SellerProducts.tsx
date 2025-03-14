@@ -24,9 +24,6 @@ const SellerProducts = () => {
   const { token } = useAuth();
   const { userDtos, sellerDtos } = useProfile();
   const [products, setProducts] = useState<ProductProps[]>([]);
-  const [submittedProducts, setSubmittedProducts] = useState<ProductProps[]>(
-    []
-  );
   const { activeFair } = useFair();
   const [visibleStep, setVisibleStep] = useState<string>("TIPS");
   const [visibleProducts, setVisibleProducts] = useState<boolean>(false);
@@ -41,19 +38,24 @@ const SellerProducts = () => {
     (registration: any) => registration.seller.id === userDtos?.seller?.id
   );
   const sellerCategoryFair = fairSeller?.categoryFair;
+  const userId = userDtos?.seller?.id;
 
+  //maximo de productos
   const maxProducts = sellerCategoryFair?.maxProductsSeller ?? 0;
-  const minProducts = sellerCategoryFair?.minProductsSeller ?? 0;
-  const hasReachedMinProducts =
-    products.length + submittedProducts.length >= minProducts;
 
-  const remainingProducts = activeFair?.sellerRegistrations
-    ? maxProducts - (products.length + submittedProducts.length)
-    : 0;
+  //minimo de productos
+  const minProducts = sellerCategoryFair?.minProductsSeller ?? 0;
+// Verificar si se ha alcanzado el mínimo
+const savedProducts = Number(localStorage.getItem(`savedProducts-${userId}`)) || 0;
+const hasReachedMinProducts = (products.length + savedProducts) >= minProducts;
+
+// Verificar si se ha alcanzado el máximo
+const remainingProducts = activeFair?.sellerRegistrations
+  ? Math.max(0, maxProducts - (products.length + savedProducts))
+  : 0;
 
   const isProductValid = remainingProducts > 0;
 
-  const userId = userDtos?.seller?.id;
 
   useEffect(() => {
     if (userId) {
@@ -190,7 +192,6 @@ const SellerProducts = () => {
       localStorage.removeItem(`savedProducts-${userId}`);
       setProducts([]);
 
-      setSubmittedProducts(products);
       setVisibleStep("RESUMEN");
       setError(null);
     } catch (error: any) {
@@ -464,7 +465,7 @@ const SellerProducts = () => {
                     <div className="bg-yellow-200 text-yellow-800 p-2 rounded mb-4">
                       Te falta agregar al menos{" "}
                       {minProducts -
-                        (products.length + submittedProducts.length)}{" "}
+                        (hasReachedMinProducts ? remainingProducts : 0)}{" "}
                       producto(s) para cumplir con el mínimo de {minProducts}.
                     </div>
                   )}
