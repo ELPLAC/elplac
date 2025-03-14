@@ -204,8 +204,8 @@ const SellerProducts = () => {
 
       setTimeout(() => {
         fetchProductCount();
-      }, 1000);
-      
+      }, 1500);
+
       setVisibleStep("RESUMEN");
       setError(null);
     } catch (error: any) {

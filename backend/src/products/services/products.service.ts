@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { ProductsRepository } from '@products/products.repository';
 import { ProductsDto } from '@products/dtos/products.dto';
 import { Product } from '@products/entities/products.entity';
@@ -12,9 +12,15 @@ export class ProductsService {
     ) {}
 
     async createProducts(products: ProductsDto[], sellerId: string, fairId: string) {
-        const pRequestId = await this.productsRepository.createProducts(products, sellerId, fairId);
-        return {pRequestId}
-    }
+        try {
+          const pRequestId = await this.productsRepository.createProducts(products, sellerId, fairId);
+          return { pRequestId };
+        } catch (error) {
+          console.error('Error en createProducts:', error); // Agrega esto para depurar
+          throw new InternalServerErrorException('Error al crear productos.');
+        }
+      }
+      
 
     async getProducts() {
         

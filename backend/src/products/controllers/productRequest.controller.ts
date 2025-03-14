@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  InternalServerErrorException,
   Param,
   Post,
   Put,
@@ -22,18 +23,19 @@ export class ProductRequestController {
   @Roles(Role.SELLER, Role.USER)
   @UseGuards(AuthGuard, RoleGuard)
   @Post()
-  async createProductRequest(
-    @Body() createProductRequestDto: CreateProductRequestDto,
-  ) {
-    const productRequest =
-      await this.productRequestService.createProductRequest(
-        createProductRequestDto,
-      );
-    return {
-      message: 'Productos cargados, seran revisados por el administrador',
-      productRequest,
-    };
+  async createProductRequest(@Body() createProductRequestDto: CreateProductRequestDto) {
+    try {
+      const productRequest = await this.productRequestService.createProductRequest(createProductRequestDto);
+      return {
+        message: 'Productos cargados, serán revisados por el administrador',
+        productRequest,
+      };
+    } catch (error) {
+      console.error('Error en createProductRequest:', error); // Agrega esto para ver el error en logs
+      throw new InternalServerErrorException('Ocurrió un error al procesar la solicitud.');
+    }
   }
+  
 
   @Roles(Role.ADMIN)
   @UseGuards(AuthGuard, RoleGuard)
