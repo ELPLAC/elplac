@@ -131,49 +131,63 @@ const SellerProducts = () => {
     let hasError = false;
     const newErrors: Record<string, string> = {};
 
-    const totalProducts = productsLengthSeller + productInLocalStorage;    console.log("totalProducts:", totalProducts);
-    console.log("cantidad de productos totales:", totalProducts.length);
-    if (totalProducts < minProducts) {
+    if (products.length < minProducts) {
       setError(`Debes cargar al menos ${minProducts} productos para enviar.`);
-      notify("ToastError", `Debes cargar al menos ${minProducts} productos para enviar.`);
+      notify(
+        "ToastError",
+        `Debes cargar al menos ${minProducts} productos para enviar.`
+      );
       return;
     }
-  
-    if (maxProducts > 0 && totalProducts > maxProducts) {
-      setError(`No puedes enviar más de ${maxProducts} productos en total.`);
-      notify("ToastError", `No puedes enviar más de ${maxProducts} productos en total.`);
+    if (maxProducts > 0 && products.length > maxProducts) {
+      setError(`No puedes enviar más de ${maxProducts} productos.`);
+      notify("ToastError", `No puedes enviar más de ${maxProducts} productos.`);
       return;
     }
 
-    const productsToSend: ProductProps[] = products.map((product) => {
-      const { id, price, ...rest } = product;
-    
-      let validPrice: string | number;
-    
-      if (price === undefined) {
-        validPrice = 0; 
-      } else if (typeof price === "string") {
-        validPrice = parseFloat(price.replace(/[^\d.-]/g, ""));
-        if (isNaN(validPrice) || validPrice <= 0) {
-          newErrors[`${product.id}-price`] = "El precio debe ser un número válido y mayor a 0";
+    const productsToSend: Partial<ProductProps>[] = products.map((product) => {
+      const { id, ...rest } = product;
+      let numericPrice: number | undefined;
+
+      if (typeof product.price === "string") {
+        numericPrice = parseFloat(
+          (product.price as string).replace(/[^\d.-]/g, "")
+        );
+        if (isNaN(numericPrice) || numericPrice <= 0) {
+          newErrors[`${product.id}-price`] =
+            "El precio debe ser un número válido y mayor a 0";
           hasError = true;
         }
-      } else {
-        validPrice = price;
-        if (validPrice <= 0) {
+      } else if (typeof product.price === "number") {
+        numericPrice = product.price;
+        if (numericPrice <= 0) {
           newErrors[`${product.id}-price`] = "El precio debe ser mayor a 0";
           hasError = true;
         }
+      } else {
+        newErrors[`${product.id}-price`] = "El precio es obligatorio";
+        hasError = true;
       }
-    
+
+      if (!product.size.trim()) {
+        newErrors[`${product.id}-size`] = "Este campo es obligatorio";
+        hasError = true;
+      }
+      if (!product.brand.trim()) {
+        newErrors[`${product.id}-brand`] = "Este campo es obligatorio";
+        hasError = true;
+      }
+      if (!product.description.trim()) {
+        newErrors[`${product.id}-description`] = "Este campo es obligatorio";
+        hasError = true;
+      }
+
       return {
         ...rest,
-        price: validPrice,  
+        price: numericPrice,
         ifUnsold: product.ifUnsold,
-        id: product.id, 
       };
     });
-    
 
     if (hasError) {
       setErrors(newErrors);
@@ -184,19 +198,17 @@ const SellerProducts = () => {
       await createProductRequest(
         token,
         infoToPost.sellerId,
-        productsToSend,
+        productsToSend as ProductProps[],
         infoToPost.fairId
       );
-      
-  
+
       localStorage.removeItem(`savedProducts-${userId}`);
-  
-      setSubmittedProducts((prev) => [...prev, ...products]);
-  
       setProducts([]);
+
+      setSubmittedProducts(products);
       setVisibleStep("RESUMEN");
       setError(null);
-    } catch (error) {
+    } catch (error: any) {
       setError("Hubo un problema al enviar los productos.");
     }
   };
