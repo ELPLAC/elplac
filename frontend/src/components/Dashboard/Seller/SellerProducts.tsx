@@ -194,15 +194,23 @@ const SellerProducts = () => {
       localStorage.removeItem(`savedProducts-${userId}`);
       setProducts([]);
 
-      const data = await getProductsBySeller(userId, token);
-      if (data && data.products) {
-        setProductsCountDB(data.products.length);
-      }
+      await fetchProductCount();
 
       setVisibleStep("RESUMEN");
       setError(null);
     } catch (error: any) {
       setError("Hubo un problema al enviar los productos.");
+    }
+  };
+
+  const fetchProductCount = async () => {
+    try {
+      const data = await getProductsBySeller(userId, token);
+      if (data && data.products) {
+        setProductsCountDB(data.products.length);
+      }
+    } catch (error) {
+      setError("Hubo un problema al obtener la cantidad de productos.");
     }
   };
 
