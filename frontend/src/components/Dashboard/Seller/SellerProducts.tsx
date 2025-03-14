@@ -131,7 +131,7 @@ const SellerProducts = () => {
     let hasError = false;
     const newErrors: Record<string, string> = {};
 
-    if (products.length < minProducts) {
+    if (totalProducts.length < minProducts) {
       setError(`Debes cargar al menos ${minProducts} productos para enviar.`);
       notify(
         "ToastError",
