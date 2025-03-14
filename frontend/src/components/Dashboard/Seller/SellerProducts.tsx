@@ -96,27 +96,31 @@ const SellerProducts = () => {
       try {
         const savedProducts = localStorage.getItem(`savedProducts-${userId}`);
         if (savedProducts) {
-          console.log(
-            "Usando productos desde localStorage, no llamamos a la API."
-          );
-          return;
-        }
-
-        const data = await getProductsBySeller(userDtos?.seller?.id, token);
-        if (data) {
-          setProducts(data.products || []);
+          console.log("Usando productos desde localStorage, no llamamos a la API.");
+          setProducts(JSON.parse(savedProducts));
         } else {
-          setError("No se pudieron cargar los productos.");
+          const data = await getProductsBySeller(userDtos?.seller?.id, token);
+          if (data) {
+            setProducts(data.products || []);
+            setSubmittedProducts(
+              (data.products || []).filter((p: ProductProps) => p.id !== undefined)
+            )            
+                    
+          } else {
+            setError("No se pudieron cargar los productos.");
+          }
         }
       } catch (error) {
+        console.error("Error al cargar productos:", error);
         setError("Hubo un problema al cargar los productos.");
       }
     };
-
+  
     if (activeFair && userDtos?.seller?.id && token) {
       fetchProducts();
     }
   }, [activeFair, userDtos?.seller?.id, token, userId]);
+  
 
   const infoToPost = {
     sellerId: userDtos?.seller?.id ?? "",
@@ -127,70 +131,54 @@ const SellerProducts = () => {
     let hasError = false;
     const newErrors: Record<string, string> = {};
 
-    const savedSubmittedProducts = JSON.parse(
-      localStorage.getItem(`submittedProducts-${userId}`) || "[]"
-    );
-
-    const totalProducts = products.length + savedSubmittedProducts.length;
-
+    const totalProducts = submittedProducts.length + products.length + (localStorage.getItem(`savedProducts-${userId}`) ? JSON.parse(localStorage.getItem(`savedProducts-${userId}`) || "[]").length : 0);
+    console.log("totalProducts:", totalProducts);
+    console.log("cantidad de productos totales:", totalProducts.length);
     if (totalProducts < minProducts) {
       setError(`Debes cargar al menos ${minProducts} productos para enviar.`);
-      notify(
-        "ToastError",
-        `Debes cargar al menos ${minProducts} productos para enviar.`
-      );
+      notify("ToastError", `Debes cargar al menos ${minProducts} productos para enviar.`);
       return;
     }
+  
     if (maxProducts > 0 && totalProducts > maxProducts) {
       setError(`No puedes enviar más de ${maxProducts} productos en total.`);
-      notify(
-        "ToastError",
-        `No puedes enviar más de ${maxProducts} productos en total.`
-      );
+      notify("ToastError", `No puedes enviar más de ${maxProducts} productos en total.`);
       return;
     }
 
-    const productsToSend: Partial<ProductProps>[] = products.map((product) => {
-      const { id, ...rest } = product;
-      let numericPrice: number | undefined;
-
-      if (typeof product.price === "string") {
-        numericPrice = parseFloat(product.price.replace(/[^\d.-]/g, ""));
-        if (isNaN(numericPrice) || numericPrice <= 0) {
-          newErrors[`${product.id}-price`] =
-            "El precio debe ser un número válido y mayor a 0";
-          hasError = true;
-        }
-      } else if (typeof product.price === "number") {
-        numericPrice = product.price;
-        if (numericPrice <= 0) {
-          newErrors[`${product.id}-price`] = "El precio debe ser mayor a 0";
+    const productsToSend: ProductProps[] = products.map((product) => {
+      const { id, price, ...rest } = product;
+    
+      if (id === undefined) {
+        product.id = 0; // O el valor adecuado
+      }
+    
+      let validPrice: string | number;
+    
+      if (price === undefined) {
+        validPrice = 0; 
+      } else if (typeof price === "string") {
+        validPrice = parseFloat(price.replace(/[^\d.-]/g, ""));
+        if (isNaN(validPrice) || validPrice <= 0) {
+          newErrors[`${product.id}-price`] = "El precio debe ser un número válido y mayor a 0";
           hasError = true;
         }
       } else {
-        newErrors[`${product.id}-price`] = "El precio es obligatorio";
-        hasError = true;
+        validPrice = price;
+        if (validPrice <= 0) {
+          newErrors[`${product.id}-price`] = "El precio debe ser mayor a 0";
+          hasError = true;
+        }
       }
-
-      if (!product.size.trim()) {
-        newErrors[`${product.id}-size`] = "Este campo es obligatorio";
-        hasError = true;
-      }
-      if (!product.brand.trim()) {
-        newErrors[`${product.id}-brand`] = "Este campo es obligatorio";
-        hasError = true;
-      }
-      if (!product.description.trim()) {
-        newErrors[`${product.id}-description`] = "Este campo es obligatorio";
-        hasError = true;
-      }
-
+    
       return {
         ...rest,
-        price: numericPrice,
+        price: validPrice,  
         ifUnsold: product.ifUnsold,
+        id: product.id, 
       };
     });
+    
 
     if (hasError) {
       setErrors(newErrors);
@@ -198,17 +186,22 @@ const SellerProducts = () => {
     }
 
     try {
-      await createProductRequest(token, infoToPost.sellerId, productsToSend as ProductProps[], infoToPost.fairId);
+      await createProductRequest(
+        token,
+        infoToPost.sellerId,
+        productsToSend,
+        activeFair?.id ?? "0" 
+      );
+      
   
-      const updatedSubmittedProducts = [...savedSubmittedProducts, ...products];
-      localStorage.setItem(`submittedProducts-${userId}`, JSON.stringify(updatedSubmittedProducts));
+      localStorage.removeItem(`savedProducts-${userId}`);
   
-      setSubmittedProducts(updatedSubmittedProducts);
+      setSubmittedProducts((prev) => [...prev, ...products]);
+  
       setProducts([]);
-  
       setVisibleStep("RESUMEN");
       setError(null);
-    } catch (error: any) {
+    } catch (error) {
       setError("Hubo un problema al enviar los productos.");
     }
   };
