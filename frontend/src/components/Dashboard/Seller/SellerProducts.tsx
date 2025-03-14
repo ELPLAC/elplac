@@ -65,6 +65,7 @@ const SellerProducts = () => {
       const data = await getProductsBySeller(userId, token);
       if (data && data.products) {
         setProductsCountDB(data.products.length);
+        console.log("Cantidad de productos en BD:", data.products.length);
       }
     } catch (error) {
       setError("Hubo un problema al obtener la cantidad de productos.");
@@ -77,10 +78,12 @@ const SellerProducts = () => {
     }
   }, [activeFair, userId, token, fetchProductCount]);
 
+  // Recalcular cuando productsCountDB cambie
   useEffect(() => {
-    setProductsCountDB(productsCountDB);
+    console.log("Actualizando productsCountDB a:", productsCountDB);
   }, [productsCountDB]);
 
+  // Verificar si el usuario es activo y si puede ver los productos
   useEffect(() => {
     setIsLoading(true);
 
@@ -110,7 +113,10 @@ const SellerProducts = () => {
   const totalProducts = products.length + productsCountDB;
   const remainingProducts = Math.max(0, maxProducts - totalProducts);
   const hasReachedMinProducts = totalProducts >= minProducts;
-  const isProductValid = remainingProducts > 0;
+  const isProductValid = totalProducts < maxProducts;
+
+  console.log("totalProducts:", totalProducts, "minProducts:", minProducts);
+
 
   const infoToPost = {
     sellerId: userDtos?.seller?.id ?? "",
@@ -196,7 +202,10 @@ const SellerProducts = () => {
       localStorage.removeItem(`savedProducts-${userId}`);
       setProducts([]);
 
-
+      setTimeout(() => {
+        fetchProductCount();
+      }, 1000);
+      
       setVisibleStep("RESUMEN");
       setError(null);
     } catch (error: any) {
