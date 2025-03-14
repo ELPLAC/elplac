@@ -61,23 +61,29 @@ const SellerProducts = () => {
   }, [products, userId]);
 
   const fetchProductCount = useCallback(async () => {
+    console.log("Llamando a fetchProductCount...");
     try {
       const data = await getProductsBySeller(userId, token);
       if (data && data.products) {
-        setProductsCountDB(data.products.length);
-        console.log("Cantidad de productos en BD:", data.products.length);
+        console.log("Cantidad de productos obtenidos de la API:", data.products.length);
+        setProductsCountDB((prev) => {
+          console.log("Actualizando productsCountDB:", prev, "→", data.products.length);
+          return data.products.length;
+        });
       }
     } catch (error) {
       console.error("Error al obtener la cantidad de productos:", error);
       setError("Hubo un problema al obtener la cantidad de productos.");
     }
-  }, [userId, token]);
+  }, [userId, token]);  
 
   useEffect(() => {
+    console.log("Ejecutando useEffect para fetchProductCount...");
     if (activeFair && userId && token) {
       fetchProductCount();
     }
-  }, [activeFair, userId, token, fetchProductCount]);
+  }, [activeFair, userId, token , fetchProductCount]);
+  
 
   useEffect(() => {
     console.log("Actualizando productsCountDB a:", productsCountDB);
@@ -198,14 +204,14 @@ console.log("productos de base de datos: ", productsCountDB);
         productsToSend as ProductProps[],
         infoToPost.fairId
       );
-      await fetchProductCount();
-
-      localStorage.removeItem(`savedProducts-${userId}`);
-      setProducts([]);
 
       setTimeout(() => {
         fetchProductCount();
       }, 1500);
+      
+      localStorage.removeItem(`savedProducts-${userId}`);
+      setProducts([]);
+
 
       setVisibleStep("RESUMEN");
       setError(null);
