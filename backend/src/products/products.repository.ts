@@ -31,60 +31,60 @@ export class ProductsRepository {
   async createProducts(
     products: ProductsDto[],
     sellerId: string,
-    fairId: string,
+    fairId: string
   ) {
     const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
-
+  
     await queryRunner.connect();
-    await queryRunner.startTransaction();
-
     try {
+      await queryRunner.startTransaction(); // 🔥 Asegurar que la transacción se inicie correctamente
+  
       const seller = await queryRunner.manager.findOne(Seller, {
         where: { id: sellerId },
         relations: { products: true },
       });
-
+  
       if (!seller || seller.status === SellerStatus.NO_ACTIVE) {
         throw new NotFoundException(
-          'Vendedor no autorizado a cargar los productos',
+          "Vendedor no autorizado a cargar los productos"
         );
       }
-
+  
       const searchFair = await queryRunner.manager.findOne(Fair, {
         where: { id: fairId },
       });
-
+  
       if (!searchFair || searchFair.isActive === false) {
-        throw new NotFoundException('Feria inactiva');
+        throw new NotFoundException("Feria inactiva");
       }
-
+  
       const fairSeller = await queryRunner.manager.findOne(
         SellerFairRegistration,
         {
           where: { seller, fair: searchFair },
-          relations: ['categoryFair', 'categoryFair.category'],
-        },
+          relations: ["categoryFair", "categoryFair.category"],
+        }
       );
-
+  
       if (!fairSeller) {
-        throw new NotFoundException('Vendedor no registrado en la feria');
+        throw new NotFoundException("Vendedor no registrado en la feria");
       }
-
+  
       const foundCategory = await queryRunner.manager.findOne(Category, {
         where: { id: fairSeller.categoryFair.category.id },
       });
-
+  
       const fairCategory = await queryRunner.manager.findOne(FairCategory, {
         where: { fair: searchFair, category: foundCategory },
       });
-
+  
       if (!fairCategory) {
-        throw new NotFoundException('Categoría de la feria no encontrada');
+        throw new NotFoundException("Categoría de la feria no encontrada");
       }
-
+  
       const liquidation = fairSeller.liquidation;
       const arrayProducts: Product[] = [];
-
+  
       for (const product of products) {
         const productEntity = new Product();
         productEntity.brand = product.brand;
@@ -94,44 +94,43 @@ export class ProductsRepository {
         productEntity.liquidation = liquidation;
         productEntity.fairCategory = fairCategory;
         productEntity.seller = seller;
-
-        const number = seller.products?.length + 1;
+  
+        const number = (seller.products?.length ?? 0) + arrayProducts.length + 1;
         productEntity.code = `${seller.sku}-${number}`;
-
+  
         const savedProduct = await queryRunner.manager.save(
           Product,
-          productEntity,
+          productEntity
         );
-
-        seller.products.push(savedProduct);
+  
         arrayProducts.push(savedProduct);
       }
-
-      await queryRunner.manager.save(Seller, seller);
+  
       const productRequest = new ProductRequest();
       productRequest.seller = seller;
       productRequest.fair = searchFair;
       productRequest.status = StatusProductRequest.PENDING;
       productRequest.category = foundCategory.name;
       productRequest.products = arrayProducts;
-
+  
       const newProductRequest = await queryRunner.manager.save(
         ProductRequest,
-        productRequest,
+        productRequest
       );
-
-      await queryRunner.commitTransaction();
-
+  
+      await queryRunner.commitTransaction(); // ✅ Confirmar la transacción después de todas las operaciones
+  
       await this.informAdminEmail(sellerId);
-
+  
       return newProductRequest.id;
     } catch (error) {
-      await queryRunner.rollbackTransaction();
-      throw error;
+      await queryRunner.rollbackTransaction(); // 🚨 Asegurar rollback en caso de error
+      throw new InternalServerErrorException("Error al crear productos.");
     } finally {
-      await queryRunner.release();
+      await queryRunner.release(); // ✅ Liberar el queryRunner para evitar bloqueos
     }
-  }   
+  }
+  
 
   async informAdminEmail(sellerId: string): Promise<void> {
     const seller = await this.sellerRepository.findOne({ where: { id: sellerId } });

@@ -68,6 +68,7 @@ const SellerProducts = () => {
         console.log("Cantidad de productos en BD:", data.products.length);
       }
     } catch (error) {
+      console.error("Error al obtener la cantidad de productos:", error);
       setError("Hubo un problema al obtener la cantidad de productos.");
     }
   }, [userId, token]);
