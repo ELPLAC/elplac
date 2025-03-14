@@ -35,10 +35,10 @@ export class ProductsRepository {
   ) {
     console.log("products:", products);
     const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
-
+  
     await queryRunner.connect();
     await queryRunner.startTransaction();
-
+  
     try {
       const seller = await queryRunner.manager.findOne(Seller, {
         where: { id: sellerId },
@@ -50,16 +50,16 @@ export class ProductsRepository {
           'Vendedor no autorizado a cargar los productos',
         );
       }
-
+  
       const searchFair = await queryRunner.manager.findOne(Fair, {
         where: { id: fairId },
       });
       console.log("searchFair:", searchFair);
-
+  
       if (!searchFair || searchFair.isActive === false) {
         throw new NotFoundException('Feria inactiva');
       }
-
+  
       const fairSeller = await queryRunner.manager.findOne(
         SellerFairRegistration,
         {
@@ -67,28 +67,28 @@ export class ProductsRepository {
           relations: ['categoryFair', 'categoryFair.category'],
         },
       );
-
+  
       console.log("fairSeller:", fairSeller);
-
+  
       if (!fairSeller) {
         throw new NotFoundException('Vendedor no registrado en la feria');
       }
-
+  
       const foundCategory = await queryRunner.manager.findOne(Category, {
         where: { id: fairSeller.categoryFair.category.id },
       });
-
+  
       const fairCategory = await queryRunner.manager.findOne(FairCategory, {
         where: { fair: searchFair, category: foundCategory },
       });
-
+  
       if (!fairCategory) {
         throw new NotFoundException('Categoría de la feria no encontrada');
       }
-
+  
       const liquidation = fairSeller.liquidation;
       const arrayProducts: Product[] = [];
-
+  
       for (const product of products) {
         const productEntity = new Product();
         productEntity.brand = product.brand;
@@ -98,19 +98,26 @@ export class ProductsRepository {
         productEntity.liquidation = liquidation;
         productEntity.fairCategory = fairCategory;
         productEntity.seller = seller;
-
+  
         const number = seller.products?.length + 1;
         productEntity.code = `${seller.sku}-${number}`;
-
-        const savedProduct = await queryRunner.manager.save(
-          Product,
-          productEntity,
-        );
-
+  
+        // Verificar si el producto ya existe antes de guardarlo
+        const existingProduct = await queryRunner.manager.findOne(Product, {
+          where: { code: productEntity.code },
+        });
+  
+        if (existingProduct) {
+          console.log(`Producto con código ${productEntity.code} ya existe.`);
+          continue;  // Omitir este producto si ya existe
+        }
+  
+        const savedProduct = await queryRunner.manager.save(Product, productEntity);
+  
         seller.products.push(savedProduct);
         arrayProducts.push(savedProduct);
       }
-
+  
       await queryRunner.manager.save(Seller, seller);
       const productRequest = new ProductRequest();
       productRequest.seller = seller;
@@ -118,16 +125,13 @@ export class ProductsRepository {
       productRequest.status = StatusProductRequest.PENDING;
       productRequest.category = foundCategory.name;
       productRequest.products = arrayProducts;
-
-      const newProductRequest = await queryRunner.manager.save(
-        ProductRequest,
-        productRequest,
-      );
-
+  
+      const newProductRequest = await queryRunner.manager.save(ProductRequest, productRequest);
+  
       await queryRunner.commitTransaction();
-
+  
       await this.informAdminEmail(sellerId);
-
+  
       return newProductRequest.id;
     } catch (error) {
       await queryRunner.rollbackTransaction();
@@ -136,6 +140,7 @@ export class ProductsRepository {
       await queryRunner.release();
     }
   }
+  
 
   async informAdminEmail(sellerId: string): Promise<void> {
     const seller = await this.sellerRepository.findOne({ where: { id: sellerId } });
