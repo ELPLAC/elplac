@@ -294,14 +294,29 @@ const SellerProducts = () => {
   };
 
   useEffect(() => {
-    if (
-      sellerDtos?.registrations?.length === 0 ||
-      sellerDtos?.registrations?.every(
-        (registration) => registration.fair.id !== activeFair?.id
-      )
-    ) {
-      setVisibleProducts(true);
-    }
+    setIsLoading(true);
+
+    const timer = setTimeout(() => {
+      const checkRegistration = () => {
+        if (
+          sellerDtos?.status !== "active" ||
+          !sellerDtos?.registrations ||
+          sellerDtos.registrations.length === 0 ||
+          !sellerDtos.registrations.some(
+            (registration) => registration.fair.id === activeFair?.id
+          )
+        ) {
+          setVisibleProducts(true);
+        } else {
+          setVisibleProducts(false);
+        }
+        setIsLoading(false);
+      };
+
+      checkRegistration();
+    }, 3000);
+
+    return () => clearTimeout(timer);
   }, [activeFair, sellerDtos]);
 
   return (
@@ -314,28 +329,36 @@ const SellerProducts = () => {
           <Sidebar userRole={userDtos?.role} />
         </div>
         <div className="bg-secondary-lighter col-span-6 sm:col-span-7 lg:h-[100vh] w-full container-r">
-          {visibleProducts && (
+        {isLoading ? (
             <div className="w-full flex-col h-full flex items-center justify-center font-bold gap-4 p-4 sm:p-6">
               <h2 className="text-primary-darker text-3xl text-center sm:text-4xl">
-                ¡No podés cargar productos todavía!
+                Cargando...
               </h2>
-              <h2 className="text-primary-darker text-xl text-center sm:text-2xl">
-                Primero debes registrarte en la feria...
-              </h2>
-              <Link
-                href="/dashboard/fairs"
-                className="flex items-center rounded-md shadow-lg bg-secondary-light gap-2 p-2 sm:p-4"
-              >
-                <PiCoatHanger
-                  className="w-10 h-10"
-                  style={{ color: "#2f8083" }}
-                  size={40}
-                />
-                <h2 className="text-primary-darker text-xl sm:text-2xl">
-                  Ir a Ferias
-                </h2>
-              </Link>
             </div>
+          ) : (
+            visibleProducts && (
+              <div className="w-full flex-col h-full flex items-center justify-center font-bold gap-4 p-4 sm:p-6">
+                <h2 className="text-primary-darker text-3xl text-center sm:text-4xl">
+                  ¡No podés cargar productos todavía!
+                </h2>
+                <h2 className="text-primary-darker text-xl text-center sm:text-2xl">
+                  Primero debes registrarte en la feria...
+                </h2>
+                <Link
+                  href="/dashboard/fairs"
+                  className="flex items-center rounded-md shadow-lg bg-secondary-light gap-2 p-2 sm:p-4"
+                >
+                  <PiCoatHanger
+                    className="w-10 h-10"
+                    style={{ color: "#2f8083" }}
+                    size={40}
+                  />
+                  <h2 className="text-primary-darker text-xl sm:text-2xl">
+                    Ir a Ferias
+                  </h2>
+                </Link>
+              </div>
+            )
           )}
           {!visibleProducts && (
             <div className="mx-5 flex flex-col items-center max-h-[100vh] w-full">
