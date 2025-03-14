@@ -792,6 +792,8 @@ export const getProductsBySeller = async (
       throw new Error("Res was not found");
     }
     const data = await res.json();
+
+    console.log("data del service al getProductBySeller", data);
     return data;
   } catch (error) {
   }
