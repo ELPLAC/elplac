@@ -121,6 +121,7 @@ export class ProductsRepository {
       throw new InternalServerErrorException("Error al crear productos.");
     }
   }
+  
 
   async informAdminEmail(sellerId: string): Promise<void> {
     const seller = await this.sellerRepository.findOne({ where: { id: sellerId } });
