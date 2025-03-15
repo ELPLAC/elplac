@@ -50,13 +50,19 @@ const SellerProducts = () => {
       console.log("🔄 Llamando a fetchProductCount...");
       const data = await getProductsBySeller(userId, token);
       console.log("📦 Datos obtenidos de la API:", data);
-  
-      if (Array.isArray(data)) {  
-        console.log("📌 Cantidad de productos obtenidos de la API:", data.length);
-  
+
+      if (Array.isArray(data)) {
+        console.log(
+          "📌 Cantidad de productos obtenidos de la API:",
+          data.length
+        );
+
         setProductsCountDB(() => {
-          console.log("📦 Actualizando estado de productsCountDB:", data.length);
-          return data.length; 
+          console.log(
+            "📦 Actualizando estado de productsCountDB:",
+            data.length
+          );
+          return data.length;
         });
       } else {
         console.error("❌ La respuesta de la API no es un array:", data);
@@ -66,17 +72,15 @@ const SellerProducts = () => {
       setError("Hubo un problema al obtener la cantidad de productos.");
     }
   }, [userId, token]);
-  
-  
+
   useEffect(() => {
     console.log("✅ Usuario activo, cargando productos...");
     fetchProductCount();
   }, [fetchProductCount]);
-  
+
   useEffect(() => {
     console.log("🎯 Nuevo valor de productsCountDB:", productsCountDB);
   }, [productsCountDB]);
-  
 
   useEffect(() => {
     if (userId) {
@@ -95,7 +99,8 @@ const SellerProducts = () => {
 
   useEffect(() => {
     setIsLoading(true);
-  
+    setVisibleProducts(false); // ⬅️ Inicialmente ocultamos el mensaje de error
+
     const checkRegistration = async () => {
       try {
         const isUserRegistered =
@@ -105,30 +110,25 @@ const SellerProducts = () => {
           sellerDtos.registrations.some(
             (registration) => registration.fair.id === activeFair?.id
           );
-  
+
         if (!isUserRegistered) {
           console.log("⚠️ Usuario NO registrado en la feria.");
-          setTimeout(() => {
-            setVisibleProducts(true);
-            setIsLoading(false);
-          }, 5000); 
+          setIsLoading(false);
+          setVisibleProducts(true); // ⬅️ Mostramos esto SOLO cuando `isLoading` ya es falso
         } else {
           console.log("✅ Usuario registrado, cargando productos...");
           await fetchProductCount();
-          setTimeout(() => {
-            setVisibleProducts(false);
-            setIsLoading(false);
-          }, 5000);
+          setIsLoading(false);
+          setVisibleProducts(false);
         }
       } catch (error) {
         console.error("❌ Error al verificar usuario:", error);
         setIsLoading(false);
       }
     };
-  
+
     checkRegistration();
-  }, [activeFair, sellerDtos, fetchProductCount]);  
-  
+  }, [activeFair, sellerDtos, fetchProductCount]);
 
   const totalProducts = products.length + productsCountDB;
   const remainingProducts = Math.max(0, maxProducts - totalProducts);
@@ -337,32 +337,29 @@ const SellerProducts = () => {
                 Cargando...
               </h2>
             </div>
+          ) : visibleProducts ? ( // ⬅️ Solo mostramos esto si ya terminó de cargar
+            <div className="w-full flex-col h-full flex items-center justify-center font-bold gap-4 p-4 sm:p-6">
+              <h2 className="text-primary-darker text-3xl text-center sm:text-4xl">
+                ¡No podés cargar productos todavía!
+              </h2>
+              <h2 className="text-primary-darker text-xl text-center sm:text-2xl">
+                Primero debes registrarte en la feria...
+              </h2>
+              <Link
+                href="/dashboard/fairs"
+                className="flex items-center rounded-md shadow-lg bg-secondary-light gap-2 p-2 sm:p-4"
+              >
+                <PiCoatHanger
+                  className="w-10 h-10"
+                  style={{ color: "#2f8083" }}
+                  size={40}
+                />
+                <h2 className="text-primary-darker text-xl sm:text-2xl">
+                  Ir a Ferias
+                </h2>
+              </Link>
+            </div>
           ) : (
-            visibleProducts && (
-              <div className="w-full flex-col h-full flex items-center justify-center font-bold gap-4 p-4 sm:p-6">
-                <h2 className="text-primary-darker text-3xl text-center sm:text-4xl">
-                  ¡No podés cargar productos todavía!
-                </h2>
-                <h2 className="text-primary-darker text-xl text-center sm:text-2xl">
-                  Primero debes registrarte en la feria...
-                </h2>
-                <Link
-                  href="/dashboard/fairs"
-                  className="flex items-center rounded-md shadow-lg bg-secondary-light gap-2 p-2 sm:p-4"
-                >
-                  <PiCoatHanger
-                    className="w-10 h-10"
-                    style={{ color: "#2f8083" }}
-                    size={40}
-                  />
-                  <h2 className="text-primary-darker text-xl sm:text-2xl">
-                    Ir a Ferias
-                  </h2>
-                </Link>
-              </div>
-            )
-          )}
-          {!visibleProducts && (
             <div className="mx-5 flex flex-col items-center max-h-[100vh] w-full">
               <div className="mt-5 w-full flex flex-col sm:flex-row justify-between gap-4 sm:gap-6">
                 <div className="border border-primary-lighter font-semibold rounded-lg text-primary-darker w-full sm:w-auto">
