@@ -47,17 +47,31 @@ const SellerProducts = () => {
 
   const fetchProductCount = useCallback(async () => {
     try {
-      console.log("Llamando a fetchProductCount...");
+      console.log("🔄 Llamando a fetchProductCount...");
       const data = await getProductsBySeller(userId, token);
+      console.log("📦 Datos obtenidos de la API:", data);
       if (data && data.products) {
-        console.log("Cantidad de productos obtenidos de la API:", data.products.length);
-        setProductsCountDB(data.products.length);
+        console.log("📌 Cantidad de productos obtenidos de la API:", data.products.length);
+        setProductsCountDB((prev) => {
+          console.log("📦 Actualizando estado de productsCountDB:", data.products.length);
+          return data.products.length; 
+        });
       }
     } catch (error) {
-      console.error("Error al obtener la cantidad de productos:", error);
+      console.error("❌ Error al obtener la cantidad de productos:", error);
       setError("Hubo un problema al obtener la cantidad de productos.");
     }
   }, [userId, token]);
+  
+  useEffect(() => {
+    console.log("✅ Usuario activo, cargando productos...");
+    fetchProductCount();
+  }, [fetchProductCount]);
+  
+  useEffect(() => {
+    console.log("🎯 Nuevo valor de productsCountDB:", productsCountDB);
+  }, [productsCountDB]);
+  
 
   useEffect(() => {
     if (userId) {
