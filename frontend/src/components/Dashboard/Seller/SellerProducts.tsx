@@ -51,7 +51,7 @@ const SellerProducts = () => {
       const data = await getProductsBySeller(userId, token);
       console.log("📦 Datos obtenidos de la API:", data);
   
-      if (Array.isArray(data)) {  // Verifica si data es un array
+      if (Array.isArray(data)) {  
         console.log("📌 Cantidad de productos obtenidos de la API:", data.length);
   
         setProductsCountDB(() => {
@@ -95,7 +95,7 @@ const SellerProducts = () => {
 
   useEffect(() => {
     setIsLoading(true);
-
+  
     const checkRegistration = async () => {
       if (
         sellerDtos?.status !== "active" ||
@@ -105,17 +105,20 @@ const SellerProducts = () => {
           (registration) => registration.fair.id === activeFair?.id
         )
       ) {
-        setVisibleProducts(true);
+        console.log("⚠️ Usuario no registrado en la feria.");
+        setVisibleProducts(false); 
       } else {
-        setVisibleProducts(false);
         console.log("✅ Usuario activo, cargando productos...");
-        await fetchProductCount(); // ⬅️ Se llama a la API solo si el usuario está activo
+        await fetchProductCount(); 
+        setVisibleProducts(true);
       }
+  
       setIsLoading(false);
     };
-
+  
     checkRegistration();
   }, [activeFair, sellerDtos, fetchProductCount]);
+  
 
 
   const totalProducts = products.length + productsCountDB;
