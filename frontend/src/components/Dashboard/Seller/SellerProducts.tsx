@@ -99,8 +99,8 @@ const SellerProducts = () => {
 
   useEffect(() => {
     setIsLoading(true);
-    setVisibleProducts(false); // ⬅️ Inicialmente ocultamos el mensaje de error
-  
+    setVisibleProducts(false); // ⬅️ Ocultamos el mensaje al inicio para evitar parpadeos
+
     const checkRegistration = async () => {
       try {
         const isUserRegistered =
@@ -110,26 +110,29 @@ const SellerProducts = () => {
           sellerDtos.registrations.some(
             (registration) => registration.fair.id === activeFair?.id
           );
-  
+
         if (!isUserRegistered) {
           console.log("⚠️ Usuario NO registrado en la feria.");
-          setIsLoading(false); // ⬅️ Primero terminamos la carga
-          setVisibleProducts(true); // ⬅️ Luego mostramos el mensaje de error
+          setTimeout(() => {
+            setIsLoading(false); // ⬅️ Primero terminamos la carga
+            setVisibleProducts(true); // ⬅️ Luego mostramos el mensaje de error
+          }, 1000); // Agregamos un delay para evitar parpadeos
         } else {
           console.log("✅ Usuario registrado, cargando productos...");
           await fetchProductCount();
           setIsLoading(false);
-          setVisibleProducts(false);
+          setTimeout(() => {
+            setVisibleProducts(false); // ⬅️ Aseguramos que se oculte correctamente
+          }, 1000);
         }
       } catch (error) {
         console.error("❌ Error al verificar usuario:", error);
         setIsLoading(false);
       }
     };
-  
+
     checkRegistration();
   }, [activeFair, sellerDtos, fetchProductCount]);
-  
 
   const totalProducts = products.length + productsCountDB;
   const remainingProducts = Math.max(0, maxProducts - totalProducts);
@@ -338,7 +341,7 @@ const SellerProducts = () => {
                 Cargando...
               </h2>
             </div>
-          ) : visibleProducts ? ( // ⬅️ Solo mostramos esto si ya terminó de cargar
+          ) : !isLoading && visibleProducts ? ( // ⬅️ Solo mostramos esto si ya terminó de cargar
             <div className="w-full flex-col h-full flex items-center justify-center font-bold gap-4 p-4 sm:p-6">
               <h2 className="text-primary-darker text-3xl text-center sm:text-4xl">
                 ¡No podés cargar productos todavía!
