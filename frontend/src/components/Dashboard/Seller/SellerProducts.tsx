@@ -111,14 +111,14 @@ const SellerProducts = () => {
           setTimeout(() => {
             setVisibleProducts(true);
             setIsLoading(false);
-          }, 3000); 
+          }, 5000); 
         } else {
           console.log("✅ Usuario registrado, cargando productos...");
           await fetchProductCount();
           setTimeout(() => {
             setVisibleProducts(false);
             setIsLoading(false);
-          }, 3000);
+          }, 5000);
         }
       } catch (error) {
         console.error("❌ Error al verificar usuario:", error);
