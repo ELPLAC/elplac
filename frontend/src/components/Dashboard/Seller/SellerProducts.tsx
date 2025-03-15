@@ -94,9 +94,9 @@ const SellerProducts = () => {
   }, [products, userId]);
 
   useEffect(() => {
-    const checkRegistration = async () => {
-      setIsLoading(true);
+    setIsLoading(true);
   
+    const checkRegistration = async () => {
       try {
         const isUserRegistered =
           sellerDtos?.status === "active" &&
@@ -108,24 +108,27 @@ const SellerProducts = () => {
   
         if (!isUserRegistered) {
           console.log("⚠️ Usuario NO registrado en la feria.");
-          setVisibleProducts(true);
+          setTimeout(() => {
+            setVisibleProducts(true);
+            setIsLoading(false);
+          }, 3000); 
         } else {
           console.log("✅ Usuario registrado, cargando productos...");
-          await fetchProductCount(); // ⬅️ Esperamos a la API antes de seguir
-          setVisibleProducts(false);
+          await fetchProductCount();
+          setTimeout(() => {
+            setVisibleProducts(false);
+            setIsLoading(false);
+          }, 3000);
         }
       } catch (error) {
         console.error("❌ Error al verificar usuario:", error);
-      } finally {
         setIsLoading(false);
       }
     };
   
     checkRegistration();
-  }, [activeFair, sellerDtos, fetchProductCount]);
+  }, [activeFair, sellerDtos, fetchProductCount]);  
   
-  
-
 
   const totalProducts = products.length + productsCountDB;
   const remainingProducts = Math.max(0, maxProducts - totalProducts);
