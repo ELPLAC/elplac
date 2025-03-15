@@ -94,30 +94,36 @@ const SellerProducts = () => {
   }, [products, userId]);
 
   useEffect(() => {
-    setIsLoading(true);
-  
     const checkRegistration = async () => {
-      if (
-        sellerDtos?.status !== "active" ||
-        !sellerDtos?.registrations ||
-        sellerDtos.registrations.length === 0 ||
-        !sellerDtos.registrations.some(
-          (registration) => registration.fair.id === activeFair?.id
-        )
-      ) {
-        console.log("⚠️ Usuario no registrado en la feria.");
-        setVisibleProducts(false); 
-      } else {
-        console.log("✅ Usuario activo, cargando productos...");
-        await fetchProductCount(); 
-        setVisibleProducts(true);
-      }
+      setIsLoading(true);
   
-      setIsLoading(false);
+      try {
+        const isUserRegistered =
+          sellerDtos?.status === "active" &&
+          sellerDtos?.registrations &&
+          sellerDtos.registrations.length > 0 &&
+          sellerDtos.registrations.some(
+            (registration) => registration.fair.id === activeFair?.id
+          );
+  
+        if (!isUserRegistered) {
+          console.log("⚠️ Usuario NO registrado en la feria.");
+          setVisibleProducts(true);
+        } else {
+          console.log("✅ Usuario registrado, cargando productos...");
+          await fetchProductCount(); // ⬅️ Esperamos a la API antes de seguir
+          setVisibleProducts(false);
+        }
+      } catch (error) {
+        console.error("❌ Error al verificar usuario:", error);
+      } finally {
+        setIsLoading(false);
+      }
     };
   
     checkRegistration();
   }, [activeFair, sellerDtos, fetchProductCount]);
+  
   
 
 
