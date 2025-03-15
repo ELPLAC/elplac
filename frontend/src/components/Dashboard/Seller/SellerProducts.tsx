@@ -47,34 +47,21 @@ const SellerProducts = () => {
 
   const fetchProductCount = useCallback(async () => {
     try {
-      console.log("🔄 Llamando a fetchProductCount...");
       const data = await getProductsBySeller(userId, token);
-      console.log("📦 Datos obtenidos de la API:", data);
 
       if (Array.isArray(data)) {
-        console.log(
-          "📌 Cantidad de productos obtenidos de la API:",
-          data.length
-        );
-
         setProductsCountDB(() => {
-          console.log(
-            "📦 Actualizando estado de productsCountDB:",
-            data.length
-          );
           return data.length;
         });
       } else {
-        console.error("❌ La respuesta de la API no es un array:", data);
+        setError("Hubo un problema al obtener la cantidad de productos.");
       }
     } catch (error) {
-      console.error("❌ Error al obtener la cantidad de productos:", error);
       setError("Hubo un problema al obtener la cantidad de productos.");
     }
   }, [userId, token]);
 
   useEffect(() => {
-    console.log("✅ Usuario activo, cargando productos...");
     fetchProductCount();
   }, [fetchProductCount]);
 
@@ -99,12 +86,11 @@ const SellerProducts = () => {
 
   useEffect(() => {
     if (!userId || !activeFair) {
-      console.log("⏳ Esperando que userId y activeFair estén disponibles...");
-      return; // ⬅️ Evitamos llamar a la API si `userId` o `activeFair` no están listos
+      return; 
     }
   
     setIsLoading(true);
-    setVisibleProducts(false); // ⬅️ Ocultamos el mensaje de error mientras se carga
+    setVisibleProducts(false); 
   
     const checkRegistration = async () => {
       try {
@@ -117,20 +103,17 @@ const SellerProducts = () => {
           );
   
         if (isUserRegistered) {
-          console.log("✅ Usuario registrado, cargando productos...");
           await fetchProductCount();
           setTimeout(() => {
-            setIsLoading(false); // ⬅️ Primero terminamos la carga
+            setIsLoading(false); 
           }, 300);
         } else {
-          console.log("⚠️ Usuario NO registrado en la feria.");
           setTimeout(() => {
-            setIsLoading(false); // ⬅️ Primero terminamos la carga
-            setVisibleProducts(true); // ⬅️ Luego mostramos el mensaje
+            setIsLoading(false);
+            setVisibleProducts(true); 
           }, 300);
         }
       } catch (error) {
-        console.error("❌ Error al verificar usuario:", error);
         setIsLoading(false);
       }
     };
@@ -138,17 +121,10 @@ const SellerProducts = () => {
     checkRegistration();
   }, [activeFair, sellerDtos, fetchProductCount, userId]);
   
-  
-  
-
   const totalProducts = products.length + productsCountDB;
   const remainingProducts = Math.max(0, maxProducts - totalProducts);
   const hasReachedMinProducts = totalProducts >= minProducts;
   const isProductValid = totalProducts < maxProducts;
-
-  console.log("totalProducts:", totalProducts, "minProducts:", minProducts);
-
-  console.log("productos de base de datos: ", productsCountDB);
 
   const infoToPost = {
     sellerId: userDtos?.seller?.id ?? "",
@@ -348,7 +324,7 @@ const SellerProducts = () => {
                 Cargando...
               </h2>
             </div>
-          ) : !isLoading && visibleProducts ? ( // ⬅️ Solo mostramos esto si ya terminó de cargar
+          ) : !isLoading && visibleProducts ? ( 
             <div className="w-full flex-col h-full flex items-center justify-center font-bold gap-4 p-4 sm:p-6">
               <h2 className="text-primary-darker text-3xl text-center sm:text-4xl">
                 ¡No podés cargar productos todavía!
