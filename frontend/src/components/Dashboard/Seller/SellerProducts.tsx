@@ -98,9 +98,9 @@ const SellerProducts = () => {
   }, [products, userId]);
 
   useEffect(() => {
-    setIsLoading(true);
-    setVisibleProducts(false); // ⬅️ Ocultamos el mensaje al inicio para evitar parpadeos
-
+    setIsLoading(true);  // ⬅️ Indicamos que empieza la carga
+    setVisibleProducts(false); // ⬅️ Ocultamos para evitar que se muestre por error
+  
     const checkRegistration = async () => {
       try {
         const isUserRegistered =
@@ -110,29 +110,28 @@ const SellerProducts = () => {
           sellerDtos.registrations.some(
             (registration) => registration.fair.id === activeFair?.id
           );
-
+  
         if (!isUserRegistered) {
           console.log("⚠️ Usuario NO registrado en la feria.");
+          setIsLoading(false);  // ⬅️ Primero terminamos la carga
           setTimeout(() => {
-            setIsLoading(false); // ⬅️ Primero terminamos la carga
-            setVisibleProducts(true); // ⬅️ Luego mostramos el mensaje de error
-          }, 1000); // Agregamos un delay para evitar parpadeos
+            setVisibleProducts(true); // ⬅️ Luego mostramos el mensaje
+          }, 500);
         } else {
           console.log("✅ Usuario registrado, cargando productos...");
           await fetchProductCount();
           setIsLoading(false);
-          setTimeout(() => {
-            setVisibleProducts(false); // ⬅️ Aseguramos que se oculte correctamente
-          }, 1000);
+          setVisibleProducts(false); // ⬅️ Nos aseguramos de ocultar el mensaje de error
         }
       } catch (error) {
         console.error("❌ Error al verificar usuario:", error);
         setIsLoading(false);
       }
     };
-
+  
     checkRegistration();
   }, [activeFair, sellerDtos, fetchProductCount]);
+  
 
   const totalProducts = products.length + productsCountDB;
   const remainingProducts = Math.max(0, maxProducts - totalProducts);
