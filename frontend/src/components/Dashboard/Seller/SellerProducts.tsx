@@ -50,18 +50,23 @@ const SellerProducts = () => {
       console.log("🔄 Llamando a fetchProductCount...");
       const data = await getProductsBySeller(userId, token);
       console.log("📦 Datos obtenidos de la API:", data);
-      if (data ) {
-        console.log("📌 Cantidad de productos obtenidos de la API:", data.products.length);
-        setProductsCountDB((prev) => {
-          console.log("📦 Actualizando estado de productsCountDB:", data.products.length);
+  
+      if (Array.isArray(data)) {  // Verifica si data es un array
+        console.log("📌 Cantidad de productos obtenidos de la API:", data.length);
+  
+        setProductsCountDB(() => {
+          console.log("📦 Actualizando estado de productsCountDB:", data.length);
           return data.length; 
         });
+      } else {
+        console.error("❌ La respuesta de la API no es un array:", data);
       }
     } catch (error) {
       console.error("❌ Error al obtener la cantidad de productos:", error);
       setError("Hubo un problema al obtener la cantidad de productos.");
     }
   }, [userId, token]);
+  
   
   useEffect(() => {
     console.log("✅ Usuario activo, cargando productos...");
