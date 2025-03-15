@@ -98,8 +98,13 @@ const SellerProducts = () => {
   }, [products, userId]);
 
   useEffect(() => {
-    setIsLoading(true);  // ⬅️ Indicamos que empieza la carga
-    setVisibleProducts(false); // ⬅️ Ocultamos para evitar que se muestre por error
+    if (!userId || !activeFair) {
+      console.log("⏳ Esperando que userId y activeFair estén disponibles...");
+      return; // ⬅️ Evitamos llamar a la API si `userId` o `activeFair` no están listos
+    }
+  
+    setIsLoading(true);
+    setVisibleProducts(false); // ⬅️ Ocultamos el mensaje de error mientras se carga
   
     const checkRegistration = async () => {
       try {
@@ -111,17 +116,18 @@ const SellerProducts = () => {
             (registration) => registration.fair.id === activeFair?.id
           );
   
-        if (!isUserRegistered) {
-          console.log("⚠️ Usuario NO registrado en la feria.");
-          setIsLoading(false);  // ⬅️ Primero terminamos la carga
-          setTimeout(() => {
-            setVisibleProducts(true); // ⬅️ Luego mostramos el mensaje
-          }, 500);
-        } else {
+        if (isUserRegistered) {
           console.log("✅ Usuario registrado, cargando productos...");
           await fetchProductCount();
-          setIsLoading(false);
-          setVisibleProducts(false); // ⬅️ Nos aseguramos de ocultar el mensaje de error
+          setTimeout(() => {
+            setIsLoading(false); // ⬅️ Primero terminamos la carga
+          }, 300);
+        } else {
+          console.log("⚠️ Usuario NO registrado en la feria.");
+          setTimeout(() => {
+            setIsLoading(false); // ⬅️ Primero terminamos la carga
+            setVisibleProducts(true); // ⬅️ Luego mostramos el mensaje
+          }, 300);
         }
       } catch (error) {
         console.error("❌ Error al verificar usuario:", error);
@@ -130,7 +136,9 @@ const SellerProducts = () => {
     };
   
     checkRegistration();
-  }, [activeFair, sellerDtos, fetchProductCount]);
+  }, [activeFair, sellerDtos, fetchProductCount, userId]);
+  
+  
   
 
   const totalProducts = products.length + productsCountDB;
