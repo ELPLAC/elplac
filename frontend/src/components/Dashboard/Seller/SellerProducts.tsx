@@ -60,13 +60,6 @@ const SellerProducts = () => {
   }, [userId, token]);
 
   useEffect(() => {
-    if (activeFair && userId && token) {
-      fetchProductCount();
-    }
-  }, [activeFair, userId, token, fetchProductCount]);
-
-
-  useEffect(() => {
     if (userId) {
       const savedProducts = localStorage.getItem(`savedProducts-${userId}`);
       if (savedProducts) {
@@ -84,28 +77,27 @@ const SellerProducts = () => {
   useEffect(() => {
     setIsLoading(true);
 
-    const timer = setTimeout(() => {
-      const checkRegistration = () => {
-        if (
-          sellerDtos?.status !== "active" ||
-          !sellerDtos?.registrations ||
-          sellerDtos.registrations.length === 0 ||
-          !sellerDtos.registrations.some(
-            (registration) => registration.fair.id === activeFair?.id
-          )
-        ) {
-          setVisibleProducts(true);
-        } else {
-          setVisibleProducts(false);
-        }
-        setIsLoading(false);
-      };
+    const checkRegistration = async () => {
+      if (
+        sellerDtos?.status !== "active" ||
+        !sellerDtos?.registrations ||
+        sellerDtos.registrations.length === 0 ||
+        !sellerDtos.registrations.some(
+          (registration) => registration.fair.id === activeFair?.id
+        )
+      ) {
+        setVisibleProducts(true);
+      } else {
+        setVisibleProducts(false);
+        console.log("✅ Usuario activo, cargando productos...");
+        await fetchProductCount(); // ⬅️ Se llama a la API solo si el usuario está activo
+      }
+      setIsLoading(false);
+    };
 
-      checkRegistration();
-    }, 3000);
+    checkRegistration();
+  }, [activeFair, sellerDtos, fetchProductCount]);
 
-    return () => clearTimeout(timer);
-  }, [activeFair, sellerDtos]);
 
   const totalProducts = products.length + productsCountDB;
   const remainingProducts = Math.max(0, maxProducts - totalProducts);
