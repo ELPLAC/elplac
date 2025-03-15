@@ -50,11 +50,11 @@ const SellerProducts = () => {
       console.log("🔄 Llamando a fetchProductCount...");
       const data = await getProductsBySeller(userId, token);
       console.log("📦 Datos obtenidos de la API:", data);
-      if (data && data.products) {
+      if (data ) {
         console.log("📌 Cantidad de productos obtenidos de la API:", data.products.length);
         setProductsCountDB((prev) => {
           console.log("📦 Actualizando estado de productsCountDB:", data.products.length);
-          return data.products.length; 
+          return data.length; 
         });
       }
     } catch (error) {
