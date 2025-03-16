@@ -40,6 +40,7 @@ const SellerProducts = () => {
   const fairSeller = activeFair?.sellerRegistrations.find(
     (registration: any) => registration.seller.id === userId
   );
+  const activeFairId = activeFair?.id;
 
   const sellerCategoryFair = fairSeller?.categoryFair;
   const maxProducts = sellerCategoryFair?.maxProductsSeller ?? 0;
@@ -47,19 +48,31 @@ const SellerProducts = () => {
 
   const fetchProductCount = useCallback(async () => {
     try {
-      const data = await getProductsBySeller(userId, token);
-
+      const response = await fetch(`/api/fairs/${userId}/${activeFairId}/products`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error("Error en la respuesta del servidor");
+      }
+  
+      const data = await response.json();
+  
       if (Array.isArray(data)) {
-        setProductsCountDB(() => {
-          return data.length;
-        });
+        setProductsCountDB(() => data.length);
       } else {
         setError("Hubo un problema al obtener la cantidad de productos.");
       }
     } catch (error) {
+      console.error("Error al obtener productos:", error);
       setError("Hubo un problema al obtener la cantidad de productos.");
     }
-  }, [userId, token]);
+  }, [userId, activeFairId, token]);
+  
 
   useEffect(() => {
     fetchProductCount();

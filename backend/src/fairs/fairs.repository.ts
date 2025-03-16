@@ -299,4 +299,38 @@ export class FairsRepository {
     await this.fairRepository.save(fairToClose);
     return { message: 'Feria cerrada correctamente', fairToClose };
   }
+
+  async getProductsByIdAndFair(fairId: string, sellerId: string) {
+    const fair = await this.fairRepository.findOne({
+      where: { id: fairId },
+      relations: {
+        fairCategories: {
+          products: {
+            seller: true
+          }
+        }
+      }
+    });
+  
+    if (!fair) {
+      throw new NotFoundException('Feria no encontrada');
+    }
+  
+    const fairCategories = Array.isArray(fair.fairCategories) 
+      ? fair.fairCategories 
+      : [fair.fairCategories];
+  
+    const products = fairCategories.flatMap(fc =>
+      fc.products.filter(product => product.seller.id === sellerId)
+    );
+  
+    return products.map(product => ({
+      id: product.id,
+      brand: product.brand,
+      status: product.status,
+      price: product.price,
+      description: product.description,
+    }));
+  }
+  
 }

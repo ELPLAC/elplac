@@ -33,4 +33,14 @@ export class FairsController {
   async closeFair(@Param('id') fairId: string) {
     return await this.fairsService.closeFair(fairId);
   }
+  
+  @Roles(Role.ADMIN)
+  @UseGuards(AuthGuard, RoleGuard)
+  @Get(':sellerId/:fairId/products')
+  async getProductsByIdAndFair(
+    @Param('sellerId') sellerId: string,
+    @Param('fairId') fairId: string
+  ) {
+    return await this.fairsService.getProductsByIdAndFair(fairId, sellerId);
+  }
 }
