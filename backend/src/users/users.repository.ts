@@ -204,7 +204,7 @@ export class UserRepository {
 
       const userRegistration = new UserFairRegistration();
       userRegistration.registrationDate = new Date();
-      userRegistration.entryFee = fair.entryPriceBuyer;
+      userRegistration.entryFee = Number(fair.entryPriceBuyer);
       userRegistration.registrationDay = selectedDay;
       userRegistration.registrationHour = selectedHour;
       userRegistration.user = user;
