@@ -408,9 +408,12 @@ const CreateFairForm: React.FC = () => {
                 </p>
                 <p className="text-lg mb-2 text-primary-dark">
                   <strong className="text-primary-darker">Categorías:</strong>{" "}
-                  {activeFair.fairCategories
-                    .map((category) => category.category.name)
-                    .join(", ")}
+                  {activeFair?.fairCategories &&
+                  Array.isArray(activeFair.fairCategories)
+                    ? activeFair.fairCategories
+                        .map((category) => category.category.name)
+                        .join(", ")
+                    : "Sin categorías"}
                 </p>
 
                 <div className="mt-6">
@@ -418,51 +421,60 @@ const CreateFairForm: React.FC = () => {
                     Días de la Feria
                   </h3>
                   <div className="p-4 rounded-lg text-primary-dark">
-                    {activeFair.fairDays
-                      .sort((a, b) => {
-                        const dateA = new Date(a.day).getTime();
-                        const dateB = new Date(b.day).getTime();
-                        return dateB - dateA;
-                      })
-                      .map((fairDay, index) => {
-                        const formattedDay = new Date(fairDay.day);
-                        const formattedStartTime = new Date(
-                          `1970-01-01T${fairDay.startTime}`
-                        );
-                        const formattedEndTime = new Date(
-                          `1970-01-01T${fairDay.endTime}`
-                        );
+                    {activeFair?.fairDays &&
+                    Array.isArray(activeFair.fairDays) &&
+                    activeFair.fairDays.length > 0 ? (
+                      activeFair.fairDays
+                        .sort((a, b) => {
+                          const dateA = new Date(a.day).getTime();
+                          const dateB = new Date(b.day).getTime();
+                          return dateB - dateA;
+                        })
+                        .map((fairDay, index) => {
+                          const formattedDay = new Date(fairDay.day);
+                          const formattedStartTime = new Date(
+                            `1970-01-01T${fairDay.startTime}`
+                          );
+                          const formattedEndTime = new Date(
+                            `1970-01-01T${fairDay.endTime}`
+                          );
 
-                        const dayFormatted = new Intl.DateTimeFormat(
-                          "es-ES"
-                        ).format(formattedDay);
+                          const dayFormatted = new Intl.DateTimeFormat(
+                            "es-ES"
+                          ).format(formattedDay);
 
-                        const startTimeFormatted =
-                          formattedStartTime.toLocaleTimeString("es-ES", {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          });
-                        const endTimeFormatted =
-                          formattedEndTime.toLocaleTimeString("es-ES", {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          });
+                          const startTimeFormatted =
+                            formattedStartTime.toLocaleTimeString("es-ES", {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            });
+                          const endTimeFormatted =
+                            formattedEndTime.toLocaleTimeString("es-ES", {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            });
 
-                        return (
-                          <div key={index} className="mb-4 text-primary-dark">
-                            {fairDay.isClosed === true ? (
-                              <p>
-                                <strong>{dayFormatted}</strong> - Feria Cerrada
-                              </p>
-                            ) : (
-                              <p>
-                                <strong>{dayFormatted}</strong> -{" "}
-                                {startTimeFormatted} a {endTimeFormatted}
-                              </p>
-                            )}
-                          </div>
-                        );
-                      })}
+                          return (
+                            <div key={index} className="mb-4 text-primary-dark">
+                              {fairDay.isClosed ? (
+                                <p>
+                                  <strong>{dayFormatted}</strong> - Feria
+                                  Cerrada
+                                </p>
+                              ) : (
+                                <p>
+                                  <strong>{dayFormatted}</strong> -{" "}
+                                  {startTimeFormatted} a {endTimeFormatted}
+                                </p>
+                              )}
+                            </div>
+                          );
+                        })
+                    ) : (
+                      <p className="text-primary-dark">
+                        No hay días registrados para esta feria.
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
