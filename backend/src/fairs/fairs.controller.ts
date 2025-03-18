@@ -67,11 +67,4 @@ export class FairsController {
     return this.fairsService.updateEntryPriceBuyer(fairId, entryPriceBuyer);
   }
 
-  @Roles(Role.ADMIN)
-  @UseGuards(AuthGuard, RoleGuard)
-  @Put(':id/toggle-user-visibility')
-  async toggleUserVisibility(@Param('id') fairId: string) {
-    return this.fairsService.toggleUserVisibility(fairId);
-  }
-
 }

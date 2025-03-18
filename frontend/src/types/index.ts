@@ -315,6 +315,7 @@ export interface IFair {
   entryPriceSeller: number;
   isActive: boolean;
   entryPriceBuyer: string;
+  isLabelPrintingEnabled: boolean;
   entryDescription: string;
   isVisibleUser: boolean;
   fairCategories: FairCategories[];

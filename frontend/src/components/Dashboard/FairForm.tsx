@@ -91,13 +91,14 @@ const CreateFairForm: React.FC = () => {
       notify("ToastError", "Error al actualizar el precio de entrada");
     }
   };
+  const handleToggleLabelVisibility = async () => {
+    if (!activeFair?.id) return;
 
-  const handleToggleFormVisibility = async () => {
     try {
       const response = await fetch(
-        `${URL}/fairs/${activeFair?.id}/toggle-user-visibility`,
+        `${URL}/fairs/${activeFair.id}/update-label-printing`,
         {
-          method: "PUT",
+          method: "PATCH",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -106,19 +107,32 @@ const CreateFairForm: React.FC = () => {
       );
 
       if (!response.ok) {
-        throw new Error("Error al cambiar la visibilidad del formulario.");
+        const errorData = await response.json();
+        throw new Error(
+          `Error ${response.status}: ${
+            errorData.message || response.statusText
+          }`
+        );
       }
 
-      notify("ToastSuccess", "Visibilidad del formulario actualizada.");
-      if (!activeFair) return;
-
+      const data = await response.json();
       setActiveFair({
-        ...activeFair,
-        id: activeFair.id || "",
-        isVisibleUser: !activeFair.isVisibleUser,
+        ...activeFair!,
+        isLabelPrintingEnabled: data.fair.isLabelPrintingEnabled,
       });
+
+      notify(
+        "ToastSuccess",
+        `Impresión de etiquetas ${
+          data.isLabelPrintingEnabled ? "habilitada" : "deshabilitada"
+        } correctamente`
+      );
     } catch (error) {
-      notify("ToastError", "No se pudo actualizar la visibilidad.");
+      console.error(error);
+      notify(
+        "ToastError",
+        "Error al actualizar la visibilidad de impresión de etiquetas"
+      );
     }
   };
 
@@ -507,17 +521,11 @@ const CreateFairForm: React.FC = () => {
                     </>
                   )}
                 </p>
-                <button
-                  onClick={handleToggleFormVisibility}
-                  className="action-button mt-5 mb-5 bg-white flex items-center justify-center text-primary-darker gap-2 p-2 border border-[#D0D5DD] rounded-lg hover:bg-primary-darker hover:text-white hover:shadow-md transition duration-200"
-                >
-                  <FaCheckCircle />
-                  {activeFair?.isVisibleUser
-                    ? "Ocultar Formulario para Compradores"
-                    : "Habilitar Formulario para Compradores"}
-                </button>
                 <div className="pb-6 mb-6 border-b border-gray-300 opacity-60"></div>
 
+                <h3 className="text-primary-darker text-xl font-semibold mb-4">
+                  Vendedores
+                </h3>
                 <p className="text-lg mb-2 text-primary-dark">
                   <strong className="text-primary-darker">
                     Precio de entrada para vendedores:
@@ -536,6 +544,15 @@ const CreateFairForm: React.FC = () => {
                 </p>
                 <div className="pb-6 mb-6 border-b border-gray-300 opacity-60"></div>
 
+                <button
+                  onClick={handleToggleLabelVisibility}
+                  className="action-button mt-5 mb-5 bg-white flex items-center justify-center text-primary-darker gap-2 p-2 border border-[#D0D5DD] rounded-lg hover:bg-primary-darker hover:text-white hover:shadow-md transition duration-200"
+                >
+                  <FaCheckCircle />
+                  {activeFair?.isLabelPrintingEnabled
+                    ? "Deshabilitar impresión de etiquetas"
+                    : "Habilitar impresión de etiquetas"}
+                </button>
                 <div className="mt-6">
                   <h3 className="text-xl text-primary-darker font-semibold mb-4">
                     Días de la Feria

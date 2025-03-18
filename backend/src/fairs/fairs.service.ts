@@ -34,7 +34,4 @@ export class FairsService {
     return this.fairsRepository.updateEntryPriceBuyer(fairId, entryPriceBuyer);
   }
 
-  async toggleUserVisibility(fairId: string) {
-    return await this.fairsRepository.toggleUserVisibility(fairId);
-  }
 }

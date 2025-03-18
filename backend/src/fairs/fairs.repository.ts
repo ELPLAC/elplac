@@ -356,20 +356,4 @@ export class FairsRepository {
   
     return { message: 'Precio de entrada actualizado correctamente', fair };
   }
-
-  async toggleUserVisibility(fairId: string) {
-    const fair = await this.fairRepository.findOneBy({ id: fairId });
-
-    if (!fair) {
-      throw new NotFoundException('Feria no encontrada');
-    }
-
-    fair.isVisibleUser = !fair.isVisibleUser;
-    await this.fairRepository.save(fair);
-
-    return {
-      message: `Visibilidad de formulario cambiada a ${fair.isVisibleUser}`,
-      fair: await this.getFairById(fairId),
-    };
-  }
 }
