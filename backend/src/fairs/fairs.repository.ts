@@ -344,4 +344,16 @@ export class FairsRepository {
 
     return await this.fairRepository.save(fairToEdit);
   }
+  async updateEntryPriceBuyer(fairId: string, entryPriceBuyer: string) {
+    const fair = await this.fairRepository.findOne({ where: { id: fairId } });
+  
+    if (!fair) {
+      throw new NotFoundException('Feria no encontrada');
+    }
+  
+    fair.entryPriceBuyer = entryPriceBuyer;
+    await this.fairRepository.save(fair);
+  
+    return { message: 'Precio de entrada actualizado correctamente', fair };
+  }
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, UseGuards} from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Post, Put, UseGuards} from '@nestjs/common';
 import { FairsService } from '@fairs/fairs.service';
 import { FairDto } from '@fairs/fairs.dto';
 import { AuthGuard } from '@auth/auth.guard';
@@ -53,4 +53,18 @@ export class FairsController {
   ) {
     return await this.fairsService.editAddressFair(fairId, newAddressFair);
   }
+  @Roles(Role.ADMIN)
+  @UseGuards(AuthGuard, RoleGuard)
+  @Put(':id/update-entry-price-buyer')
+  async updateEntryPriceBuyer(
+    @Param('id') fairId: string,
+    @Body('entryPriceBuyer') entryPriceBuyer: string,
+  ) {
+    if (!entryPriceBuyer) {
+      throw new BadRequestException('El precio de entrada es obligatorio.');
+    }
+
+    return this.fairsService.updateEntryPriceBuyer(fairId, entryPriceBuyer);
+  }
+
 }

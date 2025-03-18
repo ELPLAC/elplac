@@ -141,7 +141,7 @@ const Ticket: React.FC<TicketProps> = ({
           <>
             <p className="font-bold"></p>
             {fairSelectedPerUser &&
-            fairSelectedPerUser.entryPriceBuyer === 0 ? (
+            fairSelectedPerUser.entryPriceBuyer === "0" ? (
               <div className="flex flex-col">
                 <input
                   type="text"

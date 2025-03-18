@@ -29,4 +29,8 @@ export class FairsService {
   async editAddressFair(fairId: string, newAddressFair: Partial<FairDto>) {
     return await this.fairsRepository.editAddressFair(fairId, newAddressFair);
   }  
+
+  async updateEntryPriceBuyer(fairId: string, entryPriceBuyer: string) {
+    return this.fairsRepository.updateEntryPriceBuyer(fairId, entryPriceBuyer);
+  }
 }

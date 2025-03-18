@@ -314,7 +314,7 @@ export interface IFair {
   address: string;
   entryPriceSeller: number;
   isActive: boolean;
-  entryPriceBuyer: number;
+  entryPriceBuyer: string;
   entryDescription: string;
   fairCategories: FairCategories[];
   fairDays: FairDay[];

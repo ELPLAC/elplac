@@ -20,6 +20,7 @@ import * as Yup from "yup";
 import { FaCheckCircle } from "react-icons/fa";
 import "./FairForm.css";
 import EditFairAddress from "./EditAddressFair";
+import { URL } from "../../../envs";
 
 const CreateFairForm: React.FC = () => {
   const { token } = useAuth();
@@ -48,6 +49,48 @@ const CreateFairForm: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isEditingPrice, setIsEditingPrice] = useState(false);
+  const [newEntryPrice, setNewEntryPrice] = useState(
+    activeFair?.entryPriceBuyer || ""
+  );
+
+  const handleUpdateEntryPrice = async (newPrice: string) => {
+    if (!activeFair?.id) return;
+
+    try {
+      const response = await fetch(
+        `${URL}/fairs/${activeFair.id}/update-entry-price-buyer`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ entryPriceBuyer: newPrice }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          `Error ${response.status}: ${
+            errorData.message || response.statusText
+          }`
+        );
+      }
+
+      const data = await response.json();
+      setActiveFair({
+        ...activeFair,
+        entryPriceBuyer: data.fair.entryPriceBuyer,
+      });
+
+      notify("ToastSuccess", "Precio de entrada actualizado correctamente");
+      setIsEditingPrice(false);
+    } catch (error) {
+      notify("ToastError", "Error al actualizar el precio de entrada");
+    }
+  };
 
   const handleFairDayChange = (
     index: number,
@@ -337,38 +380,37 @@ const CreateFairForm: React.FC = () => {
                 vendido en liquidación). Cuando ya hayas finalizado, puedes
                 concluir la feria.
               </p>
-              <div className="flex gap-4 mb-6 conteiner-active-fair">
+              <div className="flex gap-4 mb-6">
                 <a
                   href="/admin/postFair"
-                  className="w-1/3 bg-white flex items-center justify-center text-primary-darker gap-2 p-3 border border-[#D0D5DD] rounded-lg hover:bg-primary-darker hover:text-white hover:shadow-lg transition duration-200"
+                  className="action-button w-full mt-5 mb-5 bg-white flex items-center justify-center text-primary-darker gap-2 p-2 border border-[#D0D5DD] rounded-lg hover:bg-primary-darker hover:text-white hover:shadow-md transition duration-200"
                 >
-                  <FaCheckCircle />
-                  Administrar feria
+                  <FaCheckCircle /> Clasificar productos en venta
                 </a>
                 <a
                   href="/admin/products"
-                  className="w-1/3 bg-white flex items-center justify-center text-primary-darker gap-2 p-3 border border-[#D0D5DD] rounded-lg hover:bg-primary-darker hover:text-white hover:shadow-lg transition duration-200"
+                  className="action-button w-full mt-5 mb-5 bg-white flex items-center justify-center text-primary-darker gap-2 p-2 border border-[#D0D5DD] rounded-lg hover:bg-primary-darker hover:text-white hover:shadow-md transition duration-200"
                 >
-                  <FaCheckCircle />
-                  Ver productos
+                  <FaCheckCircle /> Ver solicitudes de clasificación
                 </a>
                 <button
                   onClick={() => setOpenModalUserId(true)}
-                  className="w-1/3 bg-white flex items-center justify-center text-primary-darker gap-2 p-3 border border-[#D0D5DD] rounded-lg hover:bg-primary-darker hover:text-white hover:shadow-lg transition duration-200"
+                  className="action-button w-full mt-5 mb-5 bg-white flex items-center justify-center text-red-600 gap-2 p-2 border border-red-600 rounded-lg hover:bg-red-600 hover:text-white hover:shadow-md transition duration-200"
                 >
-                  <FaCheckCircle />
-                  Concluir feria
+                  <FaCheckCircle /> Concluir feria
                 </button>
               </div>
+              <div className="pb-6 mb-6 border-b border-gray-300 opacity-60"></div>
 
-              <div className="p-6 rounded-lg conteiner-active-fair">
-                <h1 className="text-3xl font-semibold mb-4 text-primary-darker">
+              <div className="pb-6 mb-6 border-b border-gray-300 opacity-60">
+                <h1 className="text-primary-darker text-xl font-semibold mb-4">
                   Datos de la feria actual
                 </h1>
                 <p className="text-lg mb-2 text-primary-dark">
                   <strong className="text-primary-darker">Nombre:</strong>{" "}
-                  {activeFair.name}
+                  {activeFair?.name}
                 </p>
+
                 <div>
                   <p className="text-lg mb-2 text-primary-dark">
                     <strong className="text-primary-darker">Dirección:</strong>{" "}
@@ -391,15 +433,48 @@ const CreateFairForm: React.FC = () => {
                     )}
                   </p>
                 </div>
+                <div className="pb-6 mb-6 border-b border-gray-300 opacity-60"></div>
                 <p className="text-lg mb-2 text-primary-dark">
                   <strong className="text-primary-darker">
                     Precio de entrada para compradores:
                   </strong>{" "}
-                  $
-                  {activeFair.entryPriceBuyer === 0
-                    ? "Gratis"
-                    : activeFair.entryPriceBuyer}
+                  {isEditingPrice ? (
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={newEntryPrice}
+                        onChange={(e) => setNewEntryPrice(e.target.value)}
+                        className="w-1/2 p-2 border rounded-md text-primary-dark"
+                      />
+                      <button
+                        onClick={() => handleUpdateEntryPrice(newEntryPrice)}
+                        className="ml-2 text-green-500"
+                      >
+                        Guardar
+                      </button>
+                      <button
+                        onClick={() => setIsEditingPrice(false)}
+                        className="ml-2 text-red-500"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      {Number(activeFair?.entryPriceBuyer) === 0
+                        ? "Entrada gratis"
+                        : `$${activeFair?.entryPriceBuyer}`}
+                      <button
+                        onClick={() => setIsEditingPrice(true)}
+                        className="ml-4 text-blue-500 hover:text-blue-600"
+                      >
+                        Editar
+                      </button>
+                    </>
+                  )}
                 </p>
+                <div className="pb-6 mb-6 border-b border-gray-300 opacity-60"></div>
+
                 <p className="text-lg mb-2 text-primary-dark">
                   <strong className="text-primary-darker">
                     Precio de entrada para vendedores:
