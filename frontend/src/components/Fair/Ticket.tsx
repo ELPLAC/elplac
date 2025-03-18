@@ -43,20 +43,24 @@ const Ticket: React.FC<TicketProps> = ({
   console.log("termsChecked:", termsChecked);
 
   useEffect(() => {
-    if (fairSelectedPerUser) {
-      if (
-        userDtos?.role === "seller" &&
-        fairSelectedPerUser.entryPriceSeller !== undefined &&
-        fairSelectedPerUser.entryPriceSeller > 0
-      ) {
-        setAmount(fairSelectedPerUser.entryPriceSeller);
-      } else if (
-        userDtos?.role === "user" &&
-        fairSelectedPerUser.entryPriceBuyer !== undefined &&
-        fairSelectedPerUser.entryPriceBuyer > 0
-      ) {
-        setAmount(fairSelectedPerUser.entryPriceBuyer);
-        setCharitableEntity(fairSelectedPerUser.entryDescription || "");
+    if (!fairSelectedPerUser || !userDtos) {
+      setAmount("");
+      setCharitableEntity("");
+      return;
+    }
+  
+    const { entryPriceBuyer, entryPriceSeller, entryDescription } = fairSelectedPerUser;
+  
+    if (userDtos.role === "seller" && entryPriceSeller !== undefined && entryPriceSeller > 0) {
+      setAmount(entryPriceSeller);
+    } else if (userDtos.role === "user") {
+      if (entryPriceBuyer !== undefined) {
+        if (!isNaN(Number(entryPriceBuyer))) {
+          setAmount(Number(entryPriceBuyer) === 0 ? "¡Sin costo!" : Number(entryPriceBuyer));
+        } else {
+          setAmount(entryPriceBuyer);
+        }
+        setCharitableEntity(entryDescription || "");
       } else {
         setAmount("");
         setCharitableEntity("");
@@ -65,7 +69,8 @@ const Ticket: React.FC<TicketProps> = ({
       setAmount("");
       setCharitableEntity("");
     }
-  }, [fairSelectedPerUser, userDtos?.role]);
+  }, [fairSelectedPerUser, userDtos]);
+  
 
   const handleBuy = async () => {
     try {
