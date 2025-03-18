@@ -19,6 +19,7 @@ import {
 import * as Yup from "yup";
 import { FaCheckCircle } from "react-icons/fa";
 import "./FairForm.css";
+import EditFairAddress from "./EditAddressFair";
 
 const CreateFairForm: React.FC = () => {
   const { token } = useAuth();
@@ -46,6 +47,7 @@ const CreateFairForm: React.FC = () => {
   const [fairDays, setFairDays] = useState<FairDaysData[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [loading, setLoading] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const handleFairDayChange = (
     index: number,
@@ -208,24 +210,22 @@ const CreateFairForm: React.FC = () => {
 
   const handleCreateFair = async () => {
     setLoading(true);
-    
+
     const errors = await formik.validateForm();
     if (Object.keys(errors).length > 0) {
       notify("ToastError", "Completa todos los campos antes de continuar.");
-      setLoading(false); 
+      setLoading(false);
       return;
     }
-  
+
     try {
       await formik.handleSubmit();
     } catch (error) {
       console.error(error);
     } finally {
-      setTimeout(() => setLoading(false), 1500); 
+      setTimeout(() => setLoading(false), 1500);
     }
   };
-  
-  
 
   const formik = useFormik({
     initialValues: {
@@ -369,10 +369,28 @@ const CreateFairForm: React.FC = () => {
                   <strong className="text-primary-darker">Nombre:</strong>{" "}
                   {activeFair.name}
                 </p>
-                <p className="text-lg mb-2 text-primary-dark">
-                  <strong className="text-primary-darker">Dirección:</strong>{" "}
-                  {activeFair.address}
-                </p>
+                <div>
+                  <p className="text-lg mb-2 text-primary-dark">
+                    <strong className="text-primary-darker">Dirección:</strong>{" "}
+                    {isEditing ? (
+                      <EditFairAddress
+                        activeFair={activeFair}
+                        token={token}
+                        setIsEditing={setIsEditing}
+                      />
+                    ) : (
+                      <>
+                        {activeFair?.address}
+                        <button
+                          onClick={() => setIsEditing(true)}
+                          className="ml-8 text-blue-500 hover:text-blue-600"
+                        >
+                          Editar
+                        </button>
+                      </>
+                    )}
+                  </p>
+                </div>
                 <p className="text-lg mb-2 text-primary-dark">
                   <strong className="text-primary-darker">
                     Precio de entrada para compradores:

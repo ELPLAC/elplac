@@ -333,4 +333,15 @@ export class FairsRepository {
     }));
   }
   
+  async editAddressFair(fairId: string, newAddressFair: Partial<FairDto>) {
+    const fairToEdit = await this.fairRepository.findOneBy({ id: fairId });
+
+    if (!fairToEdit) throw new NotFoundException('Feria no encontrada');
+
+    if (newAddressFair.address) {
+      fairToEdit.address = newAddressFair.address;
+    }
+
+    return await this.fairRepository.save(fairToEdit);
+  }
 }

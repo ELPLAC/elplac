@@ -43,4 +43,14 @@ export class FairsController {
   ) {
     return await this.fairsService.getProductsByIdAndFair(fairId, sellerId);
   }
+
+  @Roles(Role.ADMIN)
+  @UseGuards(AuthGuard, RoleGuard)
+  @Put('edit/:id')
+  async editAddressFair(
+    @Param('id') fairId: string,
+    @Body() newAddressFair: Partial<FairDto>,
+  ) {
+    return await this.fairsService.editAddressFair(fairId, newAddressFair);
+  }
 }
