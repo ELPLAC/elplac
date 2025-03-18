@@ -15,6 +15,12 @@ export class Fair {
   @Column()
   name: string;
 
+  @Column({ default: false })
+  isVisibleUser: boolean;
+
+  @Column({ default: false }) 
+  isLabelPrintingEnabled: boolean;
+
   @Column()
   address: string;
 
@@ -24,8 +30,8 @@ export class Fair {
   @Column({default : true})
   isActive: boolean;
 
-  @Column()
-  entryPriceBuyer: number;
+  @Column({ type: 'varchar', nullable: true })
+  entryPriceBuyer: string;
 
   @Column()
   entryDescription: string;

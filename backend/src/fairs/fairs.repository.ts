@@ -40,7 +40,7 @@ export class FairsRepository {
     fair.name = fairDto.name;
     fair.address = fairDto.address;
     fair.entryPriceSeller = fairDto.entryPriceSeller;
-    fair.entryPriceBuyer = fairDto.entryPriceBuyer;
+    fair.entryPriceBuyer = fairDto.entryPriceBuyer.toString();
     fair.entryDescription = fairDto.entryDescription;
 
     const savedFair = await this.fairRepository.save(fair);

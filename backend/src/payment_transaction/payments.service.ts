@@ -134,7 +134,7 @@ export class PaymentsService {
           id: fair.id,
           title: fair.name,
           quantity: 1,
-          unit_price: fair.entryPriceBuyer,
+          unit_price: Number(fair.entryPriceBuyer),
         },
       ],
       notification_url: `https://elplac-production-3a9f.up.railway.app/payments/success/buyer/?selectedHour=${registrationHour}&selectedDay=${registrationDay}&fairId=${fairId}&userId=${user.id}`,
@@ -189,7 +189,7 @@ export class PaymentsService {
         const transactions = new PaymentTransaction();
         transactions.fair = fair;
         transactions.user = user;
-        transactions.amount = fair.entryPriceBuyer;
+        transactions.amount = Number(fair.entryPriceBuyer);
         transactions.transactionDate = new Date();
         transactions.transactionType = 'Inscripción';
 
