@@ -92,6 +92,36 @@ const CreateFairForm: React.FC = () => {
     }
   };
 
+  const handleToggleFormVisibility = async () => {
+    try {
+      const response = await fetch(
+        `${URL}/fairs/${activeFair?.id}/toggle-user-visibility`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Error al cambiar la visibilidad del formulario.");
+      }
+
+      notify("ToastSuccess", "Visibilidad del formulario actualizada.");
+      if (!activeFair) return;
+
+      setActiveFair({
+        ...activeFair,
+        id: activeFair.id || "",
+        isVisibleUser: !activeFair.isVisibleUser,
+      });
+    } catch (error) {
+      notify("ToastError", "No se pudo actualizar la visibilidad.");
+    }
+  };
+
   const handleFairDayChange = (
     index: number,
     field: keyof FairDaysData,
@@ -433,7 +463,11 @@ const CreateFairForm: React.FC = () => {
                     )}
                   </p>
                 </div>
+
                 <div className="pb-6 mb-6 border-b border-gray-300 opacity-60"></div>
+                <h3 className="text-primary-darker text-xl font-semibold mb-4">
+                  Compradores
+                </h3>
                 <p className="text-lg mb-2 text-primary-dark">
                   <strong className="text-primary-darker">
                     Precio de entrada para compradores:
@@ -473,6 +507,15 @@ const CreateFairForm: React.FC = () => {
                     </>
                   )}
                 </p>
+                <button
+                  onClick={handleToggleFormVisibility}
+                  className="action-button mt-5 mb-5 bg-white flex items-center justify-center text-primary-darker gap-2 p-2 border border-[#D0D5DD] rounded-lg hover:bg-primary-darker hover:text-white hover:shadow-md transition duration-200"
+                >
+                  <FaCheckCircle />
+                  {activeFair?.isVisibleUser
+                    ? "Ocultar Formulario para Compradores"
+                    : "Habilitar Formulario para Compradores"}
+                </button>
                 <div className="pb-6 mb-6 border-b border-gray-300 opacity-60"></div>
 
                 <p className="text-lg mb-2 text-primary-dark">
@@ -481,6 +524,7 @@ const CreateFairForm: React.FC = () => {
                   </strong>{" "}
                   ${activeFair.entryPriceSeller}
                 </p>
+
                 <p className="text-lg mb-2 text-primary-dark">
                   <strong className="text-primary-darker">Categorías:</strong>{" "}
                   {activeFair?.fairCategories &&
@@ -490,6 +534,7 @@ const CreateFairForm: React.FC = () => {
                         .join(", ")
                     : "Sin categorías"}
                 </p>
+                <div className="pb-6 mb-6 border-b border-gray-300 opacity-60"></div>
 
                 <div className="mt-6">
                   <h3 className="text-xl text-primary-darker font-semibold mb-4">

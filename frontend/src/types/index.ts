@@ -316,6 +316,7 @@ export interface IFair {
   isActive: boolean;
   entryPriceBuyer: string;
   entryDescription: string;
+  isVisibleUser: boolean;
   fairCategories: FairCategories[];
   fairDays: FairDay[];
   sellerRegistrations: SellerRegistrations[];
