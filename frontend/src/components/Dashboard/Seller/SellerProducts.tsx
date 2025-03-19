@@ -19,6 +19,8 @@ import PrintLabel from "@/components/PrintLabel/PrintLabel";
 import { PiCoatHanger } from "react-icons/pi";
 import "./seller.css";
 import { notify } from "@/components/Notifications/Notifications";
+import { URL } from "../../../../envs";
+
 
 const SellerProducts = () => {
   const { token } = useAuth();
@@ -34,6 +36,7 @@ const SellerProducts = () => {
   const [isSecondModalOpen, setIsSecondModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [visibleProducts, setVisibleProducts] = useState<boolean>(false);
+  
 
   const userId = userDtos?.seller?.id;
 
@@ -48,7 +51,7 @@ const SellerProducts = () => {
 
   const fetchProductCount = useCallback(async () => {
     try {
-      const response = await fetch(`/fairs/${userId}/${activeFairId}/products`, {
+      const response = await fetch(`${URL}/fairs/${userId}/${activeFairId}/products`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
