@@ -48,7 +48,7 @@ const SellerProducts = () => {
 
   const fetchProductCount = useCallback(async () => {
     try {
-      const response = await fetch(`/api/fairs/${userId}/${activeFairId}/products`, {
+      const response = await fetch(`/fairs/${userId}/${activeFairId}/products`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
