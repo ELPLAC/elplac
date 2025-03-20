@@ -117,6 +117,7 @@ const ProductsTable: React.FC<IProductRequestTableProps> = ({
     notAvailable: "No entregado",
     categoryNotApply: "No corresponde",
     secondMark: "Segunda marca",
+    acceptedPlay: "Aceptado PLAY",
   };
 
   const handleSelect = async ({ id, status }: IHandleSelectProductStatus) => {
