@@ -150,28 +150,22 @@ const AdminPostFair = () => {
     (product) => product.status === "sold"
   ).length;
   
-  // Suma total de productos vendidos
+  // Total de productos vendidos
 const totalSoledProducts = products
 .filter((product) => product.status === "sold")
 .reduce((acc, product) => acc + product.price, 0);
 
-// Función para truncar a 2 decimales sin redondear
-const truncateToTwoDecimals = (num: number) => Math.trunc(num * 100) / 100;
+// Función para truncar a número entero sin redondear
+const truncateToInt = (num: number) => Math.trunc(num);
 
-// Truncar el total y las ganancias
-const truncatedTotal = truncateToTwoDecimals(totalSoledProducts);
-const truncatedGananciasTPV = truncateToTwoDecimals(truncatedTotal * 0.3);
+// Truncar monto total y ganancias TPV
+const truncatedTotal = truncateToInt(totalSoledProducts);
+const truncatedGananciasTPV = truncateToInt(truncatedTotal * 0.3);
 
-// Formatear como string con 2 decimales y coma decimal (es-AR)
-const priceSoledProducts = truncatedTotal.toLocaleString("es-AR", {
-minimumFractionDigits: 2,
-maximumFractionDigits: 2,
-});
+// Formatear sin decimales, estilo argentino
+const priceSoledProducts = truncatedTotal.toLocaleString("es-AR");
+const gananciasTPV = truncatedGananciasTPV.toLocaleString("es-AR");
 
-const gananciasTPV = truncatedGananciasTPV.toLocaleString("es-AR", {
-minimumFractionDigits: 2,
-maximumFractionDigits: 2,
-});
 
   // Cantidad de productos "vendidos en liquidación" con status soldOnClearance
   const soldedOnClearance = products.filter(
