@@ -134,82 +134,77 @@ const AdminPostFair = () => {
     fetchData();
   }, [token, trigger, activeFair]);
 
-  const filteredProducts = products.filter((product) =>
-    product.code.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+ // Filtrado por búsqueda (no se modifica)
+const filteredProducts = products.filter((product) =>
+  product.code.toLowerCase().includes(searchTerm.toLowerCase())
+);
 
-  const formatNumber = (num: number) => num.toLocaleString("es-ES");
+// Función general de formateo con separador de miles
+const formatNumber = (num: number) => num.toLocaleString("es-ES");
 
-  // Precio total de toda la mercancía
-  const valorTotal = formatNumber(
-    Math.round(products.reduce((acc, product) => acc + product.price, 0))
-  );
-  
-  // Cantidad de productos "vendidos" con status sold
-  const soldedProducts = products.filter(
-    (product) => product.status === "sold"
-  ).length;
-  
-  // Total de productos vendidos
+// Función para cortar a 2 decimales sin redondear
+function formatNumberCutDecimals(value: number, decimals: number = 2): string {
+  const factor = Math.pow(10, decimals);
+  const cut = Math.trunc(value * factor) / factor;
+  return cut.toFixed(decimals);
+}
+
+// --- TOTAL GENERAL DE STOCK ---
+const valorTotal = formatNumber(
+  Math.round(products.reduce((acc, product) => acc + product.price, 0))
+);
+
+// --- PRODUCTOS VENDIDOS (PRECIO ORIGINAL) ---
+const soldedProducts = products.filter(
+  (product) => product.status === "sold"
+).length;
+
 const totalSoledProducts = products
-.filter((product) => product.status === "sold")
-.reduce((acc, product) => acc + product.price, 0);
+  .filter((product) => product.status === "sold")
+  .reduce((acc, product) => acc + product.price, 0);
 
-// Función para truncar a número entero sin redondear
-const truncateToInt = (num: number) => Math.trunc(num);
+const truncatedTotal = Math.trunc(totalSoledProducts);
+const truncatedGananciasTPV = Math.trunc(truncatedTotal * 0.3);
 
-// Truncar monto total y ganancias TPV
-const truncatedTotal = truncateToInt(totalSoledProducts);
-const truncatedGananciasTPV = truncateToInt(truncatedTotal * 0.3);
-
-// Formatear sin decimales, estilo argentino
 const priceSoledProducts = truncatedTotal.toLocaleString("es-AR");
 const gananciasTPV = truncatedGananciasTPV.toLocaleString("es-AR");
 
+// --- PRODUCTOS VENDIDOS EN LIQUIDACIÓN ---
+const soldedOnClearance = products.filter(
+  (product) => product.status === "soldOnClearance"
+).length;
 
-  // Cantidad de productos "vendidos en liquidación" con status soldOnClearance
-  const soldedOnClearance = products.filter(
-    (product) => product.status === "soldOnClearance"
-  ).length;
-  
-  // Cálculo del 25% de descuento por liquidación para cada producto
-  const totalPriceSoldOnClearanceProducts = formatNumber(
-    Math.round(
-      products
-        .filter((product) => product.status === "soldOnClearance")
-        .reduce((acc, product) => acc + product.price * 0.75, 0)
-    )
-  );
-  
-  function formatNumberCutDecimals(value: number, decimals: number = 2): string {
-    const factor = Math.pow(10, decimals);
-    const cut = Math.trunc(value * factor) / factor;
-    return cut.toFixed(decimals);
-  }
+// Monto total con descuento del 25% aplicado (sin formatear aún)
+const totalPriceSoldOnClearanceProductsRaw = products
+  .filter((product) => product.status === "soldOnClearance")
+  .reduce((acc, product) => acc + product.price * 0.75, 0);
 
-  const gananciasTPVOnClearance = formatNumberCutDecimals(
-    (Number(totalPriceSoldOnClearanceProducts) || 0) * 0.3
-  );
-  
-  
-  // Cantidad de productos "no vendidos"
-  const unSoldedProducts = products.filter(
-    (product) => product.status === "unsold"
-  ).length;
-  
-  // Valor total de los productos "no vendidos"
-  const priceUnSoldedProducts = formatNumber(
-    Math.round(
-      products
-        .filter((product) => product.status === "unsold")
-        .reduce((acc, product) => acc + product.price, 0)
-    )
-  );
-  
-  const applyLiquidation = (price: number) => {
-    const discount = price * 0.25;
-    return price - discount;
-  };
+// Ganancia del 30% sobre ese monto
+const gananciasTPVOnClearanceRaw = totalPriceSoldOnClearanceProductsRaw * 0.3;
+
+// Formateo de valores finales
+const totalPriceSoldOnClearanceProducts = totalPriceSoldOnClearanceProductsRaw.toLocaleString("es-AR");
+const gananciasTPVOnClearance = formatNumberCutDecimals(gananciasTPVOnClearanceRaw);
+
+// --- PRODUCTOS NO VENDIDOS ---
+const unSoldedProducts = products.filter(
+  (product) => product.status === "unsold"
+).length;
+
+const priceUnSoldedProducts = formatNumber(
+  Math.round(
+    products
+      .filter((product) => product.status === "unsold")
+      .reduce((acc, product) => acc + product.price, 0)
+  )
+);
+
+// Función que aplica el 25% de descuento (por si la usás en otro lado)
+const applyLiquidation = (price: number) => {
+  const discount = price * 0.25;
+  return price - discount;
+};
+
 
   const actionsOptions = [
     { id: productsStatusEnum.sold, name: "Vendido" },
