@@ -181,10 +181,16 @@ const gananciasTPV = truncatedGananciasTPV.toLocaleString("es-AR");
     )
   );
   
-  // 30% del total de las ganancias de los productos vendidos con status soldOnClearance
-  const gananciasTPVOnClearance = formatNumber(
-    Math.round((Number(totalPriceSoldOnClearanceProducts) || 0) * 0.3)
+  function formatNumberCutDecimals(value: number, decimals: number = 2): string {
+    const factor = Math.pow(10, decimals);
+    const cut = Math.trunc(value * factor) / factor;
+    return cut.toFixed(decimals);
+  }
+
+  const gananciasTPVOnClearance = formatNumberCutDecimals(
+    (Number(totalPriceSoldOnClearanceProducts) || 0) * 0.3
   );
+  
   
   // Cantidad de productos "no vendidos"
   const unSoldedProducts = products.filter(
