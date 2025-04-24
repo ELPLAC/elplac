@@ -248,7 +248,7 @@ const AdminProfiles = () => {
                   <strong>SKU: </strong> {selectedUser.seller?.sku}
                 </p>
                 <h3 className="font-bold mt-2">
-                  Información del registro en feria:
+                  Información del registro en feria de vendedor:
                 </h3>
 
                 {selectedUser.seller?.registrations &&
