@@ -201,14 +201,16 @@ const AdminProfiles = () => {
       </div>
       {selectedUser && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white p-6 rounded-lg shadow-lg max-h-[90vh] overflow-y-auto w-[90%] md:w-[70%] lg:w-[50%] relative">
-          <button
-            onClick={() => setSelectedUser(null)}
-            className="absolute top-2 right-2 px-2 py-0.5 bg-primary-darker text-white rounded hover:bg-primary-dark"
-          >
-            X
-          </button>
-          <h2 className="text-xl font-bold mb-2 mt-5">Información del Usuario:</h2>
+          <div className="bg-white p-6 rounded-lg shadow-lg max-h-[90vh] overflow-y-auto w-[90%] md:w-[70%] lg:w-[50%] relative">
+            <button
+              onClick={() => setSelectedUser(null)}
+              className="absolute top-2 right-2 px-2 py-0.5 bg-primary-darker text-white rounded hover:bg-primary-dark"
+            >
+              X
+            </button>
+            <h2 className="text-xl font-bold mb-2 mt-5">
+              Información del Usuario:
+            </h2>
             {selectedUser.role === "seller" && (
               <div>
                 <p>
@@ -247,6 +249,7 @@ const AdminProfiles = () => {
                 <p>
                   <strong>SKU: </strong> {selectedUser.seller?.sku}
                 </p>
+
                 <h3 className="font-bold mt-2">
                   Información del registro en feria de vendedor:
                 </h3>
@@ -334,6 +337,95 @@ const AdminProfiles = () => {
                                 </li>
                               ))}
                           </ul>
+                          {(() => {
+                            const products =
+                              selectedUser.seller?.products?.filter(
+                                (product: any) =>
+                                  product.fairCategory?.fair?.id ===
+                                  registration.fair?.id
+                              ) || [];
+
+                            const sold = products.filter(
+                              (p) => p.status === "sold"
+                            );
+                            const soldOnClearance = products.filter(
+                              (p) => p.status === "soldOnClearance"
+                            );
+
+                            const totalSold = sold.reduce(
+                              (acc, p) => acc + p.price,
+                              0
+                            );
+                            const totalClearance = soldOnClearance.reduce(
+                              (acc, p) => acc + p.price,
+                              0
+                            );
+
+                            const seventyPercent = totalSold * 0.7;
+                            const discounted = totalClearance * 0.75;
+                            const clearanceEarnings = discounted * 0.7;
+
+                            const totalProductsSold =
+                              sold.length + soldOnClearance.length;
+                            const totalEarnings =
+                              seventyPercent + clearanceEarnings;
+
+                            return (
+                              <div className="bg-yellow-50 p-4 rounded-lg mt-4">
+                                <h3 className="text-xl font-bold text-primary-dark mb-2">
+                                  📊 Resumen de ventas en{" "}
+                                  {registration.fair?.name}
+                                </h3>
+
+                                <div className="text-lg text-gray-800">
+                                  <div className="mb-4">
+                                    <h4 className="text-lg font-semibold mb-1">
+                                      🛍️ A precio original
+                                    </h4>
+                                    <p>Cantidad: {sold.length}</p>
+                                    <p>
+                                      Total en ventas: $
+                                      {totalSold.toLocaleString("es-ES")}
+                                    </p>
+                                    <p>
+                                      Ganancia (70%): $
+                                      {seventyPercent.toLocaleString("es-ES")}
+                                    </p>
+                                  </div>
+
+                                  <div className="mb-4">
+                                    <h4 className="text-lg font-semibold mb-1">
+                                      🏷️ En liquidación
+                                    </h4>
+                                    <p>Cantidad: {soldOnClearance.length}</p>
+                                    <p>
+                                      Total con descuento: $
+                                      {discounted.toLocaleString("es-ES")}
+                                    </p>
+                                    <p>
+                                      Ganancia (70%): $
+                                      {clearanceEarnings.toLocaleString(
+                                        "es-ES"
+                                      )}
+                                    </p>
+                                  </div>
+
+                                  <div className="border-t pt-3">
+                                    <h4 className="text-lg font-bold">
+                                      📦 Total Final
+                                    </h4>
+                                    <p>
+                                      Productos vendidos: {totalProductsSold}
+                                    </p>
+                                    <p>
+                                      Total a recibir: $
+                                      {totalEarnings.toLocaleString("es-ES")}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })()}
                         </div>
                       </details>
                     )
