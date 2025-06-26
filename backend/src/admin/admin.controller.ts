@@ -1,9 +1,17 @@
-import { Controller, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  UseGuards,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
 import { AdminService } from './admin.service';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../users/roles/roles.decorator';
-import { Role } from '../users/roles/roles.enum';
+import {
+  JwtAuthGuard,
+  RolesGuard,
+  Roles,
+  Role,
+} from '../auth/auth.guard';
 
 @Controller('admin')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -12,8 +20,8 @@ export class AdminController {
 
   @Delete('cleanup')
   @Roles(Role.ADMIN)
-  async cleanupOldData(): Promise<{ message: string }> {
-    await this.adminService.cleanupOldData();
-    return { message: 'Cleanup completed successfully.' };
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async cleanOldData(): Promise<void> {
+    await this.adminService.cleanOldData();
   }
 }
