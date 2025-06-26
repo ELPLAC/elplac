@@ -4,10 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import typeorm from '@config/typeorm';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
-
 import { AppService } from './app.service';
-import { AppController } from 'app.controller';
-
 import { UsersModule } from '@users/users.module';
 import { SellerModule } from '@sellers/sellers.module';
 import { AuthController } from '@auth/auth.controller';
@@ -40,9 +37,9 @@ import { FairCategory } from '@fairs/entities/fairCategory.entity';
 import { UserToSellerService } from '@users/changeRole';
 import { ProductsRepository } from '@products/products.repository';
 import { Product } from '@products/entities/products.entity';
-import { ProductRequest } from '@products/entities/productRequest.entity';
+import { ProductRequest } from '@products/entities/productRequest.entity'
+import { AppController } from 'app.controller';
 
-import { AdminModule } from './admin/admin.module'; 
 
 @Module({
   imports: [
@@ -71,7 +68,7 @@ import { AdminModule } from './admin/admin.module';
       Category,
       FairCategory,
       Product,
-      ProductRequest,
+      ProductRequest
     ]),
     UsersModule,
     SellerModule,
@@ -81,14 +78,13 @@ import { AdminModule } from './admin/admin.module';
     FileModule,
     CategoriesModule,
     MercadoPagoModule,
-    AdminModule, 
   ],
   controllers: [
     AuthController,
     FileController,
     UsersController,
     SellerController,
-    AppController,
+    AppController
   ],
   providers: [
     AppService,
@@ -101,9 +97,8 @@ import { AdminModule } from './admin/admin.module';
     FairsService,
     SellerService,
     UserToSellerService,
-    ProductsRepository,
+    ProductsRepository
   ],
 })
 export class AppModule {}
-
 
