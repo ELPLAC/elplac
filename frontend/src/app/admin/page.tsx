@@ -1,8 +1,13 @@
-"use client";
-
+import AdminHome from "@/components/Dashboard/Admin/AdminHome";
 import MainDashboardAdmin from "@/components/Dashboard/Admin/MainDashboardAdmin";
+import React from "react";
 
-export default function AdminPage() {
-  return <MainDashboardAdmin />;
-}
+const page = () => {
+  return (
+    <MainDashboardAdmin>
+      <AdminHome />
+    </MainDashboardAdmin>
+  );
+};
 
+export default page;

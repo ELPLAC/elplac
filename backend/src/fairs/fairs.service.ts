@@ -4,50 +4,48 @@ import { FairDto } from './fairs.dto';
 
 @Injectable()
 export class FairsService {
-  async concludeAndDeleteFair(fairId: string) {
-    await this.fairsRepository.closeFair(fairId);
-    await this.fairsRepository.deleteFair(fairId);
-    return { message: 'Feria concluida y eliminada' };
-  }
-
   constructor(private readonly fairsRepository: FairsRepository) {}
 
   async createFair(fairDto: FairDto) {
-    return this.fairsRepository.createFair(fairDto);
+    return await this.fairsRepository.createFair(fairDto);
   }
 
   async getAllFairs() {
-    return this.fairsRepository.getAllFairs();
+    return await this.fairsRepository.getAllFairs();
   }
 
   async getFairById(fairId: string) {
-    return this.fairsRepository.getFairById(fairId);
+    return await this.fairsRepository.getFairById(fairId);
+  }
+
+  async saveFair(fair: any) {
+    return await this.fairsRepository.saveFair(fair);
   }
 
   async closeFair(fairId: string) {
-    return this.fairsRepository.closeFair(fairId);
+    return await this.fairsRepository.closeFair(fairId);
   }
 
   async getProductsByIdAndFair(fairId: string, sellerId: string) {
-    return this.fairsRepository.getProductsByIdAndFair(fairId, sellerId);
+    return await this.fairsRepository.getProductsByIdAndFair(fairId, sellerId);
   }
 
   async editAddressFair(fairId: string, newAddressFair: Partial<FairDto>) {
-    return this.fairsRepository.editAddressFair(fairId, newAddressFair);
+    return await this.fairsRepository.editAddressFair(fairId, newAddressFair);
   }
 
   async updateEntryPriceBuyer(fairId: string, entryPriceBuyer: string) {
-    return this.fairsRepository.updateEntryPriceBuyer(fairId, entryPriceBuyer);
+    return await this.fairsRepository.updateEntryPriceBuyer(fairId, entryPriceBuyer);
   }
 
-  async getConcludedFairs() {
-    return this.fairsRepository.getConcludedFairs();
-  }
-
-  async deleteFair(id: string) {
-    return this.fairsRepository.deleteFair(id);
+  
+  async concludeAndDeleteFair(fairId: string) {
+    await this.fairsRepository.closeFair(fairId);
+    await this.fairsRepository.deleteProductsByFair(fairId);
+    await this.fairsRepository.deleteTransactionsByFair(fairId);
+    await this.fairsRepository.deleteSellerRegistrationsByFair(fairId);
+    await this.fairsRepository.deleteFair(fairId);
+    return { message: 'Feria concluida y eliminada correctamente' };
   }
 }
-
-
 
