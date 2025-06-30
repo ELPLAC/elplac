@@ -99,4 +99,18 @@ getConcludedFairs() {
 @UseGuards(AuthGuard, RoleGuard)
 deleteConcludedFair(@Param('id') fairId: string) {
   return this.fairsService.deleteFair(fairId);
+
+@Get('history')
+  @Roles(Role.ADMIN)
+  @UseGuards(AuthGuard, RoleGuard)
+  getConcludedFairs() {
+    return this.fairsService.getConcludedFairs();
+  }
+
+  @Delete('history/:id')
+  @Roles(Role.ADMIN)
+  @UseGuards(AuthGuard, RoleGuard)
+  deleteConcludedFair(@Param('id') fairId: string) {
+    return this.fairsService.deleteFair(fairId);
+  }
 }

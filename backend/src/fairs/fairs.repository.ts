@@ -403,4 +403,21 @@ async getConcludedFairs(): Promise<Fair[]> {
 
 async deleteFair(fairId: string) {
   await this.fairRepository.delete({ id: fairId });
+
+async getConcludedFairs(): Promise<Fair[]> {
+    return await this.fairRepository.find({
+      where: { isActive: false },
+      relations: [
+        'fairDays',
+        'fairCategories',
+        'fairCategories.products',
+        'sellerRegistrations',
+        'userRegistrations'
+      ],
+    });
+  }
+
+  async deleteFair(fairId: string) {
+    await this.fairRepository.delete({ id: fairId });
+  }
 }
