@@ -49,20 +49,3 @@ export class FairsService {
   }
 }
 
-
-
-async getConcludedFairs() {
-  return this.fairsRepository.getConcludedFairs();
-}
-
-async deleteFair(id: string) {
-  return this.fairsRepository.deleteFair(id);
-
-async getConcludedFairs() {
-    return this.fairsRepository.getConcludedFairs();
-  }
-
-  async deleteFair(id: string) {
-    return this.fairsRepository.deleteFair(id);
-  }
-}
