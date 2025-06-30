@@ -5,27 +5,32 @@ import axios from 'axios';
 import { getUserFromLocalStorage } from '@/helpers/getUserFromLocalStorage';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Fair } from '@/types/fair';
+
+interface Fair {
+  id: string;
+  name: string;
+  address: string;
+  entryDescription: string;
+  isActive: boolean;
+}
 
 export default function MainDashboardAdmin() {
   const [fairs, setFairs] = useState<Fair[]>([]);
-  const [filteredFairs, setFilteredFairs] = useState<Fair[]>([]);
   const [search, setSearch] = useState('');
   const user = getUserFromLocalStorage();
 
   const fetchFairs = async () => {
     try {
       const { data } = await axios.get('/api/fairs');
-      const concluded = data.filter((f: Fair) => f.isActive === false);
-      setFairs(concluded);
-      setFilteredFairs(concluded);
+      const concludedFairs = data.filter((f: Fair) => !f.isActive);
+      setFairs(concludedFairs);
     } catch (err) {
-      console.error('Error cargando ferias concluidas:', err);
+      console.error('Error al obtener ferias concluidas:', err);
     }
   };
 
   const handleDelete = async (id: string) => {
-    const confirmDelete = confirm('¿Estás seguro de eliminar esta feria?');
+    const confirmDelete = confirm('¿Eliminar esta feria definitivamente?');
     if (!confirmDelete) return;
 
     try {
@@ -34,11 +39,12 @@ export default function MainDashboardAdmin() {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
-      alert('Feria eliminada correctamente');
-      fetchFairs();
+
+      setFairs((prev) => prev.filter((fair) => fair.id !== id));
+      alert('Feria eliminada correctamente.');
     } catch (err) {
       console.error('Error al eliminar la feria:', err);
-      alert('No se pudo eliminar la feria.');
+      alert('Error al eliminar la feria.');
     }
   };
 
@@ -46,12 +52,9 @@ export default function MainDashboardAdmin() {
     fetchFairs();
   }, []);
 
-  useEffect(() => {
-    const filtered = fairs.filter((fair) =>
-      fair.name.toLowerCase().includes(search.toLowerCase())
-    );
-    setFilteredFairs(filtered);
-  }, [search, fairs]);
+  const filteredFairs = fairs.filter((fair) =>
+    fair.name.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <section className="p-6">
@@ -66,9 +69,9 @@ export default function MainDashboardAdmin() {
       />
 
       {filteredFairs.length === 0 ? (
-        <p>No hay ferias concluidas disponibles.</p>
+        <p>No hay ferias concluidas.</p>
       ) : (
-        <ul className="space-y-4">
+        <div className="space-y-4">
           {filteredFairs.map((fair) => (
             <Card
               key={fair.id}
@@ -77,6 +80,7 @@ export default function MainDashboardAdmin() {
               <div>
                 <h3 className="text-lg font-semibold">{fair.name}</h3>
                 <p className="text-sm text-gray-600">{fair.address}</p>
+                <p className="text-sm text-gray-500">{fair.entryDescription}</p>
               </div>
 
               {user?.role === 'admin' && (
@@ -89,8 +93,9 @@ export default function MainDashboardAdmin() {
               )}
             </Card>
           ))}
-        </ul>
+        </div>
       )}
     </section>
   );
 }
+
