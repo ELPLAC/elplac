@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
 interface Fair {
@@ -86,7 +85,7 @@ export default function MainDashboardAdmin() {
                   onClick={() => handleDelete(fair.id)}
                 >
                   Eliminar
-                </Button>
+                </button>
             </Card>
           ))}
         </div>
