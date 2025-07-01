@@ -80,9 +80,7 @@ export default function MainDashboardAdmin() {
                 <p className="text-sm text-gray-500">{fair.entryDescription}</p>
               </div>
 
-                <Button
-                  variant="destructive"
-                  onClick={() => handleDelete(fair.id)}
+                 handleDelete(fair.id)}
                 >
                   Eliminar
                 </button>
@@ -94,4 +92,3 @@ export default function MainDashboardAdmin() {
   );
 }
 
-//h
