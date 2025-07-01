@@ -70,18 +70,20 @@ export default function MainDashboardAdmin() {
         <div className="space-y-4">
           {filteredFairs.map((fair) => (
             
-              <div>
-                <h3 className="text-lg font-semibold">{fair.name}</h3>
-                <p className="text-sm text-gray-600">{fair.address}</p>
-                <p className="text-sm text-gray-500">{fair.entryDescription}</p>
-              </div>
+              <>
+  <div>
+    <h3 className="text-lg font-semibold">{fair.name}</h3>
+    <p className="text-sm text-gray-600">{fair.address}</p>
+    <p className="text-sm text-gray-500">{fair.entryDescription}</p>
+  </div>
 
-                 <button
-  onClick={() => handleDelete(fair.id)}
-  className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
->
-  Eliminar
-</button>
+  <button
+    onClick={() => handleDelete(fair.id)}
+    className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+  >
+    Eliminar
+  </button>
+</>
             </div>
           ))}
         </div>
