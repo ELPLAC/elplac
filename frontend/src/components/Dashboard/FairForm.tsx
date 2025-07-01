@@ -209,62 +209,8 @@ const CreateFairForm: React.FC = () => {
       router.push("/admin/fairs");
     }
 
-  const handleDeleteFair = async () => {
-    if (!activeFair?.id) return;
-
-    const confirmDelete = window.confirm("¿Estás seguro de eliminar esta feria?");
-    if (!confirmDelete) return;
-
-    try {
-      const res = await fetch(`${URL}/fairs/${activeFair.id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.message || "Error al eliminar la feria");
-      }
-
-      notify("ToastSuccess", "Feria eliminada con éxito");
-      setActiveFair(undefined);
-      router.push("/admin/fairs");
-    } catch (err) {
-      notify("ToastError", "Error al eliminar la feria");
-      console.error(err);
-    }
-  };
-
-  const handleDeleteFair = async () => {
-    if (!activeFair?.id) return;
-
-    const confirmDelete = window.confirm("¿Estás seguro de eliminar esta feria?");
-    if (!confirmDelete) return;
-
-    try {
-      const res = await fetch(`${URL}/fairs/${activeFair.id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.message || "Error al eliminar la feria");
-      }
-
-      notify("ToastSuccess", "Feria eliminada con éxito");
-      setActiveFair(undefined);
-      router.push("/admin/fairs");
-    } catch (err) {
-      notify("ToastError", "Error al eliminar la feria");
-      console.error(err);
-    }
-  };
-
+  
+  
 
   };
 
