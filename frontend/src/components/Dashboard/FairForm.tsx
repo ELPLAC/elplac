@@ -23,7 +23,7 @@ import EditFairAddress from "./EditAddressFair";
 import { URL } from "../../../envs";
 
 const CreateFairForm: React.FC = () => {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const [hasCost, setHasCost] = useState(false);
   const { activeFair, setActiveFair } = useFair();
   const router = useRouter();
