@@ -363,15 +363,6 @@ export class FairsRepository {
       .execute();
   }
 
-  async deleteTransactionsByFair(fairId: string) {
-    await this.dataSource
-      .createQueryBuilder()
-      .delete()
-      .from('payment_transaction')
-      .where('fairId = :fairId', { fairId })
-      .execute();
-  }
-
   async deleteSellerRegistrationsByFair(fairId: string) {
     await this.dataSource
       .createQueryBuilder()
@@ -381,10 +372,26 @@ export class FairsRepository {
       .execute();
   }
 
+ 
+
+  async getConcludedFairs(): Promise<Fair[]> {
+    return await this.fairRepository.find({
+      where: { isActive: false },
+      relations: [
+        'fairDays',
+        'fairCategories',
+        'fairCategories.products',
+        'sellerRegistrations',
+        'userRegistrations',
+      ],
+    });
+  }
+
   async deleteFair(fairId: string) {
     await this.fairRepository.delete({ id: fairId });
   }
 }
+
 
 
 

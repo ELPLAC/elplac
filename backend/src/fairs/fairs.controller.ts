@@ -18,6 +18,23 @@ import { Role } from '@users/roles/roles.enum';
 
 @Controller('fairs')
 export class FairsController {
+
+  // 🔹 NUEVO: Obtener historial de ferias concluidas
+  @Roles(Role.ADMIN)
+  @UseGuards(AuthGuard, RoleGuard)
+  @Get('history')
+  getConcludedFairs() {
+    return this.fairsService.getConcludedFairs();
+  }
+
+  // 🔹 NUEVO: Eliminar feria concluida
+  @Roles(Role.ADMIN)
+  @UseGuards(AuthGuard, RoleGuard)
+  @Delete('history/:id')
+  deleteConcludedFair(@Param('id') fairId: string) {
+    return this.fairsService.deleteFair(fairId);
+  }
+
   constructor(private readonly fairsService: FairsService) {}
 
   @Roles(Role.ADMIN)
@@ -72,11 +89,9 @@ export class FairsController {
     if (!entryPriceBuyer) {
       throw new BadRequestException('El precio de entrada es obligatorio.');
     }
-
     return this.fairsService.updateEntryPriceBuyer(fairId, entryPriceBuyer);
   }
 
-  // ✅ NUEVA RUTA: concluir y eliminar feria
   @Roles(Role.ADMIN)
   @UseGuards(AuthGuard, RoleGuard)
   @Delete('conclude/:id')
@@ -84,3 +99,4 @@ export class FairsController {
     return await this.fairsService.concludeAndDeleteFair(fairId);
   }
 }
+
