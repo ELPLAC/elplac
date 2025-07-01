@@ -209,34 +209,6 @@ const CreateFairForm: React.FC = () => {
       router.push("/admin/fairs");
     }
   };
-  const handleDeleteFair = async () => {
-    if (!activeFair?.id) return;
-
-    const confirmDelete = window.confirm("¿Estás seguro de que querés eliminar esta feria? Esta acción no se puede deshacer.");
-    if (!confirmDelete) return;
-
-    try {
-      const response = await fetch(`${URL}/fairs/${activeFair.id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Error eliminando la feria");
-      }
-
-      notify("ToastSuccess", "Feria eliminada correctamente");
-      setActiveFair(undefined);
-      router.push("/admin/fairs");
-    } catch (error) {
-      console.error(error);
-      notify("ToastError", "No se pudo eliminar la feria");
-    }
-  };
-
 
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = event.target;
@@ -465,17 +437,8 @@ const CreateFairForm: React.FC = () => {
                 >
                   <FaCheckCircle /> Ver solicitudes de clasificación
                 </a>
-                
-<button
-  onClick={handleDeleteFair}
-  className="action-button w-full mt-5 mb-5 bg-white flex items-center justify-center text-red-600 gap-2 p-2 border border-red-600 rounded-lg hover:bg-red-600 hover:text-white hover:shadow-md transition duration-200"
->
-  🗑 Eliminar feria
-</button>
-
-<button
-  onClick={() => setOpenModalUserId(true)}
-
+                <button
+                  onClick={() => setOpenModalUserId(true)}
                   className="action-button w-full mt-5 mb-5 bg-white flex items-center justify-center text-red-600 gap-2 p-2 border border-red-600 rounded-lg hover:bg-red-600 hover:text-white hover:shadow-md transition duration-200"
                 >
                   <FaCheckCircle /> Concluir feria
