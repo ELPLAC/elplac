@@ -79,10 +79,12 @@ export default function MainDashboardAdmin() {
                 <p className="text-sm text-gray-500">{fair.entryDescription}</p>
               </div>
 
-                 handleDelete(fair.id)}
-                >
-                  Eliminar
-                </button>
+                 <button
+  onClick={() => handleDelete(fair.id)}
+  className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+>
+  Eliminar
+</button>
             </div>
           ))}
         </div>
