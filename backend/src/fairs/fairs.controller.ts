@@ -10,7 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { FairsService } from './fairs.service';
-import { JwtAuthGuard } from '../auth/auth.guard';
+import { AuthGuard } from '../auth/auth.guard';
 import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
 
@@ -19,15 +19,16 @@ export class FairsController {
   constructor(private readonly fairsService: FairsService) {}
 
   @Put(':id/update-entry-price-buyer')
+  @UseGuards(AuthGuard)
   async updateEntryPriceBuyer(
     @Param('id') fairId: string,
     @Body('entryPriceBuyer') entryPriceBuyer: number,
   ) {
-    return this.fairsService.updateEntryPriceBuyer(fairId, entryPriceBuyer);
+    return this.fairsService.updateEntryPriceBuyer(fairId, entryPriceBuyer.toString());
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard)
   @Roles('admin')
   async deleteFair(@Param('id') id: string) {
     return this.fairsService.concludeAndDeleteFair(id);
