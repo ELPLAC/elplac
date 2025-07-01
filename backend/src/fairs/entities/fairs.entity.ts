@@ -1,34 +1,56 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { FairCategory } from './fair-categories.entity';
-import { FairProduct } from './fair-products.entity';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToMany, JoinTable } from 'typeorm';
+import { v4 as uuid } from 'uuid';
+import { FairDay } from '@fairs/entities/fairDay.entity';
+import { UserFairRegistration } from '@fairs/entities/userFairRegistration.entity';
+import { SellerFairRegistration } from '@fairs/entities/sellerFairRegistration.entity';
+import { PaymentTransaction } from '@payment_transaction/paymentTransaction.entity';
+import { ProductRequest } from '@products/entities/productRequest.entity';
+import { FairCategory } from '@fairs/entities/fairCategory.entity';
 
-@Entity()
+@Entity({ name: 'fair' })
 export class Fair {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id: string = uuid();
 
   @Column()
   name: string;
 
-  @Column()
-  description: string;
+  @Column({ default: false })
+  isVisibleUser: boolean;
+
+  @Column({ default: false }) 
+  isLabelPrintingEnabled: boolean;
 
   @Column()
   address: string;
 
-  @Column({ type: 'timestamp' })
-  startDate: Date;
+  @Column()
+  entryPriceSeller: number;
 
-  @Column({ type: 'timestamp' })
-  endDate: Date;
+  @Column({default : true})
+  isActive: boolean;
 
-  @OneToMany(() => FairCategory, (category) => category.fair, {
-    cascade: true,
-  })
-  categories: FairCategory[];
+  @Column({ type: 'varchar', nullable: true })
+  entryPriceBuyer: string;
 
-  @OneToMany(() => FairProduct, (product) => product.fair, {
-    cascade: true,
-  })
-  products: FairProduct[];
+  @Column()
+  entryDescription: string;
+
+  @OneToMany(() => FairDay, fairDay => fairDay.fair)
+  fairDays: FairDay[];
+
+  @OneToMany(() => UserFairRegistration, registrations => registrations.fair)
+  userRegistrations: UserFairRegistration[];
+
+  @OneToMany(() => SellerFairRegistration, registrations => registrations.fair)
+  sellerRegistrations: SellerFairRegistration[];
+
+  @OneToMany(() => PaymentTransaction, transaction => transaction.fair)
+  transactions: PaymentTransaction[];
+
+  @OneToMany(() => ProductRequest, productRequest => productRequest.fair)
+  productRequests: ProductRequest[];
+
+  @OneToMany(() => FairCategory, fairCategory => fairCategory.fair)
+  fairCategories: FairCategory[] | FairCategory;
 }
