@@ -1,56 +1,60 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { FairsRepository } from './fairs.repository';
 import { FairDto } from './fairs.dto';
+import { Fair } from './entities/fairs.entity';
 
 @Injectable()
 export class FairsService {
   constructor(private readonly fairsRepository: FairsRepository) {}
 
-  async createFair(fairDto: FairDto) {
-    return await this.fairsRepository.createFair(fairDto);
+  async createFair(fairDto: FairDto): Promise<Fair> {
+    return this.fairsRepository.createFair(fairDto);
   }
 
-  async getAllFairs() {
-    return await this.fairsRepository.getAllFairs();
+  async getAllFairs(): Promise<Fair[]> {
+    return this.fairsRepository.getAllFairs();
   }
 
-  async getFairById(fairId: string) {
-    return await this.fairsRepository.getFairById(fairId);
+  async getFairById(fairId: string): Promise<Partial<Fair>> {
+    return this.fairsRepository.getFairById(fairId);
   }
 
-  async saveFair(fair: any) {
-    return await this.fairsRepository.saveFair(fair);
+  async editAddressFair(fairId: string, data: Partial<FairDto>) {
+    return this.fairsRepository.editAddressFair(fairId, data);
+  }
+
+  async updateEntryPriceBuyer(fairId: string, price: string) {
+    return this.fairsRepository.updateEntryPriceBuyer(fairId, price);
   }
 
   async closeFair(fairId: string) {
-    return await this.fairsRepository.closeFair(fairId);
+    return this.fairsRepository.closeFair(fairId);
   }
 
-  async getProductsByIdAndFair(fairId: string, sellerId: string) {
-    return await this.fairsRepository.getProductsByIdAndFair(fairId, sellerId);
+  async softDeleteFair(fairId: string) {
+    const fair = await this.fairsRepository.findOne({ where: { id: fairId } });
+
+    if (!fair) {
+      throw new NotFoundException('Feria no encontrada');
+    }
+
+    fair.isActive = false;
+
+    await this.fairsRepository.save(fair);
+
+    return {
+      message: 'Feria desactivada correctamente',
+      fair,
+    };
   }
 
-  async editAddressFair(fairId: string, newAddressFair: Partial<FairDto>) {
-    return await this.fairsRepository.editAddressFair(fairId, newAddressFair);
-  }
-
-  async updateEntryPriceBuyer(fairId: string, entryPriceBuyer: string) {
-    return await this.fairsRepository.updateEntryPriceBuyer(fairId, entryPriceBuyer);
-  }
-
-  
-  async concludeAndDeleteFair(fairId: string) {
-    await this.fairsRepository.closeFair(fairId);
+  async deleteFairCompletely(fairId: string) {
     await this.fairsRepository.deleteProductsByFair(fairId);
     await this.fairsRepository.deleteTransactionsByFair(fairId);
     await this.fairsRepository.deleteSellerRegistrationsByFair(fairId);
     await this.fairsRepository.deleteFair(fairId);
-    return { message: 'Feria concluida y eliminada correctamente' };
-  
 
-  async softDeleteFair(fairId: string): Promise<any> {
-    const fair = await this.fairsRepository.findOne({ where: { id: fairId } });
-    if (!fair) throw new NotFoundException('Fair not found');
-    fair.isActive = false;
-    return this.fairsRepository.save(fair);
+    return { message: 'Feria eliminada completamente del sistema' };
   }
+}
+

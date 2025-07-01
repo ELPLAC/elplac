@@ -331,26 +331,18 @@ export class FairsRepository {
 
   async editAddressFair(fairId: string, newAddressFair: Partial<FairDto>) {
     const fairToEdit = await this.fairRepository.findOneBy({ id: fairId });
-
     if (!fairToEdit) throw new NotFoundException('Feria no encontrada');
-
     if (newAddressFair.address) {
       fairToEdit.address = newAddressFair.address;
     }
-
     return await this.fairRepository.save(fairToEdit);
   }
 
   async updateEntryPriceBuyer(fairId: string, entryPriceBuyer: string) {
     const fair = await this.fairRepository.findOne({ where: { id: fairId } });
-
-    if (!fair) {
-      throw new NotFoundException('Feria no encontrada');
-    }
-
+    if (!fair) throw new NotFoundException('Feria no encontrada');
     fair.entryPriceBuyer = entryPriceBuyer;
     await this.fairRepository.save(fair);
-
     return { message: 'Precio de entrada actualizado correctamente', fair };
   }
 
@@ -384,5 +376,14 @@ export class FairsRepository {
   async deleteFair(fairId: string) {
     await this.fairRepository.delete({ id: fairId });
   }
-}
 
+  // ✅ Agregado para que el servicio pueda usarlo
+  async findOne(options: Parameters<Repository<Fair>['findOne']>[0]) {
+    return this.fairRepository.findOne(options);
+  }
+
+  async save(fair: Fair) {
+    return this.fairRepository.save(fair);
+  }
+}
+  
