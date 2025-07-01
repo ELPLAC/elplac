@@ -46,6 +46,13 @@ export class FairsService {
     await this.fairsRepository.deleteSellerRegistrationsByFair(fairId);
     await this.fairsRepository.deleteFair(fairId);
     return { message: 'Feria concluida y eliminada correctamente' };
-  }
-}
+  
 
+  async softDeleteFair(fairId: string) {
+    const fair = await this.fairRepository.findOne({ where: { id: fairId } });
+    if (!fair) throw new NotFoundException('Fair not found');
+    fair.isActive = false;
+    return this.fairRepository.save(fair);
+  }
+
+}

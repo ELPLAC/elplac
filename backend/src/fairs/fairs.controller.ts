@@ -18,6 +18,14 @@ import { Role } from '@users/roles/roles.enum';
 
 @Controller('fairs')
 export class FairsController {
+
+  @Roles(Role.ADMIN)
+  @UseGuards(AuthGuard, RoleGuard)
+  @Delete(':id')
+  async softDeleteFair(@Param('id') fairId: string) {
+    return await this.fairsService.softDeleteFair(fairId);
+  }
+
   constructor(private readonly fairsService: FairsService) {}
 
   @Roles(Role.ADMIN)

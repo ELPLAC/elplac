@@ -13,6 +13,23 @@ import WithAuthProtect from "@/helpers/WithAuth";
 import "./Fair.css";
 
 const Fairs = () => {
+
+  const handleDeleteFair = async (fairId: string) => {
+    const confirmed = confirm("¿Estás seguro que querés eliminar esta feria?");
+    if (!confirmed) return;
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/fairs/${fairId}`, {
+        method: "DELETE",
+        credentials: "include"
+      });
+      if (!res.ok) throw new Error("Error al eliminar la feria");
+      window.location.reload(); // O actualizar estado si se maneja localmente
+    } catch (err) {
+      console.error(err);
+      alert("No se pudo eliminar la feria");
+    }
+  };
+
   const [termsChecked, setTermsChecked] = useState(false);
   const [salesChecked, setSalesChecked] = useState("Elegí una opcion");
   const { userDtos } = useProfile();
