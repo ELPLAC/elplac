@@ -69,10 +69,7 @@ export default function MainDashboardAdmin() {
       ) : (
         <div className="space-y-4">
           {filteredFairs.map((fair) => (
-            <Card
-              key={fair.id}
-              className="p-4 flex justify-between items-center"
-            >
+            
               <div>
                 <h3 className="text-lg font-semibold">{fair.name}</h3>
                 <p className="text-sm text-gray-600">{fair.address}</p>
