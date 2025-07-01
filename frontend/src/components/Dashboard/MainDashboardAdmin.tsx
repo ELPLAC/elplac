@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Card } from '@/components/ui/card';
 
 interface Fair {
   id: string;
@@ -80,13 +79,11 @@ export default function MainDashboardAdmin() {
                 <p className="text-sm text-gray-500">{fair.entryDescription}</p>
               </div>
 
-                 <button
-  onClick={() => handleDelete(fair.id)}
-  className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
->
-  Eliminar
-</button>
-            </Card>
+                 handleDelete(fair.id)}
+                >
+                  Eliminar
+                </button>
+            </div>
           ))}
         </div>
       )}
