@@ -1,36 +1,86 @@
-
 import {
+  BadRequestException,
+  Body,
   Controller,
-  Delete,
   Get,
   Param,
   Post,
   Put,
-  Body,
+  Delete,
   UseGuards,
 } from '@nestjs/common';
-import { FairsService } from './fairs.service';
-import { AuthGuard } from '../auth/auth.guard';
-import { Roles } from '../auth/roles.decorator';
-import { RolesGuard } from '../auth/roles.guard';
+import { FairsService } from '@fairs/fairs.service';
+import { FairDto } from '@fairs/fairs.dto';
+import { AuthGuard } from '@auth/auth.guard';
+import { RoleGuard } from '@users/roles/roles.guard';
+import { Roles } from '@users/roles/roles.decorator';
+import { Role } from '@users/roles/roles.enum';
 
 @Controller('fairs')
 export class FairsController {
   constructor(private readonly fairsService: FairsService) {}
 
-  @Put(':id/update-entry-price-buyer')
-  @UseGuards(AuthGuard)
-  async updateEntryPriceBuyer(
-    @Param('id') fairId: string,
-    @Body('entryPriceBuyer') entryPriceBuyer: number,
-  ) {
-    return this.fairsService.updateEntryPriceBuyer(fairId, entryPriceBuyer.toString());
+  @Roles(Role.ADMIN)
+  @UseGuards(AuthGuard, RoleGuard)
+  @Post()
+  async createFair(@Body() fair: FairDto) {
+    return await this.fairsService.createFair(fair);
   }
 
-  @Delete(':id')
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles('admin')
-  async deleteFair(@Param('id') id: string) {
-    return this.fairsService.concludeAndDeleteFair(id);
+  @Get()
+  async getAllFairs() {
+    return await this.fairsService.getAllFairs();
+  }
+
+  @Get(':id')
+  async getFairById(@Param('id') fairId: string) {
+    return await this.fairsService.getFairById(fairId);
+  }
+
+  @Roles(Role.ADMIN)
+  @UseGuards(AuthGuard, RoleGuard)
+  @Put('close/:id')
+  async closeFair(@Param('id') fairId: string) {
+    return await this.fairsService.closeFair(fairId);
+  }
+
+  @Get(':sellerId/:fairId/products')
+  async getProductsByIdAndFair(
+    @Param('sellerId') sellerId: string,
+    @Param('fairId') fairId: string,
+  ) {
+    return await this.fairsService.getProductsByIdAndFair(fairId, sellerId);
+  }
+
+  @Roles(Role.ADMIN)
+  @UseGuards(AuthGuard, RoleGuard)
+  @Put('edit/:id')
+  async editAddressFair(
+    @Param('id') fairId: string,
+    @Body() newAddressFair: Partial<FairDto>,
+  ) {
+    return await this.fairsService.editAddressFair(fairId, newAddressFair);
+  }
+
+  @Roles(Role.ADMIN)
+  @UseGuards(AuthGuard, RoleGuard)
+  @Put(':id/update-entry-price-buyer')
+  async updateEntryPriceBuyer(
+    @Param('id') fairId: string,
+    @Body('entryPriceBuyer') entryPriceBuyer: string,
+  ) {
+    if (!entryPriceBuyer) {
+      throw new BadRequestException('El precio de entrada es obligatorio.');
+    }
+
+    return this.fairsService.updateEntryPriceBuyer(fairId, entryPriceBuyer);
+  }
+
+  // ✅ NUEVA RUTA: concluir y eliminar feria
+  @Roles(Role.ADMIN)
+  @UseGuards(AuthGuard, RoleGuard)
+  @Delete('conclude/:id')
+  async concludeAndDeleteFair(@Param('id') fairId: string) {
+    return await this.fairsService.concludeAndDeleteFair(fairId);
   }
 }

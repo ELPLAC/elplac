@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { getUserFromLocalStorage } from '@/helpers/getUserFromLocalStorage';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 
 interface Fair {
   id: string;
@@ -14,7 +17,8 @@ interface Fair {
 export default function MainDashboardAdmin() {
   const [fairs, setFairs] = useState<Fair[]>([]);
   const [search, setSearch] = useState('');
-  
+  const user = getUserFromLocalStorage();
+
   const fetchFairs = async () => {
     try {
       const { data } = await axios.get('/api/fairs');
@@ -69,24 +73,29 @@ export default function MainDashboardAdmin() {
       ) : (
         <div className="space-y-4">
           {filteredFairs.map((fair) => (
-            
-              <>
-  <div>
-    <h3 className="text-lg font-semibold">{fair.name}</h3>
-    <p className="text-sm text-gray-600">{fair.address}</p>
-    <p className="text-sm text-gray-500">{fair.entryDescription}</p>
-  </div>
+            <Card
+              key={fair.id}
+              className="p-4 flex justify-between items-center"
+            >
+              <div>
+                <h3 className="text-lg font-semibold">{fair.name}</h3>
+                <p className="text-sm text-gray-600">{fair.address}</p>
+                <p className="text-sm text-gray-500">{fair.entryDescription}</p>
+              </div>
 
-  <button
-    onClick={() => handleDelete(fair.id)}
-    className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-  >
-    Eliminar
-  </button>
-</>
+              {user?.role === 'admin' && (
+                <Button
+                  variant="destructive"
+                  onClick={() => handleDelete(fair.id)}
+                >
+                  Eliminar
+                </Button>
+              )}
+            </Card>
           ))}
         </div>
       )}
     </section>
   );
 }
+
