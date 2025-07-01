@@ -48,11 +48,9 @@ export class FairsService {
     return { message: 'Feria concluida y eliminada correctamente' };
   
 
-  async softDeleteFair(fairId: string) {
-    const fair = await this.fairRepository.findOne({ where: { id: fairId } });
+  async softDeleteFair(fairId: string): Promise<any> {
+    const fair = await this.fairsRepository.findOne({ where: { id: fairId } });
     if (!fair) throw new NotFoundException('Fair not found');
     fair.isActive = false;
-    return this.fairRepository.save(fair);
+    return this.fairsRepository.save(fair);
   }
-
-}
