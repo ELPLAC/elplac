@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { getUserFromLocalStorage } from '@/helpers/getUserFromLocalStorage';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
@@ -17,8 +16,7 @@ interface Fair {
 export default function MainDashboardAdmin() {
   const [fairs, setFairs] = useState<Fair[]>([]);
   const [search, setSearch] = useState('');
-  const user = getUserFromLocalStorage();
-
+  
   const fetchFairs = async () => {
     try {
       const { data } = await axios.get('/api/fairs');
@@ -83,14 +81,12 @@ export default function MainDashboardAdmin() {
                 <p className="text-sm text-gray-500">{fair.entryDescription}</p>
               </div>
 
-              {user?.role === 'admin' && (
                 <Button
                   variant="destructive"
                   onClick={() => handleDelete(fair.id)}
                 >
                   Eliminar
                 </Button>
-              )}
             </Card>
           ))}
         </div>
