@@ -84,11 +84,9 @@ export default function MainDashboardAdmin() {
     Eliminar
   </button>
 </>
-            </div>
           ))}
         </div>
       )}
     </section>
   );
 }
-
