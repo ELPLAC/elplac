@@ -9,14 +9,12 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 
 const FairContext = createContext<IFairContext | undefined>(undefined);
 
-export const FairProvider = ({ children }: IFairProviderProps): JSX.Element => {
+export const FairProvider: React.FC<IFairProviderProps> = ({ children }) => {
   const [fairs, setFairs] = useState<IFair[]>([]);
   const [fairSelected, setFairSelected] = useState<any>(null);
   const [dateSelect, setDateSelect] = useState<Date | null>(null);
   const [timeSelect, setTimeSelect] = useState<string>("");
   const [activeFair, setActiveFair] = useState<IFair | undefined>(undefined);
-
-  const pastFairs = fairs.filter((fair: IFair) => fair.isActive === false);
 
   useEffect(() => {
     const fetchFair = async () => {
@@ -25,20 +23,20 @@ export const FairProvider = ({ children }: IFairProviderProps): JSX.Element => {
         if (Array.isArray(res)) {
           setFairs(res);
           setActiveFair(res.find((fair: IFair) => fair.isActive === true));
+        } else {
         }
       } catch (error) {
-        console.error("Error fetching fairs", error);
       }
     };
     fetchFair();
-  }, []);
+  }, [ ]);
+  
 
   return (
     <FairContext.Provider
       value={{
         fairs,
         activeFair,
-        pastFairs,
         setActiveFair,
         setDateSelect,
         setTimeSelect,
