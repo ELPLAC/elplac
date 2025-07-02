@@ -9,33 +9,32 @@ import {
   Delete,
   UseGuards,
 } from '@nestjs/common';
-import { FairsService } from '@fairs/fairs.service';
-import { FairDto } from '@fairs/fairs.dto';
-import { AuthGuard } from '@auth/auth.guard';
-import { RoleGuard } from '@users/roles/roles.guard';
-import { Roles } from '@users/roles/roles.decorator';
-import { Role } from '@users/roles/roles.enum';
+import { FairsService } from './fairs.service';
+import { FairDto } from './fairs.dto';
+import { AuthGuard } from '../auth/auth.guard';
+import { RoleGuard } from '../users/roles/roles.guard';
+import { Roles } from '../users/roles/roles.decorator';
+import { Role } from '../users/roles/roles.enum';
 
 @Controller('fairs')
 export class FairsController {
+  constructor(private readonly fairsService: FairsService) {}
 
-  // 🔹 NUEVO: Obtener historial de ferias concluidas
+  // Obtener ferias concluidas
   @Roles(Role.ADMIN)
   @UseGuards(AuthGuard, RoleGuard)
   @Get('history')
-  getConcludedFairs() {
+  async getConcludedFairs() {
     return this.fairsService.getConcludedFairs();
   }
 
-  // 🔹 NUEVO: Eliminar feria concluida
+  // Eliminar feria concluida
   @Roles(Role.ADMIN)
   @UseGuards(AuthGuard, RoleGuard)
   @Delete('history/:id')
-  deleteConcludedFair(@Param('id') fairId: string) {
+  async deleteConcludedFair(@Param('id') fairId: string) {
     return this.fairsService.deleteFair(fairId);
   }
-
-  constructor(private readonly fairsService: FairsService) {}
 
   @Roles(Role.ADMIN)
   @UseGuards(AuthGuard, RoleGuard)
@@ -99,4 +98,6 @@ export class FairsController {
     return await this.fairsService.concludeAndDeleteFair(fairId);
   }
 }
+
+
 

@@ -4,12 +4,6 @@ import { FairDto } from './fairs.dto';
 
 @Injectable()
 export class FairsService {
-  async concludeAndDeleteFair(fairId: string) {
-    await this.fairsRepository.closeFair(fairId);
-    await this.fairsRepository.deleteFair(fairId);
-    return { message: 'Feria concluida y eliminada' };
-  }
-
   constructor(private readonly fairsRepository: FairsRepository) {}
 
   async createFair(fairDto: FairDto) {
@@ -47,7 +41,15 @@ export class FairsService {
   async deleteFair(id: string) {
     return this.fairsRepository.deleteFair(id);
   }
+
+  async concludeAndDeleteFair(fairId: string) {
+    await this.fairsRepository.closeFair(fairId);
+    await this.fairsRepository.deleteFair(fairId);
+    return { message: 'Feria concluida y eliminada' };
+  }
 }
+
+
 
 
 
