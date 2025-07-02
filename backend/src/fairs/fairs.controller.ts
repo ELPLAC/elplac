@@ -76,7 +76,7 @@ export class FairsController {
     return this.fairsService.updateEntryPriceBuyer(fairId, entryPriceBuyer);
   }
 
-  // ✅ NUEVA RUTA: concluir y eliminar feria
+  
   @Roles(Role.ADMIN)
   @UseGuards(AuthGuard, RoleGuard)
   @Delete('conclude/:id')
@@ -84,3 +84,4 @@ export class FairsController {
     return await this.fairsService.concludeAndDeleteFair(fairId);
   }
 }
+
