@@ -5,8 +5,11 @@
       "dom.iterable",
       "esnext"
     ],
+    "types": ["next/types", "next/navigation"],
+    "strictNullChecks": true,
+    
     "allowJs": true,
-    "skipLibCheck": true,
+    "skipLibCheck": false,
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
@@ -15,6 +18,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
+    
     "incremental": true,
     "allowImportingTsExtensions": true,
     "plugins": [
