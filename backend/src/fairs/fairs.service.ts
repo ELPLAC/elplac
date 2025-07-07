@@ -38,7 +38,7 @@ export class FairsService {
     return await this.fairsRepository.updateEntryPriceBuyer(fairId, entryPriceBuyer);
   }
 
-  // ✅ FUNCIONALIDAD CONCLUIR Y ELIMINAR
+  
   async concludeAndDeleteFair(fairId: string) {
     await this.fairsRepository.closeFair(fairId);
     await this.fairsRepository.deleteProductsByFair(fairId);
@@ -48,3 +48,4 @@ export class FairsService {
     return { message: 'Feria concluida y eliminada correctamente' };
   }
 }
+

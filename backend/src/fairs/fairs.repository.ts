@@ -386,5 +386,3 @@ export class FairsRepository {
   }
 }
 
-
-
