@@ -1,22 +1,20 @@
+// app/admin/fairs/[id]/page.tsx
 import MainDashboardAdmin from "@/components/Dashboard/Admin/MainDashboardAdmin";
 import ConcluirFeriaButton from "@/components/Dashboard/Admin/ConcluirFeriaButton";
 
-interface FairPageProps {
+interface PageProps {
   params: { id: string };
 }
 
-const FeriaPage = ({ params }: FairPageProps) => {
-  const { id } = params;
-
+export default function FeriaPage({ params }: PageProps) {
   return (
     <MainDashboardAdmin>
-      <h1 className="text-xl font-bold mb-4">Feria #{id}</h1>
-
-      {/* Acá podrías mostrar info de la feria si tenés SWR o fetch */}
-
-      <ConcluirFeriaButton fairId={id} />
+      <div className="space-y-4">
+        <h1 className="text-2xl font-bold">Administrar Feria #{params.id}</h1>
+        
+        {/* Componente de conclusión con protección de roles */}
+        <ConcluirFeriaButton fairId={params.id} />
+      </div>
     </MainDashboardAdmin>
   );
-};
-
-export default FeriaPage;
+}
