@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, DeleteDateColumn } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 import { FairDay } from '@fairs/entities/fairDay.entity';
 import { UserFairRegistration } from '@fairs/entities/userFairRegistration.entity';
@@ -18,7 +18,7 @@ export class Fair {
   @Column({ default: false })
   isVisibleUser: boolean;
 
-  @Column({ default: false }) 
+  @Column({ default: false })
   isLabelPrintingEnabled: boolean;
 
   @Column()
@@ -27,7 +27,7 @@ export class Fair {
   @Column()
   entryPriceSeller: number;
 
-  @Column({default : true})
+  @Column({ default: true })
   isActive: boolean;
 
   @Column({ type: 'varchar', nullable: true })
@@ -36,6 +36,8 @@ export class Fair {
   @Column()
   entryDescription: string;
 
+
+  // Relaciones (sin cambios)
   @OneToMany(() => FairDay, fairDay => fairDay.fair)
   fairDays: FairDay[];
 
