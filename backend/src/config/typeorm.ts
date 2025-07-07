@@ -25,9 +25,28 @@ const config: DataSourceOptions = {
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
   
-  synchronize: true,
-  //dropSchema: true,
-  logging: false,
+  // 🔧 CONFIGURACIÓN CRÍTICA PARA MEMORIA
+  synchronize: process.env.NODE_ENV === 'development', // Solo en desarrollo
+  logging: process.env.SQL_LOGGING === 'true' ? 'all' : ['error'], // Logging configurable
+  
+  // 🚀 CONNECTION POOLING - CRÍTICO
+  extra: {
+    max: Number(process.env.DB_MAX_CONNECTIONS) || 20, // Máximo conexiones simultáneas
+    min: Number(process.env.DB_MIN_CONNECTIONS) || 5,  // Mínimo conexiones activas
+    connectionTimeoutMillis: Number(process.env.DB_CONNECTION_TIMEOUT) || 30000,
+    idleTimeoutMillis: Number(process.env.DB_IDLE_TIMEOUT) || 30000,
+    allowExitOnIdle: true, // Permitir cerrar proceso cuando no hay conexiones
+  },
+  
+  // 🔄 CONFIGURACIÓN DE CACHE
+  cache: {
+    duration: Number(process.env.CACHE_DURATION) || 30000, // Cache configurable
+    type: (process.env.CACHE_TYPE as 'database' | 'redis' | 'ioredis' | 'ioredis/cluster') || 'database', // Tipo de cache configurable
+  },
+  
+  // 📊 LÍMITES DE QUERY
+  maxQueryExecutionTime: 30000, // 30 segundos máximo por query
+  
   entities: [
     Fair,
     UserFairRegistration,
@@ -42,11 +61,21 @@ const config: DataSourceOptions = {
     FairDay,
     FairCategory,
   ],
-  ssl: false, 
-
-  // entities: ['dist/**/*.entity{.ts,.js}'],
-  //autoLoadEntities: true,
+  
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
   migrations: ['dist/src/migrations/*{.ts,.js}'],
+  
+  // 🧹 CONFIGURACIÓN DE CLEANUP
+  dropSchema: false, // NUNCA en producción
+  
+  // 🔧 CONFIGURACIONES ADICIONALES DE RECONEXIÓN
+  // acquireTimeout no existe para PostgreSQL, usamos connectionTimeoutMillis en extra
+  // timeout tampoco existe, usamos los timeouts en extra
+  
+  // 📈 CONFIGURACIÓN DE PERFORMANCE
+  installExtensions: false // No instalar extensiones automáticamente
+  // Máximo 3 intentos de reconexión
+ 
 };
 
 export default registerAs('typeorm', () => config);
