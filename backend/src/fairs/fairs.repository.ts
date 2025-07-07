@@ -2,7 +2,6 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
-  InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Fair } from '@fairs/entities/fairs.entity';
@@ -33,8 +32,7 @@ export class FairsRepository {
     private readonly fairCategoryRepository: Repository<FairCategory>,
     @InjectRepository(Seller)
     private readonly sellerRepository: Repository<Seller>,
-    @InjectRepository(User) 
-    private readonly userRepository: Repository<User>,
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
   async createFair(fairDto: FairDto) {
@@ -308,25 +306,25 @@ export class FairsRepository {
       relations: {
         fairCategories: {
           products: {
-            seller: true,
-          },
-        },
-      },
+            seller: true
+          }
+        }
+      }
     });
-
+  
     if (!fair) {
       throw new NotFoundException('Feria no encontrada');
     }
-
-    const fairCategories = Array.isArray(fair.fairCategories)
-      ? fair.fairCategories
+  
+    const fairCategories = Array.isArray(fair.fairCategories) 
+      ? fair.fairCategories 
       : [fair.fairCategories];
-
-    const products = fairCategories.flatMap((fc) =>
-      fc.products.filter((product) => product.seller.id === sellerId),
+  
+    const products = fairCategories.flatMap(fc =>
+      fc.products.filter(product => product.seller.id === sellerId)
     );
-
-    return products.map((product) => ({
+  
+    return products.map(product => ({
       id: product.id,
       brand: product.brand,
       status: product.status,
@@ -334,7 +332,7 @@ export class FairsRepository {
       description: product.description,
     }));
   }
-
+  
   async editAddressFair(fairId: string, newAddressFair: Partial<FairDto>) {
     const fairToEdit = await this.fairRepository.findOneBy({ id: fairId });
 
@@ -346,66 +344,16 @@ export class FairsRepository {
 
     return await this.fairRepository.save(fairToEdit);
   }
-
   async updateEntryPriceBuyer(fairId: string, entryPriceBuyer: string) {
     const fair = await this.fairRepository.findOne({ where: { id: fairId } });
-
+  
     if (!fair) {
       throw new NotFoundException('Feria no encontrada');
     }
-
+  
     fair.entryPriceBuyer = entryPriceBuyer;
     await this.fairRepository.save(fair);
-
+  
     return { message: 'Precio de entrada actualizado correctamente', fair };
   }
-
-  async deleteFair(fairId: string): Promise<{ message: string }> {
-  try {
-    const fair = await this.fairRepository.findOne({
-      where: { id: fairId },
-      relations: [
-        "fairDays",
-        "fairDays.buyerCapacities",
-        "fairCategories",
-        "fairCategories.products",
-      ],
-    });
-
-    if (!fair) {
-      throw new Error("Feria no encontrada");
-    }
-
-    if (fair.fairDays) {
-      for (const day of fair.fairDays) {
-        if (day.buyerCapacities) {
-          await this.buyerCapacityRepository.remove(day.buyerCapacities);
-        }
-        await this.fairDayRepository.remove(day);
-      }
-    }
-
-    if (Array.isArray(fair.fairCategories)) {
-      for (const category of fair.fairCategories) {
-        if (category.products) {
-          // await this.productRepository.remove(category.products);
-        }
-        await this.fairCategoryRepository.remove(category);
-      }
-    } else if (fair.fairCategories) {
-      const category = fair.fairCategories;
-      if (category.products) {
-        // await this.productRepository.remove(category.products);
-      }
-      await this.fairCategoryRepository.remove(category);
-    }
-
-    await this.fairRepository.remove(fair);
-
-    return { message: "Feria eliminada correctamente" };
-  } catch (error) {
-    console.error("Error al eliminar la feria:", error);
-    throw new Error("Error al eliminar la feria");
-  }
-}
 }

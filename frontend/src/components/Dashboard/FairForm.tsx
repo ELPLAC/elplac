@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useCallback } from "react";
+import React, { useState } from "react";
 import { useFormik } from "formik";
 import Input from "./InputFairForm";
 import "react-toastify/dist/ReactToastify.css";
@@ -17,16 +17,10 @@ import {
   IsCheckedType,
 } from "@/types";
 import * as Yup from "yup";
-import { FaCheckCircle, FaTrash } from "react-icons/fa";
+import { FaCheckCircle } from "react-icons/fa";
 import "./FairForm.css";
 import EditFairAddress from "./EditAddressFair";
 import { URL } from "../../../envs";
-
-interface ApiResponse {
-  ok: boolean;
-  fair?: any;
-  error?: string;
-}
 
 const CreateFairForm: React.FC = () => {
   const { token } = useAuth();
@@ -51,8 +45,6 @@ const CreateFairForm: React.FC = () => {
     undefined
   );
   const [openModalUserId, setOpenModalUserId] = useState<boolean>(false);
-  const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
   const [fairDays, setFairDays] = useState<FairDaysData[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [loading, setLoading] = useState(false);
@@ -99,43 +91,6 @@ const CreateFairForm: React.FC = () => {
       notify("ToastError", "Error al actualizar el precio de entrada");
     }
   };
-
-  const handleDeleteFair = useCallback(async () => {
-    if (!activeFair?.id) return;
-    
-    if (activeFair.isActive) {
-      notify("ToastError", "No puedes eliminar una feria activa");
-      return;
-    }
-
-    setIsDeleting(true);
-    try {
-      const response = await fetch(`${URL}/fairs/${activeFair.id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Error al eliminar la feria');
-      }
-
-      notify('ToastSuccess', 'Feria eliminada permanentemente');
-      setActiveFair(undefined);
-      setOpenDeleteModal(false);
-    } catch (error) {
-      notify(
-        'ToastError',
-        error instanceof Error ? error.message : 'Error desconocido al eliminar la feria'
-      );
-    } finally {
-      setIsDeleting(false);
-    }
-  }, [activeFair, token, setActiveFair]);
-
   const handleToggleLabelVisibility = async () => {
     if (!activeFair?.id) return;
 
@@ -181,45 +136,46 @@ const CreateFairForm: React.FC = () => {
     }
   };
 
-  const handleFairDayChange = useCallback(
-    (index: number, field: keyof FairDaysData, value: string | number | boolean) => {
-      const updatedFairDays = [...fairDays];
+  const handleFairDayChange = (
+    index: number,
+    field: keyof FairDaysData,
+    value: string | number | boolean
+  ) => {
+    const updatedFairDays = [...fairDays];
 
-      if (field === "day") {
-        const selectedDate = new Date(value as string);
-        const currentDate = new Date();
+    if (field === "day") {
+      const selectedDate = new Date(value as string);
+      const currentDate = new Date();
 
-        if (selectedDate.getTime() < currentDate.setHours(0, 0, 0, 0)) {
-          alert("La fecha seleccionada no puede ser anterior a la fecha actual.");
-          return;
-        }
+      if (selectedDate.getTime() < currentDate.setHours(0, 0, 0, 0)) {
+        alert("La fecha seleccionada no puede ser anterior a la fecha actual.");
+        return;
       }
+    }
 
-      switch (field) {
-        case "day":
-          updatedFairDays[index].day = value as string;
-          break;
-        case "startTime":
-        case "endTime":
-          updatedFairDays[index][field] = value as string;
-          break;
-        case "timeSlotInterval":
-        case "capacityPerTimeSlot":
-          updatedFairDays[index][field] = value as number;
-          break;
-        case "isClosed":
-          updatedFairDays[index].isClosed = value as boolean;
-          break;
-        default:
-          break;
-      }
+    switch (field) {
+      case "day":
+        updatedFairDays[index].day = value as string;
+        break;
+      case "startTime":
+      case "endTime":
+        updatedFairDays[index][field] = value as string;
+        break;
+      case "timeSlotInterval":
+      case "capacityPerTimeSlot":
+        updatedFairDays[index][field] = value as number;
+        break;
+      case "isClosed":
+        updatedFairDays[index].isClosed = value as boolean;
+        break;
+      default:
+        break;
+    }
 
-      setFairDays(updatedFairDays);
-    },
-    [fairDays]
-  );
+    setFairDays(updatedFairDays);
+  };
 
-  const handleAddFairDay = useCallback(() => {
+  const handleAddFairDay = () => {
     setFairDays([
       ...fairDays,
       {
@@ -231,19 +187,16 @@ const CreateFairForm: React.FC = () => {
         isClosed: false,
       },
     ]);
-  }, [fairDays]);
+  };
 
-  const handleRemoveFairDay = useCallback(
-    (index: number) => {
-      const updatedFairDays = fairDays.filter((_, i) => i !== index);
-      setFairDays(updatedFairDays);
-    },
-    [fairDays]
-  );
+  const handleRemoveFairDay = (index: number) => {
+    const updatedFairDays = fairDays.filter((_, i) => i !== index);
+    setFairDays(updatedFairDays);
+  };
 
-  const closeModalHandler = useCallback(() => {
+  const closeModalHandler = () => {
     setOpenModalUserId(false);
-  }, []);
+  };
 
   const handleConcludeFair = async () => {
     closeModalHandler();
@@ -257,78 +210,76 @@ const CreateFairForm: React.FC = () => {
     }
   };
 
-  const handleCheckboxChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const { name, checked } = event.target;
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = event.target;
 
-      setIsChecked((prevState) => ({
-        ...prevState,
-        [name]: checked,
-      }));
+    setIsChecked((prevState) => ({
+      ...prevState,
+      [name]: checked,
+    }));
 
-      setCategoriesData((prevCategories) => {
-        const updatedCategories = checked
-          ? [
-              ...prevCategories,
-              {
-                name,
-                maxProductsSeller: "",
-                minProductsSeller: "",
-                maxSellers: "",
-                maxProducts: "",
-              },
-            ]
-          : prevCategories.filter((category) => category.name !== name);
+    setCategoriesData((prevCategories) => {
+      const updatedCategories = checked
+        ? [
+            ...prevCategories,
+            {
+              name,
+              maxProductsSeller: "",
+              minProductsSeller: "",
+              maxSellers: "",
+              maxProducts: "",
+            },
+          ]
+        : prevCategories.filter((category) => category.name !== name);
 
-        return updatedCategories;
-      });
-    },
-    []
-  );
+      return updatedCategories;
+    });
+  };
 
-  const handleCategoryChange = useCallback(
-    (index: number, field: CategoryDataField, value: string) => {
-      const numericValue = parseInt(value, 10);
+  const handleCategoryChange = (
+    index: number,
+    field: CategoryDataField,
+    value: string
+  ) => {
+    const numericValue = parseInt(value, 10);
 
-      if (isNaN(numericValue) || numericValue < 0) {
+    if (isNaN(numericValue) || numericValue < 0) {
+      return;
+    }
+
+    const updatedCategories = [...categoriesData];
+    updatedCategories[index][field] = value;
+
+    if (field === "minProductsSeller" || field === "maxProductsSeller") {
+      const minProductsSeller = parseInt(
+        updatedCategories[index].minProductsSeller as string,
+        10
+      );
+      const maxProductsSeller = parseInt(
+        updatedCategories[index].maxProductsSeller as string,
+        10
+      );
+
+      if (minProductsSeller > maxProductsSeller) {
+        setCategoryErrors(
+          "Min Productos por Vendedor no puede ser mayor que Max Productos por Vendedor"
+        );
         return;
+      } else {
+        setCategoryErrors(undefined);
       }
+    }
 
-      const updatedCategories = [...categoriesData];
-      updatedCategories[index][field] = value;
-
-      if (field === "minProductsSeller" || field === "maxProductsSeller") {
-        const minProductsSeller = parseInt(
-          updatedCategories[index].minProductsSeller as string,
-          10
-        );
-        const maxProductsSeller = parseInt(
-          updatedCategories[index].maxProductsSeller as string,
-          10
-        );
-
-        if (minProductsSeller > maxProductsSeller) {
-          setCategoryErrors(
-            "Min Productos por Vendedor no puede ser mayor que Max Productos por Vendedor"
-          );
-          return;
-        } else {
-          setCategoryErrors(undefined);
-        }
+    if (field === "maxSellers" || field === "maxProductsSeller") {
+      const { maxSellers, maxProductsSeller } = updatedCategories[index];
+      if (maxSellers && maxProductsSeller) {
+        updatedCategories[index].maxProducts = (
+          parseInt(maxSellers, 10) * parseInt(maxProductsSeller, 10)
+        ).toString();
       }
-
-      if (field === "maxSellers" || field === "maxProductsSeller") {
-        const { maxSellers, maxProductsSeller } = updatedCategories[index];
-        if (maxSellers && maxProductsSeller) {
-          updatedCategories[index].maxProducts = (
-            parseInt(maxSellers, 10) * parseInt(maxProductsSeller, 10)
-          ).toString();
-        }
-      }
-      setCategoriesData(updatedCategories);
-    },
-    [categoriesData]
-  );
+    }
+    setCategoriesData(updatedCategories);
+  };
 
   const categoryMap = {
     youngMan: "Varón 0 a 12 meses",
@@ -445,23 +396,16 @@ const CreateFairForm: React.FC = () => {
 
       try {
         const response: any = await postCreateFair(transformedData, token);
-        
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'Error al crear la feria');
-        }
-        
         setActiveFair(response);
         router.push("/admin");
         notify("ToastSuccess", "Feria Creada Exitosamente");
-      } catch (error) {
-        notify(
-          'ToastError',
-          error instanceof Error ? error.message : 'Error desconocido al crear la feria'
-        );
-      }
+        if (response && response.error) {
+          console.log(response.error);
+          throw new Error("Error al crear la feria" + response.error);
+        }
+      } catch (error) {}
     },
-  
+  });
 
   return (
     <div className="container mx-auto px-6 py-6 container-general">
@@ -470,9 +414,7 @@ const CreateFairForm: React.FC = () => {
           <div className="w-full h-[120vh] p-6 bg-gray-50 conteiner-active-fair">
             <>
               <h2 className="text-4xl text-primary-darker font-semibold mb-6 w-full">
-                {activeFair.isActive 
-                  ? "¡Ya existe una feria activa!" 
-                  : "Feria concluida"}
+                ¡Ya existe una feria activa!
               </h2>
               <p className="text-2xl text-primary-darker mb-6 w-full">
                 Ve a la sección de Productos para verificar si hay solicitudes
@@ -502,14 +444,6 @@ const CreateFairForm: React.FC = () => {
                   <FaCheckCircle /> Concluir feria
                 </button>
               </div>
-              {!activeFair.isActive && (
-                <button
-                  onClick={() => setOpenDeleteModal(true)}
-                  className="action-button w-full mt-5 mb-5 bg-white flex items-center justify-center text-red-600 gap-2 p-2 border border-red-600 rounded-lg hover:bg-red-600 hover:text-white hover:shadow-md transition duration-200"
-                >
-                  <FaTrash /> Eliminar feria permanentemente
-                </button>
-              )}
               <div className="pb-6 mb-6 border-b border-gray-300 opacity-60"></div>
 
               <div className="pb-6 mb-6 border-b border-gray-300 opacity-60">
@@ -899,6 +833,7 @@ const CreateFairForm: React.FC = () => {
                                     index,
                                     "capacityPerTimeSlot",
                                     Number(e.target.value)
+                                  )
                                 }
                               />
                             </div>
@@ -1059,9 +994,7 @@ const CreateFairForm: React.FC = () => {
           </>
         )}
 
-        
-
-                  {openModalUserId && (
+        {openModalUserId && (
           <div
             className="fixed z-20 inset-0 flex items-center justify-center bg-black bg-opacity-50"
             onClick={() => closeModalHandler()}
@@ -1085,7 +1018,7 @@ const CreateFairForm: React.FC = () => {
                     onClick={() => handleConcludeFair()}
                     className="bg-primary-darker text-white w-20 p-2 rounded-lg border border-[#D0D5DD]"
                   >
-                    Sí
+                    Si
                   </button>
                   <button
                     onClick={() => closeModalHandler()}
@@ -1098,54 +1031,9 @@ const CreateFairForm: React.FC = () => {
             </div>
           </div>
         )}
-
-        {openDeleteModal && (
-          <div
-            className="fixed z-20 inset-0 flex items-center justify-center bg-black bg-opacity-50"
-            onClick={() => setOpenDeleteModal(false)}
-          >
-            <div
-              className="bg-primary-lighter h-[40vh] w-[50vw] p-8 m-3 md:m-0 rounded-3xl relative flex items-center justify-center"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                className="absolute top-2 right-2 text-2xl font-bold text-primary-darker rounded-full"
-                onClick={() => setOpenDeleteModal(false)}
-              >
-                ✖
-              </button>
-              <div className="flex flex-col gap-4 justify-center items-center">
-                <p className="font-bold text-3xl flex items-center justify-center text-center text-primary-darker">
-                  ¿Eliminar esta feria permanentemente?
-                </p>
-                <p className="text-lg text-center text-primary-darker">
-                  Esta acción no se puede deshacer. Se borrarán todos los datos asociados.
-                </p>
-                <div className="gap-4 flex">
-                  <button
-                    onClick={handleDeleteFair}
-                    disabled={isDeleting}
-                    className={`bg-red-600 text-white w-20 p-2 rounded-lg border border-[#D0D5DD] ${
-                      isDeleting ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
-                  >
-                    {isDeleting ? "Eliminando..." : "Sí"}
-                  </button>
-                  <button
-                    onClick={() => setOpenDeleteModal(false)}
-                    className="bg-white text-primary-darker w-20 p-2 rounded-lg border border-[#D0D5DD]"
-                  >
-                    No
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </div> {/* Cierre del div bg-[#f1fafa] */}
-    </div> {/* Cierre del container-general */}
+      </div>
+    </div>
   );
 };
 
 export default WithAuthProtect({ Component: CreateFairForm, role: "admin" });
- 
