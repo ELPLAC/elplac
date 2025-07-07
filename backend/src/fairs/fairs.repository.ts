@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Fair } from '@fairs/entities/fairs.entity';
-import { Repository } from 'typeorm';
+import { Repository, DataSource } from 'typeorm';
 import { FairDto } from '@fairs/fairs.dto';
 import { BuyerCapacity } from '@fairs/entities/buyersCapacity.entity';
 import { FairDay } from '@fairs/entities/fairDay.entity';
@@ -32,7 +32,9 @@ export class FairsRepository {
     private readonly fairCategoryRepository: Repository<FairCategory>,
     @InjectRepository(Seller)
     private readonly sellerRepository: Repository<Seller>,
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+    private readonly dataSource: DataSource,
   ) {}
 
   async createFair(fairDto: FairDto) {
@@ -91,11 +93,8 @@ export class FairsRepository {
                 `El día ${fairDayDto.day} debe tener horario de inicio y fin si no está marcado como cerrado`,
               );
             }
-            const startTime = parseISO(
-              `1970-01-01T${fairDayDto.startTime}:00Z`,
-            );
+            const startTime = parseISO(`1970-01-01T${fairDayDto.startTime}:00Z`);
             const endTime = parseISO(`1970-01-01T${fairDayDto.endTime}:00Z`);
-
             fairDay.startTime = startTime.toISOString().substr(11, 5);
             fairDay.endTime = endTime.toISOString().substr(11, 5);
           }
@@ -103,9 +102,7 @@ export class FairsRepository {
           const savedFairDay = await this.fairDayRepository.save(fairDay);
 
           if (!fairDayDto.isClosed) {
-            const startTime = parseISO(
-              `1970-01-01T${fairDayDto.startTime}:00Z`,
-            );
+            const startTime = parseISO(`1970-01-01T${fairDayDto.startTime}:00Z`);
             const endTime = parseISO(`1970-01-01T${fairDayDto.endTime}:00Z`);
             const interval = fairDayDto.timeSlotInterval ?? 60;
             const capacity = fairDayDto.capacityPerTimeSlot ?? 10;
@@ -131,6 +128,7 @@ export class FairsRepository {
       );
       savedFair.fairDays = fairDays;
     }
+
     return await this.getFairById(savedFair.id);
   }
 
@@ -306,25 +304,23 @@ export class FairsRepository {
       relations: {
         fairCategories: {
           products: {
-            seller: true
-          }
-        }
-      }
+            seller: true,
+          },
+        },
+      },
     });
-  
-    if (!fair) {
-      throw new NotFoundException('Feria no encontrada');
-    }
-  
-    const fairCategories = Array.isArray(fair.fairCategories) 
-      ? fair.fairCategories 
+
+    if (!fair) throw new NotFoundException('Feria no encontrada');
+
+    const fairCategories = Array.isArray(fair.fairCategories)
+      ? fair.fairCategories
       : [fair.fairCategories];
-  
-    const products = fairCategories.flatMap(fc =>
-      fc.products.filter(product => product.seller.id === sellerId)
+
+    const products = fairCategories.flatMap((fc) =>
+      fc.products.filter((product) => product.seller.id === sellerId),
     );
-  
-    return products.map(product => ({
+
+    return products.map((product) => ({
       id: product.id,
       brand: product.brand,
       status: product.status,
@@ -332,7 +328,7 @@ export class FairsRepository {
       description: product.description,
     }));
   }
-  
+
   async editAddressFair(fairId: string, newAddressFair: Partial<FairDto>) {
     const fairToEdit = await this.fairRepository.findOneBy({ id: fairId });
 
@@ -344,16 +340,51 @@ export class FairsRepository {
 
     return await this.fairRepository.save(fairToEdit);
   }
+
   async updateEntryPriceBuyer(fairId: string, entryPriceBuyer: string) {
     const fair = await this.fairRepository.findOne({ where: { id: fairId } });
-  
+
     if (!fair) {
       throw new NotFoundException('Feria no encontrada');
     }
-  
+
     fair.entryPriceBuyer = entryPriceBuyer;
     await this.fairRepository.save(fair);
-  
+
     return { message: 'Precio de entrada actualizado correctamente', fair };
   }
+
+  async deleteProductsByFair(fairId: string) {
+    await this.dataSource
+      .createQueryBuilder()
+      .delete()
+      .from('product_request')
+      .where('fairId = :fairId', { fairId })
+      .execute();
+  }
+
+  async deleteTransactionsByFair(fairId: string) {
+    await this.dataSource
+      .createQueryBuilder()
+      .delete()
+      .from('payment_transaction')
+      .where('fairId = :fairId', { fairId })
+      .execute();
+  }
+
+  async deleteSellerRegistrationsByFair(fairId: string) {
+    await this.dataSource
+      .createQueryBuilder()
+      .delete()
+      .from('seller_fair_registration')
+      .where('fairId = :fairId', { fairId })
+      .execute();
+  }
+
+  async deleteFair(fairId: string) {
+    await this.fairRepository.delete({ id: fairId });
+  }
 }
+
+
+

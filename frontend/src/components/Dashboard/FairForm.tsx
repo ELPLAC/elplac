@@ -23,7 +23,7 @@ import EditFairAddress from "./EditAddressFair";
 import { URL } from "../../../envs";
 
 const CreateFairForm: React.FC = () => {
-  const { token } = useAuth();
+  const { token, roleAuth } = useAuth();
   const [hasCost, setHasCost] = useState(false);
   const { activeFair, setActiveFair } = useFair();
   const router = useRouter();
@@ -208,7 +208,40 @@ const CreateFairForm: React.FC = () => {
       setActiveFair(undefined);
       router.push("/admin/fairs");
     }
+
+  
+  
+
   };
+
+  const handleDeleteFair = async () => {
+    if (!activeFair?.id) return;
+
+    const confirmDelete = window.confirm("¿Estás seguro de eliminar esta feria?");
+    if (!confirmDelete) return;
+
+    try {
+      const res = await fetch(`${URL}/fairs/${activeFair.id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.message || "Error al eliminar la feria");
+      }
+
+      notify("ToastSuccess", "Feria eliminada con éxito");
+      setActiveFair(undefined);
+      router.push("/admin/fairs");
+    } catch (err) {
+      notify("ToastError", "Error al eliminar la feria");
+      console.error(err);
+    }
+  };
+
 
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = event.target;
@@ -443,6 +476,14 @@ const CreateFairForm: React.FC = () => {
                 >
                   <FaCheckCircle /> Concluir feria
                 </button>
+                {roleAuth === "admin" && (
+                  <button
+                    onClick={handleDeleteFair}
+                    className="action-button w-full mt-5 mb-5 bg-red-600 text-white flex items-center justify-center gap-2 p-2 border border-red-600 rounded-lg hover:bg-red-700 hover:shadow-md transition duration-200"
+                  >
+                    <FaCheckCircle /> Eliminar feria
+                  </button>
+                )}
               </div>
               <div className="pb-6 mb-6 border-b border-gray-300 opacity-60"></div>
 
