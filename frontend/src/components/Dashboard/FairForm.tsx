@@ -1061,7 +1061,7 @@ const CreateFairForm: React.FC = () => {
 
         
 
-          {openModalUserId && (
+                  {openModalUserId && (
           <div
             className="fixed z-20 inset-0 flex items-center justify-center bg-black bg-opacity-50"
             onClick={() => closeModalHandler()}
@@ -1085,10 +1085,54 @@ const CreateFairForm: React.FC = () => {
                     onClick={() => handleConcludeFair()}
                     className="bg-primary-darker text-white w-20 p-2 rounded-lg border border-[#D0D5DD]"
                   >
-                    Si
+                    Sí
                   </button>
                   <button
                     onClick={() => closeModalHandler()}
+                    className="bg-white text-primary-darker w-20 p-2 rounded-lg border border-[#D0D5DD]"
+                  >
+                    No
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {openDeleteModal && (
+          <div
+            className="fixed z-20 inset-0 flex items-center justify-center bg-black bg-opacity-50"
+            onClick={() => setOpenDeleteModal(false)}
+          >
+            <div
+              className="bg-primary-lighter h-[40vh] w-[50vw] p-8 m-3 md:m-0 rounded-3xl relative flex items-center justify-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                className="absolute top-2 right-2 text-2xl font-bold text-primary-darker rounded-full"
+                onClick={() => setOpenDeleteModal(false)}
+              >
+                ✖
+              </button>
+              <div className="flex flex-col gap-4 justify-center items-center">
+                <p className="font-bold text-3xl flex items-center justify-center text-center text-primary-darker">
+                  ¿Eliminar esta feria permanentemente?
+                </p>
+                <p className="text-lg text-center text-primary-darker">
+                  Esta acción no se puede deshacer. Se borrarán todos los datos asociados.
+                </p>
+                <div className="gap-4 flex">
+                  <button
+                    onClick={handleDeleteFair}
+                    disabled={isDeleting}
+                    className={`bg-red-600 text-white w-20 p-2 rounded-lg border border-[#D0D5DD] ${
+                      isDeleting ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                  >
+                    {isDeleting ? "Eliminando..." : "Sí"}
+                  </button>
+                  <button
+                    onClick={() => setOpenDeleteModal(false)}
                     className="bg-white text-primary-darker w-20 p-2 rounded-lg border border-[#D0D5DD]"
                   >
                     No
@@ -1102,4 +1146,6 @@ const CreateFairForm: React.FC = () => {
     </div> {/* Cierre del container-general */}
   );
 };
+
 export default WithAuthProtect({ Component: CreateFairForm, role: "admin" });
+ 
