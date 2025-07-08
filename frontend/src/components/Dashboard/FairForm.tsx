@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useFormik } from "formik";
 import Input from "./InputFairForm";
 import "react-toastify/dist/ReactToastify.css";
-import { postCreateFair, updateFairStatus, deleteFair } from "../../helpers/services";
+import { postCreateFair, updateFairStatus, concludeAndDeleteActiveFair } from "../../helpers/services";
 import { useAuth } from "@/context/AuthProvider";
 import WithAuthProtect from "@/helpers/WithAuth";
 import { useFair } from "@/context/FairProvider";
@@ -54,26 +54,27 @@ const CreateFairForm: React.FC = () => {
   };
 
   // --- MODIFICACIÓN: Nuevo manejador para el botón "Concluir Feria" que también elimina datos ---
+// En FairForm.tsx, dentro de handleDeleteAndConcludeFair
 const handleDeleteAndConcludeFair = async () => {
-    closeConcludeModalHandler();
-    try {
-        console.log("Valor de activeFair antes de eliminar:", activeFair); // <-- ¡AÑADE ESTA LÍNEA!
-        if (!activeFair || !activeFair.id) {
-            notify("ToastError", "No hay feria activa seleccionada para eliminar.");
-            return;
-        }
-        const response = await deleteFair(token, activeFair.id);
-        if (response && response.ok) {
-            notify("ToastSuccess", "Feria eliminada exitosamente.");
-            setActiveFair(null);
-            router.push("/dashboard");
-        } else {
-            notify("ToastError", "Error al eliminar la feria.");
-        }
-    } catch (error: any) {
-        console.error("Error al eliminar la feria:", error);
-        notify("ToastError", error.message || "Error desconocido al eliminar la feria.");
+  closeConcludeModalHandler();
+  try {
+    // console.log("Valor de activeFair antes de eliminar:", activeFair); // <-- Puedes quitar este console.log una vez funcione
+    if (!activeFair || !activeFair.id) { // Puedes mantener esta validación si quieres, aunque la llamada ya no lo usa.
+      notify("ToastError", "No hay feria activa seleccionada para eliminar.");
+      return;
     }
+    const response = await concludeAndDeleteActiveFair(token); // <--- ¡NUEVA LLAMADA Y SIN activeFair.id!
+    if (response === null) { // La función ahora retorna null para 204 No Content
+        notify("ToastSuccess", "Feria eliminada exitosamente.");
+        setActiveFair(null);
+        router.push("/dashboard");
+    } else {
+        notify("ToastError", "Error al eliminar la feria.");
+    }
+  } catch (error: any) {
+      console.error("Error al eliminar la feria:", error);
+      notify("ToastError", error.message || "Error desconocido al eliminar la feria.");
+  }
 };
   const [categoriesData, setCategoriesData] = useState<CategoryData[]>([]);
   const [categoryErrors, setCategoryErrors] = useState<string | undefined>(
