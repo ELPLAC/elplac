@@ -1046,17 +1046,17 @@ const handleDeleteAndConcludeFair = async () => {
               </button>
               <div className="flex flex-col gap-4 justify-center items-center">
                 <p className="font-bold text-3xl flex items-center justify-center text-center text-primary-darker">
-                  ¿Querés concluir y eliminar la feria?
+                  ¿Realmente quieres concluir y ELIMINAR los datos de la feria?
                 </p>
                 <div className="gap-4 flex">
                   <button
-                    onClick={() => openConcludeModalHandler()}
+                    onClick={() => handleDeleteAndConcludeFair()}
                     className="bg-primary-darker text-white w-20 p-2 rounded-lg border border-[#D0D5DD]"
                   >
                     Si
                   </button>
                   <button
-                    onClick={() => handleDeleteAndConcludeFair()}
+                    onClick={() => closeConcludeModalHandler()}
                     className="bg-white text-primary-darker w-20 p-2 rounded-lg border border-[#D0D5DD]"
                   >
                     No
