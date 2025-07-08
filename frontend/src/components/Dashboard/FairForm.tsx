@@ -9,6 +9,7 @@ import WithAuthProtect from "@/helpers/WithAuth";
 import { useFair } from "@/context/FairProvider";
 import { useRouter } from "next/navigation";
 import { notify } from "../Notifications/Notifications";
+import axios from 'axios';
 import { Checkbox, Label } from "flowbite-react";
 import {
   CategoryData,
@@ -40,6 +41,65 @@ const CreateFairForm: React.FC = () => {
     entrepreneurs: false,
     others: false,
   });
+  // Estado para controlar la visibilidad del modal de confirmación de "Concluir feria"
+  const [showConcludeModal, setShowConcludeModal] = useState(false); // <--- AÑADE ESTA LÍNEA
+
+  const openConcludeModalHandler = () => { // <--- AÑADE ESTA FUNCIÓN
+    setShowConcludeModal(true);
+  };
+
+  const closeConcludeModalHandler = () => { // <--- AÑADE ESTA FUNCIÓN
+    setShowConcludeModal(false);
+  };
+
+  // --- MODIFICACIÓN: Nuevo manejador para el botón "Concluir Feria" que también elimina datos ---
+  const handleDeleteAndConcludeFair = async () => { // <--- AÑADE ESTA FUNCIÓN COMPLETA
+    closeConcludeModalHandler(); // Cerrar el modal actual de "¿Querés concluir la feria?"
+
+    // Confirmación adicional y más fuerte antes de la eliminación real
+    const confirmDelete = window.confirm(
+      '¡ADVERTENCIA CRÍTICA! Estás a punto de CONCLUIR y ELIMINAR PERMANENTEMENTE TODOS los datos asociados a la feria actual (productos, categorías, transacciones, registros, etc.). Esta acción NO SE PUEDE DESHACER.\n\n¿Estás ABSOLUTAMENTE seguro de continuar?'
+    );
+
+    if (!confirmDelete) {
+      notify("info", "Operación de eliminación de feria cancelada.");
+      return; // El usuario canceló la eliminación
+    }
+
+    try {
+      if (!token) {
+        notify("error", "No se encontró token de autenticación. Inicia sesión.");
+        router.push("/login"); // Redirigir a login
+        return;
+      }
+
+      // Llamada al nuevo endpoint DELETE del backend
+      await axios.delete(`${URL}/fairs/active`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      notify("success", "Feria concluida y todos sus datos eliminados exitosamente.");
+      setActiveFair(null); // Actualizar el contexto de la feria para que no haya una activa
+      router.refresh(); // Recargar la página para reflejar los cambios (App Router)
+      // O si usas Pages Router: router.push('/admin/fairs'); o router.reload();
+
+    } catch (error: any) {
+      console.error("Error al concluir y eliminar feria:", error);
+      if (error.response) {
+        if (error.response.status === 403) {
+          notify("error", "No tienes permisos de administrador para realizar esta acción.");
+        } else if (error.response.status === 404) {
+          notify("warn", "No se encontró una feria activa para concluir y eliminar.");
+        } else {
+          notify("error", `Error del servidor: ${error.response.data.message || 'Error desconocido'}`);
+        }
+      } else {
+        notify("error", "Error de red. Asegúrate de que el backend esté en funcionamiento.");
+      }
+    }
+  };
   const [categoriesData, setCategoriesData] = useState<CategoryData[]>([]);
   const [categoryErrors, setCategoryErrors] = useState<string | undefined>(
     undefined

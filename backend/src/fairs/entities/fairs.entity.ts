@@ -52,5 +52,5 @@ export class Fair {
   productRequests: ProductRequest[];
 
   @OneToMany(() => FairCategory, fairCategory => fairCategory.fair)
-  fairCategories: FairCategory[] | FairCategory;
+  fairCategories: FairCategory[];
 }

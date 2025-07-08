@@ -1,4 +1,16 @@
-import { BadRequestException, Body, Controller, Get, Param, Post, Put, UseGuards} from '@nestjs/common';
+// src/fairs/fairs.controller.ts
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  Delete, // Importar Delete
+  UseGuards,
+  HttpCode, // Importar HttpCode para el 204
+} from '@nestjs/common';
 import { FairsService } from '@fairs/fairs.service';
 import { FairDto } from '@fairs/fairs.dto';
 import { AuthGuard } from '@auth/auth.guard';
@@ -33,13 +45,14 @@ export class FairsController {
   async closeFair(@Param('id') fairId: string) {
     return await this.fairsService.closeFair(fairId);
   }
-  
-  //@Roles(Role.ADMIN)
-  //@UseGuards(AuthGuard, RoleGuard)
+
+  // Comentado en tu archivo, lo mantengo así
+  // @Roles(Role.ADMIN)
+  // @UseGuards(AuthGuard, RoleGuard)
   @Get(':sellerId/:fairId/products')
   async getProductsByIdAndFair(
     @Param('sellerId') sellerId: string,
-    @Param('fairId') fairId: string
+    @Param('fairId') fairId: string,
   ) {
     return await this.fairsService.getProductsByIdAndFair(fairId, sellerId);
   }
@@ -53,6 +66,7 @@ export class FairsController {
   ) {
     return await this.fairsService.editAddressFair(fairId, newAddressFair);
   }
+
   @Roles(Role.ADMIN)
   @UseGuards(AuthGuard, RoleGuard)
   @Put(':id/update-entry-price-buyer')
@@ -63,8 +77,16 @@ export class FairsController {
     if (!entryPriceBuyer) {
       throw new BadRequestException('El precio de entrada es obligatorio.');
     }
-
     return this.fairsService.updateEntryPriceBuyer(fairId, entryPriceBuyer);
   }
 
+  // --- NUEVO ENDPOINT PARA ELIMINAR LA FERIA ACTIVA ---
+  @Roles(Role.ADMIN) // Solo administradores pueden hacer esto
+  @UseGuards(AuthGuard, RoleGuard) // Autenticación y autorización por rol
+  @Delete('active') // Usamos DELETE y un endpoint descriptivo
+  @HttpCode(204) // Retorna 204 No Content para eliminación exitosa sin cuerpo
+  async deleteActiveFair() {
+    await this.fairsService.concludeAndDeleteActiveFair();
+    // No retorna nada en el cuerpo para 204 No Content
+  }
 }
