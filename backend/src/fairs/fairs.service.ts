@@ -1,9 +1,9 @@
 // src/fairs/fairs.service.ts
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { FairDto } from '@fairs/fairs.dto';
 import { FairsRepository } from '@fairs/fairs.repository';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm'; // Asegúrate de importar Repository si lo usas directamente
+import { DataSource, Repository } from 'typeorm';
 import { Fair } from './entities/fairs.entity';
 
 // Importa TODAS las entidades relacionadas que vas a eliminar o actualizar.
@@ -17,16 +17,12 @@ import { UserFairRegistration } from './entities/userFairRegistration.entity';
 import { SellerFairRegistration } from './entities/sellerFairRegistration.entity';
 import { Product } from '../products/entities/products.entity'; // Ajusta la ruta si es diferente
 
+
 @Injectable()
 export class FairsService {
   constructor(
     private readonly fairsRepository: FairsRepository,
-    @InjectDataSource() private dataSource: DataSource, // Inyectar DataSource para transacciones
-    // Si necesitas acceder directamente a los repositorios para delete en FairService, inyecta aquí.
-    // Aunque con queryRunner.manager.delete() y TypeORM cargando las relaciones, no siempre es necesario inyectar todos los repositorios.
-    // @InjectRepository(Product) private productsRepository: Repository<Product>,
-    // @InjectRepository(PaymentTransaction) private paymentTransactionsRepository: Repository<PaymentTransaction>,
-    // etc.
+    @InjectDataSource() private dataSource: DataSource,
   ) {}
 
   async createFair(fair: FairDto) {
@@ -41,7 +37,7 @@ export class FairsService {
     return await this.fairsRepository.getFairById(fairId);
   }
 
-  async closeFair(fairId: string) {
+  async closeFair(fairId: string){
     return await this.fairsRepository.closeFair(fairId);
   }
 
@@ -57,59 +53,45 @@ export class FairsService {
     return this.fairsRepository.updateEntryPriceBuyer(fairId, entryPriceBuyer);
   }
 
-  /**
-   * Concluye la feria activa y elimina todos sus datos relacionados confirmados.
-   * Esta operación es transaccional para asegurar la integridad de los datos.
-   */
-  async concludeAndDeleteActiveFair(): Promise<void> {
+  // --- ESTA ES LA FUNCIÓN MODIFICADA PARA ELIMINAR LA FERIA ACTIVA ---
+  async concludeAndDeleteActiveFair() { // <-- Ya NO espera un fairId aquí
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
-      // 1. Encontrar la feria activa con sus relaciones para una eliminación efectiva.
+      // 1. Encontrar la feria ACTIVA para eliminar
       const activeFair = await queryRunner.manager.findOne(Fair, {
-        where: { isActive: true },
-        relations: [
-          'fairDays',
-          'fairDays.buyerCapacities', // Para eliminar BuyerCapacity
-          'fairCategories',
-          'fairCategories.products', // Para eliminar Products
-          'productRequests', // Para eliminar ProductRequest
-          'transactions', // Para eliminar PaymentTransaction
-          'userRegistrations', // Para eliminar UserFairRegistration
-          'sellerRegistrations', // Para eliminar SellerFairRegistration
-        ],
+        where: { isActive: true }, // <-- Busca la feria con isActive: true
+        relations: {
+          fairDays: true,
+          buyerCapacities: true,
+          fairCategories: {
+            products: true
+          },
+          productRequests: true,
+          transactions: true,
+          userRegistrations: true,
+          sellerRegistrations: true
+        }
       });
 
       if (!activeFair) {
-        throw new NotFoundException('No hay una feria activa para concluir y eliminar.');
+        throw new NotFoundException('No se encontró ninguna feria activa para eliminar.');
       }
 
-      const fairId = activeFair.id;
+      const fairId = activeFair.id; // Obtener el ID de la feria activa encontrada
 
-      // 2. Eliminar datos relacionados en el orden correcto (hijos antes que padres).
-
-      // Eliminar BuyerCapacity (hijos de FairDay)
-      if (activeFair.fairDays && activeFair.fairDays.length > 0) {
-        for (const fairDay of activeFair.fairDays) {
-          await queryRunner.manager.delete(BuyerCapacity, { fairDay: { id: fairDay.id } });
-        }
-      }
-
-      // Eliminar FairDay
+      // 2. Eliminar todas las entidades relacionadas en cascada (¡el orden es importante!)
+      // Elimina las relaciones ManyToOne/OneToOne primero, luego las OneToMany si no están en cascada
+      await queryRunner.manager.delete(BuyerCapacity, { fair: { id: fairId } });
       await queryRunner.manager.delete(FairDay, { fair: { id: fairId } });
-
-      // Eliminar ProductRequest
       await queryRunner.manager.delete(ProductRequest, { fair: { id: fairId } });
-
-      // Eliminar PaymentTransaction (Confirmado que se eliminan)
       await queryRunner.manager.delete(PaymentTransaction, { fair: { id: fairId } });
 
       // Eliminar Product (Confirmado que se eliminan, a través de FairCategory)
       if (activeFair.fairCategories && activeFair.fairCategories.length > 0) {
         for (const fairCategory of activeFair.fairCategories) {
-          // Asegúrate de que fairCategory.products sea un array y no nulo
           if (Array.isArray(fairCategory.products) && fairCategory.products.length > 0) {
             for (const product of fairCategory.products) {
               await queryRunner.manager.delete(Product, { id: product.id });

@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useFormik } from "formik";
 import Input from "./InputFairForm";
 import "react-toastify/dist/ReactToastify.css";
-import { postCreateFair, updateFairStatus } from "../../helpers/services";
+import { postCreateFair, updateFairStatus, deleteFair } from "../../helpers/services";
 import { useAuth } from "@/context/AuthProvider";
 import WithAuthProtect from "@/helpers/WithAuth";
 import { useFair } from "@/context/FairProvider";
@@ -16,6 +16,7 @@ import {
   CategoryDataField,
   FairDaysData,
   IsCheckedType,
+  FairDto,
 } from "@/types";
 import * as Yup from "yup";
 import { FaCheckCircle } from "react-icons/fa";
@@ -53,51 +54,24 @@ const CreateFairForm: React.FC = () => {
   };
 
   // --- MODIFICACIÓN: Nuevo manejador para el botón "Concluir Feria" que también elimina datos ---
-  const handleDeleteAndConcludeFair = async () => { // <--- AÑADE ESTA FUNCIÓN COMPLETA
-    closeConcludeModalHandler(); // Cerrar el modal actual de "¿Querés concluir la feria?"
-
-    // Confirmación adicional y más fuerte antes de la eliminación real
-    const confirmDelete = window.confirm(
-      '¡ADVERTENCIA CRÍTICA! Estás a punto de CONCLUIR y ELIMINAR PERMANENTEMENTE TODOS los datos asociados a la feria actual (productos, categorías, transacciones, registros, etc.). Esta acción NO SE PUEDE DESHACER.\n\n¿Estás ABSOLUTAMENTE seguro de continuar?'
-    );
-
-    if (!confirmDelete) {
-      notify("ToastRegular", "Operación de eliminación de feria cancelada.");
-      return; // El usuario canceló la eliminación
-    }
-
+const handleDeleteAndConcludeFair = async () => {
+    closeConcludeModalHandler(); // Cierra el modal de confirmación
+    // No necesitamos activeFair.id aquí porque el backend elimina la "activa"
     try {
-      if (!token) {
-        notify("ToastError", "No se encontró token de autenticación. Inicia sesión.");
-        router.push("/login"); // Redirigir a login
-        return;
-      }
+      // Llama a la función deleteFair del servicio, no necesita ID si el backend busca la activa
+      // La función deleteFair en services.ts ahora debería esperar 'token' y 'undefined' para el ID
+      const res = await deleteFair(token, undefined);
 
-      // Llamada al nuevo endpoint DELETE del backend
-      await axios.delete(`${URL}/fairs/active`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      notify("ToastSuccess", "Feria concluida y todos sus datos eliminados exitosamente.");
-      setActiveFair(undefined); // Actualizar el contexto de la feria para que no haya una activa
-      router.refresh(); // Recargar la página para reflejar los cambios (App Router)
-      // O si usas Pages Router: router.push('/admin/fairs'); o router.reload();
-
-    } catch (error: any) {
-      console.error("Error al concluir y eliminar feria:", error);
-      if (error.response) {
-        if (error.response.status === 403) {
-          notify("ToastError", "No tienes permisos de administrador para realizar esta acción.");
-        } else if (error.response.status === 404) {
-          notify("ToastWarning", "No se encontró una feria activa para concluir y eliminar.");
-        } else {
-          notify("ToastError", `Error del servidor: ${error.response.data.message || 'Error desconocido'}`);
-        }
+      if (res?.ok) {
+        notify("ToastSuccess", "Feria eliminada exitosamente del historial.");
+        setActiveFair(undefined); // Limpia la feria activa en el contexto
+        router.refresh(); // O router.push("/admin/fairs") para recargar la página de ferias
       } else {
-        notify("ToastError", "Error de red. Asegúrate de que el backend esté en funcionamiento.");
+        notify("ToastError", "No se pudo eliminar la feria. Inténtalo de nuevo.");
       }
+    } catch (error: any) {
+      console.error("Error al eliminar la feria:", error);
+      notify("ToastError", error.message || "Error desconocido al eliminar la feria.");
     }
   };
   const [categoriesData, setCategoriesData] = useState<CategoryData[]>([]);
@@ -1071,17 +1045,17 @@ const CreateFairForm: React.FC = () => {
               </button>
               <div className="flex flex-col gap-4 justify-center items-center">
                 <p className="font-bold text-3xl flex items-center justify-center text-center text-primary-darker">
-                  ¿Querés concluir la feria?
+                  ¿Querés concluir y eliminar la feria?
                 </p>
                 <div className="gap-4 flex">
                   <button
-                    onClick={() => handleConcludeFair()}
+                    onClick={() => openConcludeModalHandler()}
                     className="bg-primary-darker text-white w-20 p-2 rounded-lg border border-[#D0D5DD]"
                   >
                     Si
                   </button>
                   <button
-                    onClick={() => closeModalHandler()}
+                    onClick={() => handleDeleteAndConcludeFair()}
                     className="bg-white text-primary-darker w-20 p-2 rounded-lg border border-[#D0D5DD]"
                   >
                     No

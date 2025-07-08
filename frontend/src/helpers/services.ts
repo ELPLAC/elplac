@@ -10,6 +10,7 @@ import {
 } from "@/types";
 import { URL } from "../../envs";
 
+
 export const postUserRegister = async (user: Partial<UserDto>) => {
   try {
     const checkUnique = await getUniqueData();
@@ -44,9 +45,9 @@ export const postUserRegister = async (user: Partial<UserDto>) => {
       return res;
     }
   } catch (error: any) {
-    throw new Error(error.message || "Error en el registro");
-  }
-};
+      throw new Error(error.message || "Error en el registro");
+    }
+  };
 
 export const postSellerRegister = async (seller: Partial<ISeller>): Promise<Response> => {
   try {
@@ -378,6 +379,7 @@ export const getFair = async () => {
   } catch (error) {
   }
 };
+
 
 export const updateFairStatus = async (
   token: string,
@@ -794,7 +796,35 @@ export const getProductsBySeller = async (
     const data = await res.json();
 
     console.log("data del service al getProductBySeller", data);
+    console.log("data del service al getProductBySeller", data);
     return data;
   } catch (error) {
+  }
+}
+
+// *** ESTA ES LA FUNCIÓN CRUCIAL QUE DEBE ESTAR EN services.ts ***
+export const deleteFair = async (token: string, id: string | undefined) => {
+  try {
+    if (!id) {
+      throw new Error("ID de feria no proporcionado para la eliminación.");
+    }
+
+    const res = await fetch(`${URL}/fairs/${id}`, {
+      method: "DELETE", // Método DELETE
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(
+        `Error ${res.status}: ${errorData.message || res.statusText}`
+      );
+    }
+    return { ok: res.ok };
+  } catch (error: any) {  
+    throw new Error(error.message || "Error al eliminar la feria.");
   }
 };
