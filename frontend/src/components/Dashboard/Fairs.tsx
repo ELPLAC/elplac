@@ -67,7 +67,7 @@ const Fairs = () => {
                     </h2>
                     <Dropdown
                       value={selectedOption || "Elegí una opción"}
-                      options={activeArray?.map((f: IFair | undefined) => ({
+                      options={activeArray?.map((f: IFair | null | undefined) => ({
                         id: "",
                         name: f ? f.name : "No hay Feria disponible",
                       }))}
