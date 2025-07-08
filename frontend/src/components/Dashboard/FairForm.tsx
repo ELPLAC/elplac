@@ -68,7 +68,7 @@ const CreateFairForm: React.FC = () => {
 
     try {
       if (!token) {
-        notify("error", "No se encontró token de autenticación. Inicia sesión.");
+        notify("ToastError", "No se encontró token de autenticación. Inicia sesión.");
         router.push("/login"); // Redirigir a login
         return;
       }
@@ -89,14 +89,14 @@ const CreateFairForm: React.FC = () => {
       console.error("Error al concluir y eliminar feria:", error);
       if (error.response) {
         if (error.response.status === 403) {
-          notify("error", "No tienes permisos de administrador para realizar esta acción.");
+          notify("ToastError", "No tienes permisos de administrador para realizar esta acción.");
         } else if (error.response.status === 404) {
           notify("warn", "No se encontró una feria activa para concluir y eliminar.");
         } else {
-          notify("error", `Error del servidor: ${error.response.data.message || 'Error desconocido'}`);
+          notify("ToastError", `Error del servidor: ${error.response.data.message || 'Error desconocido'}`);
         }
       } else {
-        notify("error", "Error de red. Asegúrate de que el backend esté en funcionamiento.");
+        notify("ToastError", "Error de red. Asegúrate de que el backend esté en funcionamiento.");
       }
     }
   };
