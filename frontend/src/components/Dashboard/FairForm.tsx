@@ -1011,7 +1011,7 @@ const CreateFairForm: React.FC = () => {
               </button>
               <div className="flex flex-col gap-4 justify-center items-center">
                 <p className="font-bold text-3xl flex items-center justify-center text-center text-primary-darker">
-                  ¿Querés concluir la feria?
+                  ¿Estas Seguro de querer Concluir y ELIMINAR la feria?
                 </p>
                 <div className="gap-4 flex">
                   <button
