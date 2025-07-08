@@ -6,6 +6,7 @@ import { SellerFairRegistration } from '@fairs/entities/sellerFairRegistration.e
 import { PaymentTransaction } from '@payment_transaction/paymentTransaction.entity';
 import { ProductRequest } from '@products/entities/productRequest.entity';
 import { FairCategory } from '@fairs/entities/fairCategory.entity';
+import { BuyerCapacity } from '@fairs/entities/buyersCapacity.entity'; // Asegúrate de que esta importación exista
 
 @Entity({ name: 'fair' })
 export class Fair {
@@ -18,7 +19,7 @@ export class Fair {
   @Column({ default: false })
   isVisibleUser: boolean;
 
-  @Column({ default: false }) 
+  @Column({ default: false })
   isLabelPrintingEnabled: boolean;
 
   @Column()
@@ -53,4 +54,8 @@ export class Fair {
 
   @OneToMany(() => FairCategory, fairCategory => fairCategory.fair)
   fairCategories: FairCategory[];
+
+  // ¡AÑADE ESTA LÍNEA!
+  @OneToMany(() => BuyerCapacity, buyerCapacity => buyerCapacity.fair)
+  buyerCapacities: BuyerCapacity[];
 }
