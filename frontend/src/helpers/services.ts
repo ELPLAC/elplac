@@ -803,13 +803,9 @@ export const getProductsBySeller = async (
 }
 
 // *** ESTA ES LA FUNCIÓN CRUCIAL QUE DEBE ESTAR EN services.ts ***
-export const deleteFair = async (token: string, id: string | undefined) => {
+export const concludeAndDeleteActiveFair = async (token: string) => { // <--- ¡SIN ID AQUÍ!
   try {
-    if (!id) {
-      throw new Error("ID de feria no proporcionado para la eliminación.");
-    }
-
-    const res = await fetch(`${URL}/fairs/${id}`, {
+    const res = await fetch(`${URL}/fairs`, { // <--- ¡URL SIN ID!
       method: "DELETE", // Método DELETE
       headers: {
         "Content-Type": "application/json",
@@ -820,11 +816,21 @@ export const deleteFair = async (token: string, id: string | undefined) => {
     if (!res.ok) {
       const errorData = await res.json();
       throw new Error(
-        `Error ${res.status}: ${errorData.message || res.statusText}`
+        `Error ${res.status}: ${errorData.message || "Error al eliminar la feria"}`
       );
     }
-    return { ok: res.ok };
-  } catch (error: any) {  
-    throw new Error(error.message || "Error al eliminar la feria.");
+
+    // Si la respuesta es 204 No Content, no habrá cuerpo JSON
+    if (res.status === 204) {
+      return null; // O un indicador de éxito sin datos
+    }
+
+    // Si esperas un JSON, pero el 204 indica no content, este bloque podría no ejecutarse
+    // const responseData = await res.json();
+    // return responseData;
+
+  } catch (error: any) {
+    console.error("Error en concludeAndDeleteActiveFair:", error);
+    throw new Error(`Error al eliminar la feria: ${error.message || "Error desconocido"}`);
   }
 };
