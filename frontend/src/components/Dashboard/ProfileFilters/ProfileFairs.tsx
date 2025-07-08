@@ -73,7 +73,7 @@ const ProfileFairs: React.FC<ProfileFairsProps> = ({
           <div className="w-full mt-3 sm:mt-4">
             <Dropdown
               value={selectedOption || "Selecciona una feria"}
-              options={fairs?.map((f: IFair | undefined) => ({
+              options={fairs?.map((f: IFair | null | undefined) => ({
                 id: f?.id || "",
                 name: f ? f.name : "No hay Feria disponible",
               }))}
