@@ -80,7 +80,7 @@ const CreateFairForm: React.FC = () => {
         },
       });
 
-      notify("success", "Feria concluida y todos sus datos eliminados exitosamente.");
+      notify("ToastSuccess", "Feria concluida y todos sus datos eliminados exitosamente.");
       setActiveFair(null); // Actualizar el contexto de la feria para que no haya una activa
       router.refresh(); // Recargar la página para reflejar los cambios (App Router)
       // O si usas Pages Router: router.push('/admin/fairs'); o router.reload();
@@ -91,7 +91,7 @@ const CreateFairForm: React.FC = () => {
         if (error.response.status === 403) {
           notify("ToastError", "No tienes permisos de administrador para realizar esta acción.");
         } else if (error.response.status === 404) {
-          notify("warn", "No se encontró una feria activa para concluir y eliminar.");
+          notify("ToastWarning", "No se encontró una feria activa para concluir y eliminar.");
         } else {
           notify("ToastError", `Error del servidor: ${error.response.data.message || 'Error desconocido'}`);
         }
