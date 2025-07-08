@@ -330,8 +330,8 @@ export interface IFairContainer {
 
 export interface IFairContext {
   fairs: IFair[];
-  activeFair?: IFair;
-  setActiveFair: (fair: IFair | undefined) => void;
+  activeFair?: IFair | null;
+  setActiveFair: (fair: IFair | null | undefined) => void;
   setDateSelect: (date: Date) => void;
   setTimeSelect: (time: string) => void;
   timeSelect: string;
