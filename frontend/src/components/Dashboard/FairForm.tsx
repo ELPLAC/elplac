@@ -62,7 +62,7 @@ const CreateFairForm: React.FC = () => {
     );
 
     if (!confirmDelete) {
-      notify("info", "Operación de eliminación de feria cancelada.");
+      notify("ToastRegular", "Operación de eliminación de feria cancelada.");
       return; // El usuario canceló la eliminación
     }
 
