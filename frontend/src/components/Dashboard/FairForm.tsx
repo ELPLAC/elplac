@@ -55,25 +55,26 @@ const CreateFairForm: React.FC = () => {
 
   // --- MODIFICACIÓN: Nuevo manejador para el botón "Concluir Feria" que también elimina datos ---
 const handleDeleteAndConcludeFair = async () => {
-    closeConcludeModalHandler(); // Cierra el modal de confirmación
-    // No necesitamos activeFair.id aquí porque el backend elimina la "activa"
+    closeConcludeModalHandler();
     try {
-      // Llama a la función deleteFair del servicio, no necesita ID si el backend busca la activa
-      // La función deleteFair en services.ts ahora debería esperar 'token' y 'undefined' para el ID
-      const res = await deleteFair(token, undefined);
-
-      if (res?.ok) {
-        notify("ToastSuccess", "Feria eliminada exitosamente del historial.");
-        setActiveFair(undefined); // Limpia la feria activa en el contexto
-        router.refresh(); // O router.push("/admin/fairs") para recargar la página de ferias
-      } else {
-        notify("ToastError", "No se pudo eliminar la feria. Inténtalo de nuevo.");
-      }
+        console.log("Valor de activeFair antes de eliminar:", activeFair); // <-- ¡AÑADE ESTA LÍNEA!
+        if (!activeFair || !activeFair.id) {
+            notify("ToastError", "No hay feria activa seleccionada para eliminar.");
+            return;
+        }
+        const response = await deleteFair(token, activeFair.id);
+        if (response && response.ok) {
+            notify("ToastSuccess", "Feria eliminada exitosamente.");
+            setActiveFair(null);
+            router.push("/dashboard");
+        } else {
+            notify("ToastError", "Error al eliminar la feria.");
+        }
     } catch (error: any) {
-      console.error("Error al eliminar la feria:", error);
-      notify("ToastError", error.message || "Error desconocido al eliminar la feria.");
+        console.error("Error al eliminar la feria:", error);
+        notify("ToastError", error.message || "Error desconocido al eliminar la feria.");
     }
-  };
+};
   const [categoriesData, setCategoriesData] = useState<CategoryData[]>([]);
   const [categoryErrors, setCategoryErrors] = useState<string | undefined>(
     undefined
