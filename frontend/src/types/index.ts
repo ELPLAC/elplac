@@ -548,7 +548,7 @@ export interface IProductRequestTableProps {
   profiles?: DropdownOption;
   products?: IProductNotification[];
   trigger?: boolean;
-  activeFair?: IFair;
+  activeFair?: IFair | null;
   setTrigger?: (newValue: boolean) => void;
 }
 
