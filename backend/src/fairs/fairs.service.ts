@@ -3,7 +3,7 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { FairDto } from '@fairs/fairs.dto';
 import { FairsRepository } from '@fairs/fairs.repository';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, Repository, In } from 'typeorm';
 import { Fair } from './entities/fairs.entity';
 
 // Importa TODAS las entidades relacionadas que vas a eliminar o actualizar.
@@ -85,7 +85,16 @@ export class FairsService {
 
       // 2. Eliminar todas las entidades relacionadas en cascada (¡el orden es importante!)
       // Elimina las relaciones ManyToOne/OneToOne primero, luego las OneToMany si no están en cascada
-      await queryRunner.manager.delete(BuyerCapacity, { fair: { id: fairId } });
+      if (activeFair.fairDays && activeFair.fairDays.length > 0) {
+        const fairDayIds = activeFair.fairDays.map(fd => fd.id);
+        if (fairDayIds.length > 0) {
+          // Elimina BuyerCapacity donde su relación 'fairDay' tenga un ID en la lista de fairDayIds
+          await queryRunner.manager.delete(BuyerCapacity, { fairDay: { id: In(fairDayIds) } });
+        }
+      }
+      // --- FIN MODIFICACIÓN PARA BuyerCapacity ---
+
+      // Estas eliminaciones probablemente están bien si tienen una relación directa 'fair'
       await queryRunner.manager.delete(FairDay, { fair: { id: fairId } });
       await queryRunner.manager.delete(ProductRequest, { fair: { id: fairId } });
       await queryRunner.manager.delete(PaymentTransaction, { fair: { id: fairId } });
