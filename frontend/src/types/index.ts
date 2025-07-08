@@ -413,7 +413,7 @@ export interface ProfileFairsProps {
   selectedOption: string | null | [];
   fairs: (IFair | null | undefined)[];
   handleSelect: (option: DropdownOption) => void;
-  fairFilter?: IFair;
+  fairFilter?: IFair | null;
 }
 
 export interface ProfileImageContextType {
