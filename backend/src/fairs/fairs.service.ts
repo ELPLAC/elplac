@@ -64,8 +64,9 @@ export class FairsService {
       const activeFair = await queryRunner.manager.findOne(Fair, {
         where: { isActive: true }, // <-- Busca la feria con isActive: true
         relations: {
-          fairDays: true,
-          buyerCapacities: true,
+          fairDays: { // <--- Accede a fairDays primero
+            buyerCapacities: true, // <--- Luego, desde fairDays, accede a buyerCapacities
+        },
           fairCategories: {
             products: true
           },

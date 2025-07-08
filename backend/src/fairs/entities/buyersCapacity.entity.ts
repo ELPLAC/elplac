@@ -20,6 +20,6 @@ export class BuyerCapacity {
 
   // ¡ESTA ES LA RELACIÓN CORRECTA A FairDay!
   @ManyToOne(() => FairDay, fairDay => fairDay.buyerCapacities)
-  @Exclude() // Mantén Exclude si lo necesitas
+  // Mantén Exclude si lo necesitas
   fairDay: FairDay; // Propiedad fairDay para la relación
 }
