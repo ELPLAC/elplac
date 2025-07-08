@@ -411,7 +411,7 @@ export interface TicketProps {
 
 export interface ProfileFairsProps {
   selectedOption: string | null | [];
-  fairs: (IFair | undefined)[];
+  fairs: (IFair | null | undefined)[];
   handleSelect: (option: DropdownOption) => void;
   fairFilter?: IFair;
 }
