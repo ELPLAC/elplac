@@ -55,7 +55,5 @@ export class Fair {
   @OneToMany(() => FairCategory, fairCategory => fairCategory.fair)
   fairCategories: FairCategory[];
 
-  // ¡AÑADE ESTA LÍNEA!
-  @OneToMany(() => BuyerCapacity, buyerCapacity => buyerCapacity.fair)
-  buyerCapacities: BuyerCapacity[];
+
 }
