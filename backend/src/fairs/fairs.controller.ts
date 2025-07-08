@@ -83,10 +83,9 @@ export class FairsController {
   // --- NUEVO ENDPOINT PARA ELIMINAR LA FERIA ACTIVA ---
   @Roles(Role.ADMIN) // Solo administradores pueden hacer esto
   @UseGuards(AuthGuard, RoleGuard) // Autenticación y autorización por rol
-  @Delete('active') // Usamos DELETE y un endpoint descriptivo
+  @Delete('id') // Usamos DELETE y un endpoint descriptivo
   @HttpCode(204) // Retorna 204 No Content para eliminación exitosa sin cuerpo
-  async deleteActiveFair() {
+  async concludeAndDeleteActiveFair(): Promise<void> { // <--- ¡CAMBIA ESTO! Ya NO recibe 'fairId'
     await this.fairsService.concludeAndDeleteActiveFair();
-    // No retorna nada en el cuerpo para 204 No Content
   }
 }
