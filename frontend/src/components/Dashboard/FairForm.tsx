@@ -65,7 +65,7 @@ const handleDeleteAndConcludeFair = async () => {
         const response = await deleteFair(token, activeFair.id);
         if (response && response.ok) {
             notify("ToastSuccess", "Feria eliminada exitosamente.");
-            setActiveFair(null);
+            setActiveFair(undefined);
             router.push("/dashboard");
         } else {
             notify("ToastError", "Error al eliminar la feria.");
