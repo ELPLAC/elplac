@@ -10,7 +10,6 @@ import {
 } from "@/types";
 import { URL } from "../../envs";
 
-
 export const postUserRegister = async (user: Partial<UserDto>) => {
   try {
     const checkUnique = await getUniqueData();
@@ -45,9 +44,9 @@ export const postUserRegister = async (user: Partial<UserDto>) => {
       return res;
     }
   } catch (error: any) {
-      throw new Error(error.message || "Error en el registro");
-    }
-  };
+    throw new Error(error.message || "Error en el registro");
+  }
+};
 
 export const postSellerRegister = async (seller: Partial<ISeller>): Promise<Response> => {
   try {
@@ -379,7 +378,6 @@ export const getFair = async () => {
   } catch (error) {
   }
 };
-
 
 export const updateFairStatus = async (
   token: string,
@@ -796,41 +794,7 @@ export const getProductsBySeller = async (
     const data = await res.json();
 
     console.log("data del service al getProductBySeller", data);
-    console.log("data del service al getProductBySeller", data);
     return data;
   } catch (error) {
-  }
-}
-
-// *** ESTA ES LA FUNCIÓN CRUCIAL QUE DEBE ESTAR EN services.ts ***
-export const concludeAndDeleteActiveFair = async (token: string) => { // <--- ¡SIN ID AQUÍ!
-  try {
-    const res = await fetch(`${URL}/fairs`, { // <--- ¡URL SIN ID!
-      method: "DELETE", // Método DELETE
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!res.ok) {
-      const errorData = await res.json();
-      throw new Error(
-        `Error ${res.status}: ${errorData.message || "Error al eliminar la feria"}`
-      );
-    }
-
-    // Si la respuesta es 204 No Content, no habrá cuerpo JSON
-    if (res.status === 204) {
-      return null; // O un indicador de éxito sin datos
-    }
-
-    // Si esperas un JSON, pero el 204 indica no content, este bloque podría no ejecutarse
-    // const responseData = await res.json();
-    // return responseData;
-
-  } catch (error: any) {
-    console.error("Error en concludeAndDeleteActiveFair:", error);
-    throw new Error(`Error al eliminar la feria: ${error.message || "Error desconocido"}`);
   }
 };

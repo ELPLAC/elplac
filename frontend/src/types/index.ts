@@ -330,8 +330,8 @@ export interface IFairContainer {
 
 export interface IFairContext {
   fairs: IFair[];
-  activeFair?: IFair | null;
-  setActiveFair: (fair: IFair | null | undefined) => void;
+  activeFair?: IFair;
+  setActiveFair: (fair: IFair | undefined) => void;
   setDateSelect: (date: Date) => void;
   setTimeSelect: (time: string) => void;
   timeSelect: string;
@@ -411,9 +411,9 @@ export interface TicketProps {
 
 export interface ProfileFairsProps {
   selectedOption: string | null | [];
-  fairs: (IFair | null | undefined)[];
+  fairs: (IFair | undefined)[];
   handleSelect: (option: DropdownOption) => void;
-  fairFilter?: IFair | null;
+  fairFilter?: IFair;
 }
 
 export interface ProfileImageContextType {
@@ -548,7 +548,7 @@ export interface IProductRequestTableProps {
   profiles?: DropdownOption;
   products?: IProductNotification[];
   trigger?: boolean;
-  activeFair?: IFair | null;
+  activeFair?: IFair;
   setTrigger?: (newValue: boolean) => void;
 }
 

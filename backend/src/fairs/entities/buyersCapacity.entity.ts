@@ -1,7 +1,6 @@
-// src/fairs/entities/buyersCapacity.entity.ts
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { v4 as uuid } from 'uuid';
-import { FairDay } from '@fairs/entities/fairDay.entity'; // Asegúrate de que esta importación sea correcta
+import { FairDay } from '@fairs/entities/fairDay.entity';
 import { Exclude } from 'class-transformer';
 
 @Entity({ name: 'buyer_capacity' })
@@ -15,11 +14,7 @@ export class BuyerCapacity {
   @Column({ default: 10 })
   capacity: number;
 
-  @Column({ type: 'date' })
-  date: Date; // Asumo que `date` estaba aquí, si no, puedes añadirla o ajustarla.
-
-  // ¡ESTA ES LA RELACIÓN CORRECTA A FairDay!
   @ManyToOne(() => FairDay, fairDay => fairDay.buyerCapacities)
-  // Mantén Exclude si lo necesitas
-  fairDay: FairDay; // Propiedad fairDay para la relación
+  @Exclude()
+  fairDay: FairDay;
 }

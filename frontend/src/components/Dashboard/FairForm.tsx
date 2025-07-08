@@ -1,22 +1,21 @@
 "use client";
 import React, { useState } from "react";
+import axios from 'axios';
 import { useFormik } from "formik";
 import Input from "./InputFairForm";
 import "react-toastify/dist/ReactToastify.css";
-import { postCreateFair, updateFairStatus, concludeAndDeleteActiveFair } from "../../helpers/services";
+import { postCreateFair, updateFairStatus } from "../../helpers/services";
 import { useAuth } from "@/context/AuthProvider";
 import WithAuthProtect from "@/helpers/WithAuth";
 import { useFair } from "@/context/FairProvider";
 import { useRouter } from "next/navigation";
 import { notify } from "../Notifications/Notifications";
-import axios from 'axios';
 import { Checkbox, Label } from "flowbite-react";
 import {
   CategoryData,
   CategoryDataField,
   FairDaysData,
   IsCheckedType,
-  FairDto,
 } from "@/types";
 import * as Yup from "yup";
 import { FaCheckCircle } from "react-icons/fa";
@@ -29,6 +28,60 @@ const CreateFairForm: React.FC = () => {
   const [hasCost, setHasCost] = useState(false);
   const { activeFair, setActiveFair } = useFair();
   const router = useRouter();
+  const [showConcludeModal, setShowConcludeModal] = useState(false);
+
+  const openConcludeModalHandler = () => {
+    setShowConcludeModal(true);
+  };
+
+  const closeConcludeModalHandler = () => {
+    setShowConcludeModal(false);
+  };
+
+  const handleDeleteAndConcludeFair = async () => {
+    closeConcludeModalHandler();
+    const confirmDelete = window.confirm(
+      '¡ADVERTENCIA CRÍTICA! Estás a punto de CONCLUIR y ELIMINAR PERMANENTEMENTE TODOS los datos asociados a la feria actual (productos, categorías, transacciones, registros, etc.). Esta acción NO SE PUEDE DESHACER.\n\n¿Estás ABSOLUTAMENTE seguro de continuar?'
+    );
+
+    if (!confirmDelete) {
+      notify("info", "Operación de eliminación de feria cancelada.");
+      return;
+    }
+
+    try {
+      if (!token) {
+        notify("error", "No se encontró token de autenticación. Inicia sesión.");
+        router.push("/login");
+        return;
+      }
+
+      await axios.delete(`${URL}/fairs/active`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      notify("success", "Feria concluida y todos sus datos eliminados exitosamente.");
+      setActiveFair(null);
+      router.refresh();
+
+    } catch (error) {
+      console.error("Error al concluir y eliminar feria:", error);
+      if (error.response) {
+        if (error.response.status === 403) {
+          notify("error", "No tienes permisos de administrador para realizar esta acción.");
+        } else if (error.response.status === 404) {
+          notify("warn", "No se encontró una feria activa para concluir y eliminar.");
+        } else {
+          notify("error", `Error del servidor: ${error.response.data.message || 'Error desconocido'}`);
+        }
+      } else {
+        notify("error", "Error de red. Asegúrate de que el backend esté en funcionamiento.");
+      }
+    }
+  };
+
   const [isChecked, setIsChecked] = useState<IsCheckedType>({
     youngMan: false,
     youngWoman: false,
@@ -42,40 +95,6 @@ const CreateFairForm: React.FC = () => {
     entrepreneurs: false,
     others: false,
   });
-  // Estado para controlar la visibilidad del modal de confirmación de "Concluir feria"
-  const [showConcludeModal, setShowConcludeModal] = useState(false); // <--- AÑADE ESTA LÍNEA
-
-  const openConcludeModalHandler = () => { // <--- AÑADE ESTA FUNCIÓN
-    setShowConcludeModal(true);
-  };
-
-  const closeConcludeModalHandler = () => { // <--- AÑADE ESTA FUNCIÓN
-    setShowConcludeModal(false);
-  };
-
-  // --- MODIFICACIÓN: Nuevo manejador para el botón "Concluir Feria" que también elimina datos ---
-// En FairForm.tsx, dentro de handleDeleteAndConcludeFair
-const handleDeleteAndConcludeFair = async () => {
-  closeConcludeModalHandler();
-  try {
-    // console.log("Valor de activeFair antes de eliminar:", activeFair); // <-- Puedes quitar este console.log una vez funcione
-    if (!activeFair || !activeFair.id) { // Puedes mantener esta validación si quieres, aunque la llamada ya no lo usa.
-      notify("ToastError", "No hay feria activa seleccionada para eliminar.");
-      return;
-    }
-    const response = await concludeAndDeleteActiveFair(token); // <--- ¡NUEVA LLAMADA Y SIN activeFair.id!
-    if (response === null) { // La función ahora retorna null para 204 No Content
-        notify("ToastSuccess", "Feria eliminada exitosamente.");
-        setActiveFair(null);
-        router.push("/dashboard");
-    } else {
-        notify("ToastError", "Error al eliminar la feria.");
-    }
-  } catch (error: any) {
-      console.error("Error al eliminar la feria:", error);
-      notify("ToastError", error.message || "Error desconocido al eliminar la feria.");
-  }
-};
   const [categoriesData, setCategoriesData] = useState<CategoryData[]>([]);
   const [categoryErrors, setCategoryErrors] = useState<string | undefined>(
     undefined
@@ -474,10 +493,10 @@ const handleDeleteAndConcludeFair = async () => {
                   <FaCheckCircle /> Ver solicitudes de clasificación
                 </a>
                 <button
-                  onClick={() => setOpenModalUserId(true)}
+                  onClick={openConcludeModalHandler}
                   className="action-button w-full mt-5 mb-5 bg-white flex items-center justify-center text-red-600 gap-2 p-2 border border-red-600 rounded-lg hover:bg-red-600 hover:text-white hover:shadow-md transition duration-200"
                 >
-                  <FaCheckCircle /> Concluir feria
+                  <FaCheckCircle /> Concluir feria y eliminar datos
                 </button>
               </div>
               <div className="pb-6 mb-6 border-b border-gray-300 opacity-60"></div>
@@ -1030,43 +1049,45 @@ const handleDeleteAndConcludeFair = async () => {
           </>
         )}
 
-        {openModalUserId && (
-          <div
-            className="fixed z-20 inset-0 flex items-center justify-center bg-black bg-opacity-50"
-            onClick={() => closeModalHandler()}
+        
+{showConcludeModal && (
+  <div
+    className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+    onClick={() => closeConcludeModalHandler()}
+  >
+    <div
+      className="bg-primary-lighter h-[40vh] w-[50vw] p-8 m-3 md:m-0 rounded-3xl relative flex items-center justify-center"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <button
+        className="absolute top-2 right-2 text-2xl font-bold text-primary-darker rounded-full"
+        onClick={() => closeConcludeModalHandler()}
+      >
+        ✖
+      </button>
+      <div className="flex flex-col gap-4 justify-center items-center">
+        <p className="font-bold text-3xl flex items-center justify-center text-center text-primary-darker">
+          ¿Realmente quieres concluir y ELIMINAR los datos de la feria?
+        </p>
+        <div className="gap-4 flex">
+          <button
+            onClick={handleDeleteAndConcludeFair}
+            className="bg-red-600 text-white w-20 p-2 rounded-lg border border-[#D0D5DD]"
           >
-            <div
-              className="bg-primary-lighter h-[40vh] w-[50vw] p-8 m-3 md:m-0 rounded-3xl relative flex items-center justify-center"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                className="absolute top-2 right-2 text-2xl font-bold text-primary-darker rounded-full"
-                onClick={() => closeModalHandler()}
-              >
-                ✖
-              </button>
-              <div className="flex flex-col gap-4 justify-center items-center">
-                <p className="font-bold text-3xl flex items-center justify-center text-center text-primary-darker">
-                  ¿Realmente quieres concluir y ELIMINAR los datos de la feria?
-                </p>
-                <div className="gap-4 flex">
-                  <button
-                    onClick={() => handleDeleteAndConcludeFair()}
-                    className="bg-primary-darker text-white w-20 p-2 rounded-lg border border-[#D0D5DD]"
-                  >
-                    Si
-                  </button>
-                  <button
-                    onClick={() => closeConcludeModalHandler()}
-                    className="bg-white text-primary-darker w-20 p-2 rounded-lg border border-[#D0D5DD]"
-                  >
-                    No
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+            Sí, eliminar
+          </button>
+          <button
+            onClick={() => closeConcludeModalHandler()}
+            className="bg-white text-primary-darker w-20 p-2 rounded-lg border border-[#D0D5DD]"
+          >
+            No
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
       </div>
     </div>
   );

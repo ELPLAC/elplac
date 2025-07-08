@@ -24,7 +24,7 @@ const ProfileFairs: React.FC<ProfileFairsProps> = ({
 
 
   const fairFilter = fairs?.find(
-    (f: IFair | null | undefined) => f?.id === activeFair?.id
+    (f: IFair | undefined) => f?.id === activeFair?.id
   );
 
   const isUserInactive = userDtos?.statusGeneral === "inactive";
@@ -73,7 +73,7 @@ const ProfileFairs: React.FC<ProfileFairsProps> = ({
           <div className="w-full mt-3 sm:mt-4">
             <Dropdown
               value={selectedOption || "Selecciona una feria"}
-              options={fairs?.map((f: IFair | null | undefined) => ({
+              options={fairs?.map((f: IFair | undefined) => ({
                 id: f?.id || "",
                 name: f ? f.name : "No hay Feria disponible",
               }))}

@@ -53,7 +53,7 @@ function Welcome() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { activeFair } = useFair();
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
-  const [fairFilter, setFairFilter] = useState<IFair | null | undefined>(undefined);
+  const [fairFilter, setFairFilter] = useState<IFair>();
 
   const activeArray = [activeFair];
 
