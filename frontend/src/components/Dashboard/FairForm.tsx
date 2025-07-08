@@ -81,7 +81,7 @@ const CreateFairForm: React.FC = () => {
       });
 
       notify("ToastSuccess", "Feria concluida y todos sus datos eliminados exitosamente.");
-      setActiveFair(null); // Actualizar el contexto de la feria para que no haya una activa
+      setActiveFair(undefined); // Actualizar el contexto de la feria para que no haya una activa
       router.refresh(); // Recargar la página para reflejar los cambios (App Router)
       // O si usas Pages Router: router.push('/admin/fairs'); o router.reload();
 
