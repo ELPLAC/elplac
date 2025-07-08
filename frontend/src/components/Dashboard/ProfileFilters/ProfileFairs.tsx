@@ -24,7 +24,7 @@ const ProfileFairs: React.FC<ProfileFairsProps> = ({
 
 
   const fairFilter = fairs?.find(
-    (f: IFair | undefined) => f?.id === activeFair?.id
+    (f: IFair | null | undefined) => f?.id === activeFair?.id
   );
 
   const isUserInactive = userDtos?.statusGeneral === "inactive";
