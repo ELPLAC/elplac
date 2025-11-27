@@ -18,8 +18,8 @@ const SellerGettingActiveFair: React.FC<SellerGettingActiveFairProps> = ({
   useEffect(() => {
     const fetchSellerProducts = async () => {
       try {
-        if (activeFair && token) {
-          const products = await getProductsBySeller(sellerId, token);
+        if (activeFair && token && sellerId) {
+          const products = await getProductsBySeller(activeFair.id,sellerId, token);
           const filteredProducts = products.filter((product: IProductNotification) => {
             const belongsToActiveFairCategory = activeFair.fairCategories.some(
               (categoryFair) => categoryFair.id === product.fairCategory?.id
