@@ -124,7 +124,7 @@ export class ProductsRepository {
   
 
   async informAdminEmail(sellerId: string): Promise<void> {
-    const seller = await this.sellerRepository.findOne({ where: { id: sellerId } });
+    const seller = await this.sellerRepository.findOne({ where: { id: sellerId }, relations: ['user'] });
     const adminEmail = 'elplacarddemibebot@gmail.com'; 
   
     const htmlContent = `
