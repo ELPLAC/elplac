@@ -124,7 +124,16 @@ export class ProductsRepository {
   
 
   async informAdminEmail(sellerId: string): Promise<void> {
-    const seller = await this.sellerRepository.findOne({ where: { id: sellerId }, relations: ['user'] });
+  const seller = await this.sellerRepository.findOne({
+    where: { id: sellerId },
+    relations: ['user'],  // <-- cargar relación
+  });
+
+  if (!seller || !seller.user) {
+    throw new InternalServerErrorException(
+      'No se pudo obtener la información del vendedor'
+    );
+  }
     const adminEmail = 'elplacarddemibebot@gmail.com'; 
   
     const htmlContent = `
