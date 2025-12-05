@@ -372,6 +372,7 @@ const fetchSubmittedProductData = useCallback(async () => {
       brand: "",
       description: "",
       price: 0,
+      liquidation: "",
       ifUnsold: productsStatusEnum.unsold,
       fairId: activeFairId ?? "",
       sellerId: userId ?? "",
