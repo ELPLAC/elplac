@@ -124,109 +124,184 @@ export class ProductsRepository {
   
 
   async informAdminEmail(sellerId: string): Promise<void> {
-  // Traemos el seller incluyendo su user
-  const seller = await this.sellerRepository.findOne({
-    where: { id: sellerId },
-    relations: ['user'], // <-- IMPORTANTE
-  });
-
-  // Si no existe el seller, no enviamos mail
-  if (!seller) {
-    console.warn(`❗ No se envía email: seller ${sellerId} no encontrado`);
-    return;
-  }
-
-  // Si no tiene user asociado, tampoco enviamos email
-  if (!seller.user) {
-    console.warn(`⚠ No se envía email: seller ${sellerId} no tiene usuario vinculado todavía.`);
-    return;
-  }
-
-  // Nombre seguro (evita undefined)
-  const sellerName = seller.user?.name ?? 'Vendedora sin nombre';
-
-  const adminEmail = 'elplacarddemibebot@gmail.com'; 
-
-  const htmlContent = `
-    <!DOCTYPE html>
-    <html lang="es">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Notificación de productos enviados</title>
-        <style>
-          :root {
-            --primary-default: #79bec1;
-            --primary-light: #acdee0;
-            --primary-lighter: #def5f6;
-            --primary-dark: #4b979b;
-            --primary-darker: #2f8083;
-            --secondary-default: #ffe09f;
-            --secondary-light: #ffecc3;
-            --secondary-lighter: #fff7e6;
-            --secondary-dark: #ffd47b;
-            --secondary-darker: #d9ab4d;
-          }
-
-          body {
-            font-family: Arial, sans-serif;
-            background-color: var(--primary-lighter);
-            margin: 0;
-            padding: 0;
-          }
-
-          .container {
-            background-color: #ffffff;
-            margin: 20px auto;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
-            border: 2px solid var(--secondary-default);
-          }
-
-          h1 {
-            color: var(--primary-darker);
-            text-align: center;
-          }
-
-          p {
-            color: var(--primary-dark);
-            line-height: 1.6;
-          }
-
-          .footer {
-            text-align: center;
-            margin-top: 20px;
-            color: var(--primary-light);
-            font-size: 12px;
-          }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <h1>Notificación de productos enviados</h1>
-          <p>¡Hola!</p>
-          <p>La vendedora <strong>${sellerName}</strong> ha enviado sus productos para su evaluación y clasificación.</p>
-          <p>Por favor, revisa los productos y asegúrate de que se ajusten a los requisitos de la feria.</p>
-          <div class="footer">
-            <p>EL PLAC FERIAS.</p>
+    const seller = await this.sellerRepository.findOne({ where: { id: sellerId } });
+    const adminEmail = 'elplacarddemibebot@gmail.com'; 
+  
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html lang="es">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Notificación de productos enviados</title>
+          <style>
+            :root {
+              --primary-default: #79bec1;
+              --primary-light: #acdee0;
+              --primary-lighter: #def5f6;
+              --primary-dark: #4b979b;
+              --primary-darker: #2f8083;
+              --secondary-default: #ffe09f;
+              --secondary-light: #ffecc3;
+              --secondary-lighter: #fff7e6;
+              --secondary-dark: #ffd47b;
+              --secondary-darker: #d9ab4d;
+            }
+  
+            body {
+              font-family: Arial, sans-serif;
+              background-color: var(--primary-lighter);
+              margin: 0;
+              padding: 0;
+            }
+  
+            .container {
+              background-color: #ffffff;
+              margin: 20px auto;
+              padding: 20px;
+              border-radius: 10px;
+              box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+              max-width: 600px;
+            }
+  
+            h1 {
+              color: var(--primary-darker);
+              text-align: center;
+            }
+  
+            p {
+              color: var(--primary-dark);
+              line-height: 1.6;
+            }
+  
+            .footer {
+              text-align: center;
+              margin-top: 20px;
+              color: var(--primary-light);
+              font-size: 12px;
+            }
+  
+            .container {
+              border: 2px solid var(--secondary-default);
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <h1>Notificación de productos enviados</h1>
+            <p>¡Hola!</p>
+            <p>La vendedora <strong>${seller.user.name}</strong> ha enviado sus productos para su evaluación y clasificación.</p>
+            <p>Por favor, revisa los productos y asegúrate de que se ajusten a los requisitos de la feria.</p>
+            <div class="footer">
+              <p>EL PLAC FERIAS.</p>
+            </div>
           </div>
-        </div>
-      </body>
-    </html>
-  `;
+        </body>
+      </html>
+    `;
+  
+    try {
+      await this.mailService.sendMail({
+        to: adminEmail,  
+        subject: 'Notificación de productos enviados por vendedora',
+        html: htmlContent,  
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'Error al enviar el correo de notificación al administrador',
+      );
+    }
+  }
+  
 
-  try {
-    await this.mailService.sendMail({
-      to: adminEmail,
-      subject: 'Notificación de productos enviados por vendedora',
-      html: htmlContent,
+  async getProducts() {
+    const product = await this.productRepository.find({
+      relations: [
+        'productRequest',
+        'seller',
+        'seller.user',
+        'fairCategory',
+        'fairCategory.fair'
+      ],
     });
-  } catch (error) {
-    throw new InternalServerErrorException(
-      'Error al enviar el correo de notificación al administrador',
-    );
+    return product;
+  }
+
+  async updateStatus(id: string, updateProduct: UpdateProductDTO) {
+    const { status } = updateProduct;
+    const product = await this.productRepository.findOne({
+      where: { id },
+      relations: { productRequest: true, seller: true },
+    });
+    if (!product) {
+      throw new NotFoundException(`Producto con id ${id} no encontrado`);
+    }
+
+    product.status = status;
+    await this.productRepository.save(product);
+
+    return product;
+  }
+
+  async getProductById(id: string): Promise<Product> {
+    return await this.productRepository.findOneBy({ id });
+  }
+
+  async getSellerProducts(sellerId: string) {
+    const seller = await this.sellerRepository.findOne({
+      where: { id: sellerId },
+      relations: ['user'], 
+    });
+  
+    if (!seller) {
+      throw new Error('Seller not found'); 
+    }
+
+    const products = await this.productRepository.find({
+      where: { seller: { id: seller.id } },
+      relations: [
+        'seller',
+        'seller.user',
+        'fairCategory',
+        'fairCategory.fair',
+        'productRequest',
+      ],
+    });
+    return products;
+  }
+
+  async getProductsWithSeller(productId: string) {
+    const product = await this.productRepository.find({
+      where: { id: productId },
+      relations: { seller: true },
+    });
+
+    const sellerProduct = product.map((product) => ({
+      ...product,
+      seller: {
+        name: product.seller.user.name,
+        lastName: product.seller.user.lastname,
+      },
+    }));
+    return sellerProduct;
+  }
+
+  async getProductsByFair(fairsId: string) {
+    const fair = await this.fairRepository.findOne({ where: { id: fairsId } });
+  
+    if (!fair) {
+      throw new NotFoundException('No hay una feria activa con el ID proporcionado');
+    }
+  
+    const products = await this.productRepository.find({
+      where: { fairCategory: { fair: { id: fair.id } } },
+      relations: ['seller', 'seller.user'],
+    });
+  
+    return products;
+  }
+
+  async updateProduct(id: string, updateProduct: Partial<ProductsDto>) {
+    return await this.productRepository.update({ id }, updateProduct);
   }
 }
-
