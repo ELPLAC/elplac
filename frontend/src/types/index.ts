@@ -562,6 +562,7 @@ export interface ISellerProductRequestTableProps {
   profiles?: DropdownOption;
   activeFair?: IFair;
   sellerId: string | undefined;
+  submittedProducts: ProductProps[];
 }
 
 export interface ProductsGettedBySellerId {
