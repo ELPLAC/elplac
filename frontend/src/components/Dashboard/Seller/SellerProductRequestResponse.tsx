@@ -19,8 +19,8 @@ const SellerProductRequestResponse: React.FC<
   const { activeFair } = useFair();
 
   useEffect(() => {
-    if (activeFair && token && sellerId) {
-      getProductsBySeller(activeFair.id,sellerId, token)
+    if (activeFair) {
+      getProductsBySeller(sellerId, token)
         .then((products) => {
           const filteredProducts = products.filter(
             (product: IProductNotification) =>

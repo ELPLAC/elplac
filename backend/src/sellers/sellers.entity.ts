@@ -18,7 +18,7 @@ import { SellerStatus } from '@sellers/sellers.enum';
 export class Seller {
   @PrimaryGeneratedColumn('uuid')
   @ApiHideProperty()
-  id: string;
+  id: string = uuid();
 
   @Column()
   social_media?: string;
@@ -33,7 +33,6 @@ export class Seller {
   sku: string;
 
   @OneToOne(() => User, (user) => user.seller)
-  @JoinColumn()
   user: User;
 
   @Column({default: SellerStatus.NO_ACTIVE})

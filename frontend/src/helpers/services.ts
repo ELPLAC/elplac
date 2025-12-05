@@ -777,48 +777,24 @@ export const postCreateFair = async (fairData: FairDto, token: string) => {
 };
 
 export const getProductsBySeller = async (
-  fairId: string | undefined, // ¡Parámetro nuevo añadido!
   sellerId: string | undefined,
   token: string
 ) => {
   try {
-    // ✔ VALIDACIÓN: Asegura que ambos IDs existan antes de la llamada.
-    if (!fairId || !sellerId) {
-      console.warn("Falta fairId o sellerId para obtener productos. Retornando array vacío.");
-      // Devuelve un array vacío o un valor que tu componente pueda manejar.
-      return []; 
-    }
-
-    // CAMBIO DE RUTA: Aplicando la nueva estructura.
-    const newUrl = `${URL}/fairs/${fairId}/seller/${sellerId}/products`;
-
-    const res = await fetch(newUrl, {
+    const res = await fetch(`${URL}/products/seller/${sellerId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
     });
-
     if (!res.ok) {
-      // Intenta obtener el mensaje de error del backend si falla
-      let errorMessage = "Res was not found";
-      try {
-        const errorData = await res.json();
-        errorMessage = errorData.message || errorMessage;
-      } catch (e) {
-        // Ignorar si no es JSON
-      }
-      throw new Error(errorMessage);
+      throw new Error("Res was not found");
     }
-
     const data = await res.json();
 
     console.log("data del service al getProductBySeller", data);
     return data;
   } catch (error) {
-    // Propaga el error o maneja la lógica de caché/fallo aquí
-    // Es recomendable lanzar el error si necesitas manejarlo en el componente que llama:
-    throw error;
   }
 };

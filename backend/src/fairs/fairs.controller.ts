@@ -36,20 +36,13 @@ export class FairsController {
   
   //@Roles(Role.ADMIN)
   //@UseGuards(AuthGuard, RoleGuard)
-  @Get(':fairId/seller/:sellerId/products')
+  @Get(':sellerId/:fairId/products')
   async getProductsByIdAndFair(
-    @Param('fairId') fairId: string,
     @Param('sellerId') sellerId: string,
-) {
-  if (!fairId || fairId === 'undefined') {
-    throw new BadRequestException('fairId inválido');
+    @Param('fairId') fairId: string
+  ) {
+    return await this.fairsService.getProductsByIdAndFair(fairId, sellerId);
   }
-  if (!sellerId || sellerId === 'undefined') {
-    throw new BadRequestException('sellerId inválido');
-  }
-
-  return this.fairsService.getProductsByIdAndFair(fairId, sellerId);
-}
 
   @Roles(Role.ADMIN)
   @UseGuards(AuthGuard, RoleGuard)
