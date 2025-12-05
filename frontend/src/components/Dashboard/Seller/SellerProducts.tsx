@@ -50,13 +50,13 @@ const SellerProducts = () => {
   const minProducts = sellerCategoryFair?.minProductsSeller ?? 0;
 
   const fetchProductCount = useCallback(async () => {
-  if (!userId || !activeFairId) {
-    console.warn("No existe seller asociado a la feria o falta el fairId");
+  if (!userId) {
+    console.warn("No existe seller asociado");
     return;
   }
 
   try {
-    const response = await fetch(`${URL}/fairs/${activeFairId}/${userId}/products`, {
+    const response = await fetch(`${URL}/sellers/${userId}/products`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -69,17 +69,12 @@ const SellerProducts = () => {
     }
 
     const data = await response.json();
-
-    if (Array.isArray(data)) {
-      setProductsCountDB(() => data.length);
-    } else {
-      setError("Hubo un problema al obtener la cantidad de productos.");
-    }
+    setProductsCountDB(Array.isArray(data) ? data.length : 0);
   } catch (error) {
     console.error("Error al obtener productos:", error);
-    setError("Hubo un problema al obtener la cantidad de productos.");
   }
-}, [userId, activeFairId, token]);
+}, [userId, token]);
+
 
   
 
