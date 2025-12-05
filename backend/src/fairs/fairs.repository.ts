@@ -297,41 +297,54 @@ export class FairsRepository {
 
     fairToClose.isActive = false;
     await this.fairRepository.save(fairToClose);
-    return { message: 'Feria cerrada correctamente', fairToClose };
+  return { message: 'Feria cerrada correctamente', fairToClose };
+}
+
+async getProductsByIdAndFair(fairId: string, sellerId?: string) {
+  if (!fairId) {
+    throw new BadRequestException('El ID de la feria es obligatorio.');
   }
 
-  async getProductsByIdAndFair(fairId: string, sellerId: string) {
-    const fair = await this.fairRepository.findOne({
-      where: { id: fairId },
-      relations: {
-        fairCategories: {
-          products: {
-            seller: true
-          }
-        }
-      }
-    });
-  
-    if (!fair) {
-      throw new NotFoundException('Feria no encontrada');
-    }
-  
-    const fairCategories = Array.isArray(fair.fairCategories) 
-      ? fair.fairCategories 
-      : [fair.fairCategories];
-  
-    const products = fairCategories.flatMap(fc =>
-      fc.products.filter(product => product.seller.id === sellerId)
-    );
-  
-    return products.map(product => ({
-      id: product.id,
-      brand: product.brand,
-      status: product.status,
-      price: product.price,
-      description: product.description,
-    }));
+  // Si NO hay sellerId, devolvemos un array vacío sin romper nada
+  if (!sellerId) {
+    return [];
   }
+
+  const fair = await this.fairRepository.findOne({
+    where: { id: fairId },
+    relations: {
+      fairCategories: {
+        products: {
+          seller: true,
+        },
+      },
+    },
+  });
+
+  if (!fair) {
+    throw new NotFoundException('Feria no encontrada');
+  }
+
+  // Nos aseguramos de que sea un array siempre
+  const fairCategories = Array.isArray(fair.fairCategories)
+    ? fair.fairCategories
+    : [fair.fairCategories];
+
+  // Filtramos productos de este seller
+  const products = fairCategories.flatMap(fc =>
+    fc.products.filter(product => product.seller?.id === sellerId)
+  );
+
+  // Mapeamos solo lo que queremos enviar al front (DTO seguro)
+  return products.map(product => ({
+    id: product.id,
+    brand: product.brand,
+    status: product.status,
+    price: product.price,
+    description: product.description,
+  }));
+}
+
   
   async editAddressFair(fairId: string, newAddressFair: Partial<FairDto>) {
     const fairToEdit = await this.fairRepository.findOneBy({ id: fairId });

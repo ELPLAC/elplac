@@ -22,9 +22,10 @@ export class FairsService {
     return await this.fairsRepository.closeFair(fairId);
   }
   
-  async getProductsByIdAndFair(fairId: string, sellerId: string) {
-    return await this.fairsRepository.getProductsByIdAndFair(fairId, sellerId);
-  }
+  async getProductsByIdAndFair(fairId: string, sellerId?: string | null) {
+  return await this.fairsRepository.getProductsByIdAndFair(fairId, sellerId);
+}
+
 
   async editAddressFair(fairId: string, newAddressFair: Partial<FairDto>) {
     return await this.fairsRepository.editAddressFair(fairId, newAddressFair);
