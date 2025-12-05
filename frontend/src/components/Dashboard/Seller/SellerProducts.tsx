@@ -52,30 +52,33 @@ const SellerProducts = () => {
   const minProducts = sellerCategoryFair?.minProductsSeller ?? 0;
 
   // 🟢 CORRECCIÓN 2: Reemplazo de fetchProductCount
-  const fetchSubmittedProductData = useCallback(async () => {
-    if (!userId || !token || !activeFairId) return;
+const fetchSubmittedProductData = useCallback(async () => {
+  // Asegurarse de que todos los IDs y el token estén presentes
+  if (!userId || !token || !activeFairId) return;
 
-    try {
-      // Usar la función helper getProductsBySeller (asumiendo que es la ruta correcta)
-      const data: ProductProps[] = await getProductsBySeller(userId, token); 
-  
-      if (Array.isArray(data)) {
-        // Filtrar los productos para obtener solo los de la feria activa
-        const productsForActiveFair = data.filter(p => p.fairId === activeFairId);
+  try {
+    // LLAMADA CORREGIDA: Se pasan 3 argumentos: (fairId, sellerId, token)
+    const data: ProductProps[] = await getProductsBySeller(
+      activeFairId,
+      userId,
+      token
+    );
 
-        // Almacenar la lista completa para el componente RESUMEN
-        setSubmittedProducts(productsForActiveFair);
-        
-        // Actualizar el conteo para las validaciones
-        setProductsCountDB(productsForActiveFair.length);
-      } else {
-        setError("Hubo un problema al obtener los productos enviados.");
-      }
-    } catch (error) {
-      console.error("Error al obtener productos enviados:", error);
-      setError("Hubo un problema al obtener los productos enviados.");
-    }
-  }, [userId, activeFairId, token]);
+    if (Array.isArray(data)) {
+      // El backend ya filtra por fairId en getProductsBySeller, 
+      // así que usamos directamente los datos retornados
+      setSubmittedProducts(data);
+
+      // Actualizar el conteo para las validaciones
+      setProductsCountDB(data.length);
+    } else {
+      setError("Hubo un problema al obtener los productos enviados.");
+    }
+  } catch (error) {
+    console.error("Error al obtener productos enviados:", error);
+    setError("Hubo un problema al obtener los productos enviados.");
+  }
+}, [userId, activeFairId, token]);
   
 
   // 🟢 CORRECCIÓN 3: Reemplazar fetchProductCount por fetchSubmittedProductData
