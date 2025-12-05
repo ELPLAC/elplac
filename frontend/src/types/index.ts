@@ -224,9 +224,6 @@ export interface ProductProps {
   liquidation: string;
   status?: productsStatusEnum;
   ifUnsold?: productsStatusEnum;
-  fairId: string;
-  sellerId: string;
-  productRequestId: string;
 }
 
 export interface IForgot {
@@ -562,7 +559,6 @@ export interface ISellerProductRequestTableProps {
   profiles?: DropdownOption;
   activeFair?: IFair;
   sellerId: string | undefined;
-  submittedProducts: ProductProps[]; //
 }
 
 export interface ProductsGettedBySellerId {

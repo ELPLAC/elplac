@@ -199,7 +199,7 @@ export class ProductsRepository {
           <div class="container">
             <h1>Notificación de productos enviados</h1>
             <p>¡Hola!</p>
-            <p>La vendedora <strong>${seller.user?.name || 'Vendedora Desconocida'}</strong> ha enviado sus productos para su evaluación y clasificación.</p>
+            <p>La vendedora <strong>${seller.user.name}</strong> ha enviado sus productos para su evaluación y clasificación.</p>
             <p>Por favor, revisa los productos y asegúrate de que se ajusten a los requisitos de la feria.</p>
             <div class="footer">
               <p>EL PLAC FERIAS.</p>
