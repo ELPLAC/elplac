@@ -50,31 +50,37 @@ const SellerProducts = () => {
   const minProducts = sellerCategoryFair?.minProductsSeller ?? 0;
 
   const fetchProductCount = useCallback(async () => {
-    try {
-      const response = await fetch(`${URL}/fairs/${userId}/${activeFairId}/products`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-  
-      if (!response.ok) {
-        throw new Error("Error en la respuesta del servidor");
-      }
-  
-      const data = await response.json();
-  
-      if (Array.isArray(data)) {
-        setProductsCountDB(() => data.length);
-      } else {
-        setError("Hubo un problema al obtener la cantidad de productos.");
-      }
-    } catch (error) {
-      console.error("Error al obtener productos:", error);
+  if (!userId || !activeFairId) {
+    console.warn("No existe seller asociado a la feria o falta el fairId");
+    return;
+  }
+
+  try {
+    const response = await fetch(`${URL}/fairs/${activeFairId}/${userId}/products`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Error en la respuesta del servidor");
+    }
+
+    const data = await response.json();
+
+    if (Array.isArray(data)) {
+      setProductsCountDB(() => data.length);
+    } else {
       setError("Hubo un problema al obtener la cantidad de productos.");
     }
-  }, [userId, activeFairId, token]);
+  } catch (error) {
+    console.error("Error al obtener productos:", error);
+    setError("Hubo un problema al obtener la cantidad de productos.");
+  }
+}, [userId, activeFairId, token]);
+
   
 
   useEffect(() => {
