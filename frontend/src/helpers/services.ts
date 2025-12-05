@@ -776,18 +776,15 @@ export const postCreateFair = async (fairData: FairDto, token: string) => {
   }
 };
 
-export const getProductsBySeller = async (
-  fairId: string | undefined, // ¡Parámetro nuevo añadido!
-  sellerId: string | undefined,
-  token: string
-) => {
-  try {
-    // ✔ VALIDACIÓN: Asegura que ambos IDs existan antes de la llamada.
-    if (!fairId || !sellerId) {
-      console.warn("Falta fairId o sellerId para obtener productos. Retornando array vacío.");
-      // Devuelve un array vacío o un valor que tu componente pueda manejar.
-      return []; 
-    }
+export const getProductsBySeller = async (sellerId: string, token: string) => {
+  return await fetch(`${URL}/products/seller/${sellerId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  }).then(res => res.json());
+};
 
     // CAMBIO DE RUTA: Aplicando la nueva estructura.
     const newUrl = `${URL}/fairs/${fairId}/seller/${sellerId}/products`;
