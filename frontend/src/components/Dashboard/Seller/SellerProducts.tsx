@@ -3,7 +3,7 @@
 import { useAuth } from "@/context/AuthProvider";
 import { useProfile } from "@/context/ProfileProvider";
 import { createProductRequest, getProductsBySeller } from "@/helpers/services";
-import { ProductProps } from "@/types";
+import { ProductProps, productsStatusEnum } from "@/types";
 import React, { useState, useEffect, useCallback } from "react";
 import Navbar from "@/components/Navbar";
 import Sidebar from "../SidebarDashboard";
@@ -372,11 +372,11 @@ const fetchSubmittedProductData = useCallback(async () => {
       brand: "",
       description: "",
       price: 0,
-      ifUnsold: "LIQUIDACION",
+      ifUnsold: productsStatusEnum.unsold,
       fairId: activeFairId ?? "",
       sellerId: userId ?? "",
       productRequestId: "",
-      status: "PENDING",
+      status: productsStatusEnum.pendingVerification,
     };
 
     setProducts((prev) => [...prev, newProduct]);
