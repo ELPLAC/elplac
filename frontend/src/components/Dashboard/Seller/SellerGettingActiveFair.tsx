@@ -48,6 +48,7 @@ const SellerGettingActiveFair: React.FC<SellerGettingActiveFairProps> = ({
   const productsSoldOnClearance = productsGetted.filter((product) => product.status === "soldOnClearance");
   const totalClearanceValue = productsSoldOnClearance.reduce((total, product) => total + (product.price || 0), 0);
   const clearanceDiscounted = totalClearanceValue * 0.75;
+  const clearanceCommission = clearanceDiscounted * 0.6;
   const clearanceEarnings = clearanceDiscounted * 0.7;
 
   // Total final
@@ -89,6 +90,10 @@ const SellerGettingActiveFair: React.FC<SellerGettingActiveFairProps> = ({
               <div className="flex gap-2">
                 <p>Total en ventas (con 25% de descuento):</p>
                 <span>${clearanceDiscounted.toLocaleString("es-ES")}</span>
+              </div>
+              <div className="flex gap-2">
+                <p>Comisión plataforma (60%):</p>
+                <span>${clearanceCommission.toLocaleString("es-ES")}</span>
               </div>
               <div className="flex gap-2">
                 <p>Ganancia (70% sobre monto con descuento):</p>
