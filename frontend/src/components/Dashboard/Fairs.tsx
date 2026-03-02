@@ -106,6 +106,9 @@ const Fairs = () => {
                       <p className="text-primary-darker font-semibold text-lg">
                         ¿Participás de la liquidación?
                       </p>
+                      <p className="text-red-600 text-sm font-medium mt-2">
+                       La participación en la liquidación es obligatoria para poder inscribirte.
+                      </p>
                       <p className="text-primary-darker text-sm sm:text-base px-4 py-2 rounded-md max-w-lg mx-auto">
                         Al sumarte, tus precios se reducen un 25%, y recibirás
                         el 70% del precio de Liquidación
@@ -116,7 +119,7 @@ const Fairs = () => {
                       value={salesChecked || ""}
                       options={[
                         { id: "1", name: "si" },
-                        { id: "2", name: "no" },
+                        
                       ]}
                       onSelect={handleDropdownChange}
                       className="lg:w-full"
