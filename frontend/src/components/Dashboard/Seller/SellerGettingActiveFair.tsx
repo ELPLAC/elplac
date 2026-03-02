@@ -88,7 +88,7 @@ const SellerGettingActiveFair: React.FC<SellerGettingActiveFairProps> = ({
                 <span>{productsSoldOnClearance.length.toLocaleString("es-ES")}</span>
               </div>
               <div className="flex gap-2">
-                <p>Total en ventas (con 25% de descuento):</p>
+                <p>Total en ventas (conn 25% de descuento):</p>
                 <span>${clearanceDiscounted.toLocaleString("es-ES")}</span>
               </div>
               <div className="flex gap-2">
