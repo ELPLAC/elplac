@@ -45,7 +45,7 @@ const SellerGettingActiveFair: React.FC<SellerGettingActiveFairProps> = ({
   const seventyPercent = totalSoldValue * 0.7;
 
   // ✅ 2. NUEVA SECCIÓN: Productos vendidos Post-feria (60%)
-  const productsPostFair = productsGetted.filter((product) => product.status === "sold_post_fair");
+  const productsPostFair = productsGetted.filter((product) => (product.status as string) === "sold_post_fair");
   const totalPostFairValue = productsPostFair.reduce((total, product) => total + (product.price || 0), 0);
   const postFairEarnings = totalPostFairValue * 0.6;
 
