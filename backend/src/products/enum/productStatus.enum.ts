@@ -7,6 +7,7 @@ export enum ProductStatus {
     SECONDMARK = 'secondMark',
     PENDINGVERICATION = 'pendingVerification',
     SOLD = 'sold',
+    SOLD_POST_FAIR = 'sold_post_fair',
     SOLDONCLEARANCE = 'soldOnClearance',
     UNSOLD = 'unsold',
   }
@@ -19,6 +20,7 @@ export const ProductStatusDescription = {
     [ProductStatus.SECONDMARK]: 'Segunda marca',
     [ProductStatus.PENDINGVERICATION]: 'Pendiente de verificación',
     [ProductStatus.SOLD]: 'Vendido',
+    [ProductStatus.SOLD_POST_FAIR]: 'Vendido Post-feria',
     [ProductStatus.SOLDONCLEARANCE]: 'Vendido en descuento',
     [ProductStatus.UNSOLD]: 'No vendido',
     [ProductStatus.ACCEPTEDPLAY]: 'Aceptado PLAY',

@@ -113,6 +113,7 @@ const AdminPostFair = () => {
                     productsStatusEnum.unsold,
                     productsStatusEnum.sold,
                     productsStatusEnum.soldOnClearance,
+                    "sold_post_fair", // ✅ Agregado al filtro
                     productsStatusEnum.acceptedPlay,
                   ].includes(product.status)
                 );
@@ -169,6 +170,12 @@ const truncatedGananciasTPV = Math.trunc(truncatedTotal * 0.3);
 const priceSoledProducts = truncatedTotal.toLocaleString("es-AR");
 const gananciasTPV = truncatedGananciasTPV.toLocaleString("es-AR");
 
+// --- ✅ NUEVO: PRODUCTOS VENDIDOS POST-FERIA ---
+  const soldedPostFair = products.filter(p => p.status === "sold_post_fair").length;
+  const totalPostFairRaw = products.filter(p => p.status === "sold_post_fair").reduce((acc, p) => acc + p.price, 0);
+  const pricePostFair = Math.trunc(totalPostFairRaw).toLocaleString("es-AR");
+  const gananciasTPVPostFair = Math.trunc(totalPostFairRaw * 0.4).toLocaleString("es-AR"); // 40% para TPV porque al seller le queda 60%
+
 // --- PRODUCTOS VENDIDOS EN LIQUIDACIÓN ---
 const soldedOnClearance = products.filter(
   (product) => product.status === "soldOnClearance"
@@ -209,6 +216,7 @@ const applyLiquidation = (price: number) => {
   const actionsOptions = [
     { id: productsStatusEnum.sold, name: "Vendido" },
     { id: productsStatusEnum.soldOnClearance, name: "Vendido en liquidación" },
+    { id: "sold_post_fair", name: "Vendido Post-feria" },
     { id: productsStatusEnum.unsold, name: "No vendido" },
   ];
 
@@ -276,6 +284,7 @@ const applyLiquidation = (price: number) => {
     categoryNotApply: "No corresponde",
     secondMark: "Segunda marca",
     pendingVerification: "Pendiente de verificación",
+    sold_post_fair: "Vendido Post-feria", 
     sold: "Vendido",
     soldOnClearance: "Vendido en liquidación",
     unsold: "No vendido",
@@ -431,6 +440,27 @@ const applyLiquidation = (price: number) => {
                 <h3 className="text-[#5E5F60] text-lg">#Ventas</h3>
                 <span className="text-[#5E5F60] text-3xl font-bold">
                   {soldedProducts}
+                </span>
+              </div>
+              <div className="border border-black"></div>
+
+              {/* --- NUEVA SECCIÓN: VENDIDO POST-FERIA --- */}
+              <div>
+                <h3 className="text-purple-700 text-lg font-semibold">Monto T.P.V. Post</h3>
+                <span className="text-purple-800 text-3xl font-bold">
+                  ${pricePostFair}
+                </span>
+              </div>
+              <div>
+                <h3 className="text-purple-700 text-lg font-semibold">T. Ingreso N. Post</h3>
+                <span className="text-green-600 text-3xl font-bold">
+                  ${gananciasTPVPostFair}
+                </span>
+              </div>
+              <div>
+                <h3 className="text-purple-700 text-lg font-semibold">#Ventas Post</h3>
+                <span className="text-purple-800 text-3xl font-bold">
+                  {soldedPostFair}
                 </span>
               </div>
 

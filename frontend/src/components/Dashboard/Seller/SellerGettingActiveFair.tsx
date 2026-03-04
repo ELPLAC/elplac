@@ -25,7 +25,7 @@ const SellerGettingActiveFair: React.FC<SellerGettingActiveFairProps> = ({
               (categoryFair) => categoryFair.id === product.fairCategory?.id
             );
             const hasValidStatus = [
-              "accepted", "acceptedPlay", "sold", "unsold", "soldOnClearance"
+              "accepted", "acceptedPlay", "sold", "unsold", "soldOnClearance", "sold_post_fair" // ✅ 1. Agregado al filtro inicial
             ].includes(product.status);
             return belongsToActiveFairCategory && hasValidStatus;
           });
@@ -44,16 +44,20 @@ const SellerGettingActiveFair: React.FC<SellerGettingActiveFairProps> = ({
   const totalSoldValue = productsSold.reduce((total, product) => total + (product.price || 0), 0);
   const seventyPercent = totalSoldValue * 0.7;
 
+  // ✅ 2. NUEVA SECCIÓN: Productos vendidos Post-feria (60%)
+  const productsPostFair = productsGetted.filter((product) => product.status === "sold_post_fair");
+  const totalPostFairValue = productsPostFair.reduce((total, product) => total + (product.price || 0), 0);
+  const postFairEarnings = totalPostFairValue * 0.6;
+
   // Sección productos vendidos en liquidación
   const productsSoldOnClearance = productsGetted.filter((product) => product.status === "soldOnClearance");
   const totalClearanceValue = productsSoldOnClearance.reduce((total, product) => total + (product.price || 0), 0);
   const clearanceDiscounted = totalClearanceValue * 0.75;
-  const clearanceCommission = clearanceDiscounted * 0.6;
   const clearanceEarnings = clearanceDiscounted * 0.7;
 
-  // Total final
-  const totalProductsSold = productsSold.length + productsSoldOnClearance.length;
-  const totalGanancia = seventyPercent + clearanceEarnings;
+  // ✅ 3. Totales finales actualizados
+  const totalProductsSold = productsSold.length + productsPostFair.length + productsSoldOnClearance.length;
+  const totalGanancia = seventyPercent + postFairEarnings + clearanceEarnings;
 
   return (
     <div className="bg-secondary-lighter flex flex-col gap-4">
@@ -80,6 +84,23 @@ const SellerGettingActiveFair: React.FC<SellerGettingActiveFairProps> = ({
               </div>
             </div>
 
+            {/* ✅ 4. RENDERIZADO NUEVA SECCIÓN POST-FERIA */}
+            <div className="flex flex-col gap-2 border-l-4 border-primary-darker pl-4">
+              <h2 className="text-2xl font-semibold uppercase">🎪 PRODUCTOS VENDIDOS POST-FERIA</h2>
+              <div className="flex gap-2">
+                <p>Cantidad:</p>
+                <span>{productsPostFair.length.toLocaleString("es-ES")}</span>
+              </div>
+              <div className="flex gap-2">
+                <p>Total en ventas:</p>
+                <span>${totalPostFairValue.toLocaleString("es-ES")}</span>
+              </div>
+              <div className="flex gap-2">
+                <p>Ganancia (60%):</p>
+                <span className="font-bold text-green-700">${postFairEarnings.toLocaleString("es-ES")}</span>
+              </div>
+            </div>
+
             {/* Productos vendidos en liquidación */}
             <div className="flex flex-col gap-2">
               <h2 className="text-2xl font-semibold">🏷️ PRODUCTOS VENDIDOS EN LIQUIDACIÓN</h2>
@@ -92,25 +113,21 @@ const SellerGettingActiveFair: React.FC<SellerGettingActiveFairProps> = ({
                 <span>${clearanceDiscounted.toLocaleString("es-ES")}</span>
               </div>
               <div className="flex gap-2">
-                <p>Ganancia (60% Postventa):</p>
-                <span>${clearanceCommission.toLocaleString("es-ES")}</span>
-              </div>
-              <div className="flex gap-2">
                 <p>Ganancia (70% sobre monto con descuento):</p>
                 <span>${clearanceEarnings.toLocaleString("es-ES")}</span>
               </div>
             </div>
 
             {/* Total final */}
-            <div className="flex flex-col gap-2 border-t pt-4">
+            <div className="flex flex-col gap-2 border-t-2 border-primary-darker pt-4">
               <h2 className="text-2xl font-bold">📦 TOTAL FINAL</h2>
               <div className="flex gap-2">
                 <p>Total de productos vendidos:</p>
                 <span>{totalProductsSold.toLocaleString("es-ES")}</span>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 underline decoration-double">
                 <p>Total a recibir:</p>
-                <span>${totalGanancia.toLocaleString("es-ES")}</span>
+                <span className="font-bold text-3xl text-green-800">${totalGanancia.toLocaleString("es-ES")}</span>
               </div>
             </div>
 
