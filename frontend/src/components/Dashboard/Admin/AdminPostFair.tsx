@@ -453,7 +453,7 @@ const applyLiquidation = (price: number) => {
               </div>
               <div>
                 <h3 className="text-purple-700 text-lg font-semibold">T. Ingreso N. Post</h3>
-                <span className="text-green-600 text-3xl font-bold">
+                <span className="text-purple-800 text-3xl font-bold">
                   ${gananciasTPVPostFair}
                 </span>
               </div>
@@ -467,20 +467,20 @@ const applyLiquidation = (price: number) => {
               <div className="border border-black"></div>
 
               <div>
-                <h3 className="text-[#5E5F60] text-lg">Monto T.P.V.Liq.</h3>
-                <span className="text-[#5E5F60] text-3xl font-bold">
+                <h3 className="text-green-700 text-lg uppercase font-semibold">Monto T.P.V.Liq.</h3>
+                <span className="text-green-800 text-3xl font-bold">
                   ${totalPriceSoldOnClearanceProducts}
                 </span>
               </div>
               <div>
-                <h3 className="text-[#5E5F60] text-lg">T. Ingreso N.Liq.</h3>
-                <span className="text-[#5E5F60] text-3xl font-bold">
+                <h3 className="text-green-700 text-lg font-semibold">T. Ingreso N.Liq.</h3>
+                <span className="text-green-800 text-3xl font-bold">
                   ${gananciasTPVOnClearance}
                 </span>
               </div>
               <div>
-                <h3 className="text-[#5E5F60] text-lg">#Ventas Liq</h3>
-                <span className="text-[#5E5F60] text-3xl font-bold">
+                <h3 className="text-green-700 text-lg font-semibold">#Ventas Liq</h3>
+                <span className="text-green-800 text-3xl font-bold">
                   {soldedOnClearance}
                 </span>
               </div>
