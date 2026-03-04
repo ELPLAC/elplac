@@ -191,7 +191,7 @@ const gananciasTPVOnClearanceRaw = totalPriceSoldOnClearanceProductsRaw * 0.3;
 
 // Formateo de valores finales
 const totalPriceSoldOnClearanceProducts = totalPriceSoldOnClearanceProductsRaw.toLocaleString("es-AR");
-const gananciasTPVOnClearance = formatNumberCutDecimals(gananciasTPVOnClearanceRaw);
+const gananciasTPVOnClearance = Math.trunc(gananciasTPVOnClearanceRaw).toLocaleString("es-AR");
 
 // --- PRODUCTOS NO VENDIDOS ---
 const unSoldedProducts = products.filter(
