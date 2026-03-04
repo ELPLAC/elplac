@@ -115,7 +115,7 @@ const AdminPostFair = () => {
                     productsStatusEnum.soldOnClearance,
                     "sold_post_fair", // ✅ Agregado al filtro
                     productsStatusEnum.acceptedPlay,
-                  ].includes(product.status)
+                  ].includes(product.status as any)
                 );
               }
             );
@@ -171,8 +171,8 @@ const priceSoledProducts = truncatedTotal.toLocaleString("es-AR");
 const gananciasTPV = truncatedGananciasTPV.toLocaleString("es-AR");
 
 // --- ✅ NUEVO: PRODUCTOS VENDIDOS POST-FERIA ---
-  const soldedPostFair = products.filter(p => p.status === "sold_post_fair").length;
-  const totalPostFairRaw = products.filter(p => p.status === "sold_post_fair").reduce((acc, p) => acc + p.price, 0);
+  const soldedPostFair = products.filter(p => p.status as string === "sold_post_fair").length;
+  const totalPostFairRaw = products.filter(p => p.status as string === "sold_post_fair").reduce((acc, p) => acc + p.price, 0);
   const pricePostFair = Math.trunc(totalPostFairRaw).toLocaleString("es-AR");
   const gananciasTPVPostFair = Math.trunc(totalPostFairRaw * 0.4).toLocaleString("es-AR"); // 40% para TPV porque al seller le queda 60%
 
