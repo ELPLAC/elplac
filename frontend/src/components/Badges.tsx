@@ -83,8 +83,8 @@ const SoldOnClearance = () => {
 
 const SoldPostFair = () => {
   return (
-    <div className="flex px-2 text-nowrap items-center gap-2 font-medium rounded-2xl p-1 w-fit bg-[#E0E7FF] text-[#4338CA]">
-      <div className="w-2 h-2 bg-[#4338CA] rounded-full"></div>
+    <div className="flex px-2 text-nowrap items-center gap-2 font-medium rounded-2xl p-1 w-fit bg-cyan-100 text-cyan-800 border border-cyan-200">
+      <div className="w-2 h-2 bg-cyan-500 rounded-full animate-pulse"></div>
       Vendido Post-feria
     </div>
   );
