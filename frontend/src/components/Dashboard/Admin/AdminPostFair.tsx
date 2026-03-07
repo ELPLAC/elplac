@@ -539,121 +539,128 @@ const applyLiquidation = (price: number) => {
             </thead>
             <tbody>
               {filteredProducts.length > 0 ? (
-                filteredProducts.map((product: IProductNotification) => (
-                  <tr
-                    key={product.id}
-                    className="shadow-sm block md:table-row border-b"
-                  >
-                    <td className="px-6 py-4 text-primary-darker font-medium block md:table-cell">
-                      <span className="md:hidden font-bold">Código: </span>
-                      {product.code}
-                    </td>
-                    <td className="px-6 py-4 text-primary-darker font-medium block md:table-cell">
-                      <span className="md:hidden font-bold">Tamaño: </span>
-                      {product.size}
-                    </td>
-                    <td className="px-6 py-4 text-primary-darker font-medium block md:table-cell">
-                      <span className="md:hidden font-bold">Marca: </span>
-                      {product.brand}
-                    </td>
-                    <td className="px-6 py-4 text-primary-darker font-medium block md:table-cell">
-                      <span className="md:hidden font-bold">Descripción: </span>
-                      {product.description}
-                    </td>
-                    <td className="px-6 py-4 text-primary-darker font-medium block md:table-cell">
-                      <span className="md:hidden font-bold">Precio: </span>$
-                      {product.price}
-                    </td>
-                    <td className="px-6 py-4 text-primary-darker font-medium block md:table-cell">
-                      <span className="md:hidden font-bold">Liquidación: </span>
-                      {product.liquidation
-                        ? `$${applyLiquidation(product.price)}`
-                        : "No aplica"}
-                    </td>
-                    <td className="px-5 py-4 text-primary-darker font-medium block md:table-cell">
-                      <Dropdown
-                        onSelect={(selectedOption) =>
-                          handleSelect({
-                            id: product.id,
-                            status: selectedOption.id,
-                          })
-                        }
-                        options={actionsOptions}
-                        className="w-60"
-                        bg="bg-[#F9FAFB]"
-                        value={
-                          actionsOptions.find(
-                            (option) => option.id === product.status
-                          )?.name || "Selecciona el estado"
-                        }
-                        noId={true}
-                      />
-                    </td>
-                    <td className="px-6 py-4 text-primary-darker font-medium block md:table-cell">
-                      <span className="md:hidden font-bold">Vendedor: </span>
-                      {product.seller?.user?.name}{" "}
-                      {product.seller?.user?.lastname}
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr className="block md:table-row">
-                  <td
-                    colSpan={detailsColumns.length + 1}
-                    className="p-16 text-center"
-                  >
-                    <div className="flex flex-col gap-4 items-center justify-center">
-                      <p className="font-semibold text-2xl text-primary-dark">
-                        No se encontraron productos.
-                      </p>
-                    </div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {openModalExport && (
-          <div
-            className="fixed z-20 inset-0 flex items-center justify-center bg-black bg-opacity-50"
-            onClick={() => setOpenModalExport(false)}
+        filteredProducts.map((product: IProductNotification) => (
+          <tr
+            key={product.id}
+            className={`shadow-sm block md:table-row border-b transition-colors ${
+              product.status === "sold_post_fair" ? "bg-[#e0f7fa]" : "bg-[#f1fafa]"
+            }`}
           >
-            <div
-              className="bg-primary-lighter h-auto md:h-[40vh] w-[90%] md:w-[50vw] p-8 m-3 md:m-0 rounded-3xl relative flex items-center justify-center"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                className="absolute top-2 right-2 text-2xl font-bold text-primary-darker rounded-full"
-                onClick={() => setOpenModalExport(false)}
-              >
-                ✖
-              </button>
-              <div className="flex flex-col gap-4 justify-center items-center text-center">
-                <p className="font-bold text-2xl md:text-3xl text-primary-darker">
-                  ¿Deseas exportar la información de esta feria?
-                </p>
-                <div className="gap-4 flex">
-                  <button
-                    onClick={() => handleExport()}
-                    className="bg-primary-darker text-white w-20 p-2 rounded-lg border border-[#D0D5DD]"
-                  >
-                    Sí
-                  </button>
-                  <button
-                    onClick={() => setOpenModalExport(false)}
-                    className="bg-white text-primary-darker w-20 p-2 rounded-lg border border-[#D0D5DD]"
-                  >
-                    No
-                  </button>
-                </div>
+            <td className="px-6 py-4 text-primary-darker font-medium block md:table-cell">
+              <span className="md:hidden font-bold">Código: </span>
+              {product.code}
+            </td>
+            <td className="px-6 py-4 text-primary-darker font-medium block md:table-cell">
+              <span className="md:hidden font-bold">Tamaño: </span>
+              {product.size}
+            </td>
+            <td className="px-6 py-4 text-primary-darker font-medium block md:table-cell">
+              <span className="md:hidden font-bold">Marca: </span>
+              {product.brand}
+            </td>
+            <td className="px-6 py-4 text-primary-darker font-medium block md:table-cell">
+              <span className="md:hidden font-bold">Descripción: </span>
+              {product.description}
+            </td>
+            <td className="px-6 py-4 text-primary-darker font-medium block md:table-cell">
+              <span className="md:hidden font-bold">Precio: </span>$
+              {product.price}
+            </td>
+            <td className="px-6 py-4 text-primary-darker font-medium block md:table-cell">
+              <span className="md:hidden font-bold">Liquidación: </span>
+              {product.liquidation
+                ? `$${applyLiquidation(product.price)}`
+                : "No aplica"}
+            </td>
+            <td className="px-5 py-4 text-primary-darker font-medium block md:table-cell">
+              <div className="flex items-center gap-2">
+                {product.status === "sold_post_fair" && (
+                  <span className="w-3 h-3 rounded-full bg-cyan-500 animate-pulse" />
+                )}
+                <Dropdown
+                  onSelect={(selectedOption) =>
+                    handleSelect({
+                      id: product.id,
+                      status: selectedOption.id,
+                    })
+                  }
+                  options={actionsOptions}
+                  className="w-60"
+                  bg={product.status === "sold_post_fair" ? "bg-cyan-100" : "bg-[#F9FAFB]"}
+                  value={
+                    actionsOptions.find(
+                      (option) => option.id === product.status
+                    )?.name || "Selecciona el estado"
+                  }
+                  noId={true}
+                />
               </div>
+            </td>
+            <td className="px-6 py-4 text-primary-darker font-medium block md:table-cell">
+              <span className="md:hidden font-bold">Vendedor: </span>
+              {product.seller?.user?.name}{" "}
+              {product.seller?.user?.lastname}
+            </td>
+          </tr>
+        ))
+      ) : (
+        <tr className="block md:table-row">
+          <td
+            colSpan={detailsColumns.length + 1}
+            className="p-16 text-center"
+          >
+            <div className="flex flex-col gap-4 items-center justify-center">
+              <p className="font-semibold text-2xl text-primary-dark">
+                No se encontraron productos.
+              </p>
             </div>
-          </div>
-        )}
+          </td>
+        </tr>
+      )}
+    </tbody>
+  </table>
+</div>
+
+{openModalExport && (
+  <div
+    className="fixed z-20 inset-0 flex items-center justify-center bg-black bg-opacity-50"
+    onClick={() => setOpenModalExport(false)}
+  >
+    <div
+      className="bg-primary-lighter h-auto md:h-[40vh] w-[90%] md:w-[50vw] p-8 m-3 md:m-0 rounded-3xl relative flex items-center justify-center"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <button
+        className="absolute top-2 right-2 text-2xl font-bold text-primary-darker rounded-full"
+        onClick={() => setOpenModalExport(false)}
+      >
+        ✖
+      </button>
+      <div className="flex flex-col gap-4 justify-center items-center text-center">
+        <p className="font-bold text-2xl md:text-3xl text-primary-darker">
+          ¿Deseas exportar la información de esta feria?
+        </p>
+        <div className="gap-4 flex">
+          <button
+            onClick={() => handleExport()}
+            className="bg-primary-darker text-white w-20 p-2 rounded-lg border border-[#D0D5DD]"
+          >
+            Sí
+          </button>
+          <button
+            onClick={() => setOpenModalExport(false)}
+            className="bg-white text-primary-darker w-20 p-2 rounded-lg border border-[#D0D5DD]"
+          >
+            No
+          </button>
+        </div>
       </div>
     </div>
-  );
+  </div>
+)}
+</div>
+</div>
+);
 };
 
 export default WithAuthProtect({ Component: AdminPostFair, role: "admin" });
