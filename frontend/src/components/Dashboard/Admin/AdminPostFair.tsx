@@ -574,7 +574,8 @@ const applyLiquidation = (price: number) => {
             </td>
             <td className="px-5 py-4 text-primary-darker font-medium block md:table-cell">
               <div className="flex items-center gap-2">
-                {product.status === "sold_post_fair" && (
+                {/* Corregido con 'as string' para evitar error en línea 577 */}
+                {(product.status as string) === "sold_post_fair" && (
                   <span className="w-3 h-3 rounded-full bg-cyan-500 animate-pulse" />
                 )}
                 <Dropdown
@@ -586,7 +587,8 @@ const applyLiquidation = (price: number) => {
                   }
                   options={actionsOptions}
                   className="w-60"
-                  bg={product.status === "sold_post_fair" ? "bg-cyan-100" : "bg-[#F9FAFB]"}
+                  /* Corregido con 'as string' para el fondo del Dropdown */
+                  bg={(product.status as string) === "sold_post_fair" ? "bg-cyan-100" : "bg-[#F9FAFB]"}
                   value={
                     actionsOptions.find(
                       (option) => option.id === product.status
