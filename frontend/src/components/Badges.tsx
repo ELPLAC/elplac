@@ -2,7 +2,7 @@ import { BadgeProps, statusGeneralEnum, productsStatusEnum } from "@/types";
 
 const Accepted = () => {
   return (
-    <div className="flex px-2 text-nowrap  items-center gap-2 font-medium rounded-2xl p-1 w-fit bg-[#D0D5DD] text-[#344054]">
+    <div className="flex px-2 text-nowrap items-center gap-2 font-medium rounded-2xl p-1 w-fit bg-[#D0D5DD] text-[#344054]">
       <div className="w-2 h-2 bg-[#667085] rounded-full"></div>
       Aceptado
     </div>
@@ -18,10 +18,9 @@ const AcceptedPlay = () => {
   );
 };
 
-
 const NotAccepted = () => {
   return (
-    <div className="flex px-2 text-nowrap  items-center gap-2 font-medium rounded-2xl p-1 w-fit bg-[#F5CECE] text-[#FF0303]">
+    <div className="flex px-2 text-nowrap items-center gap-2 font-medium rounded-2xl p-1 w-fit bg-[#F5CECE] text-[#FF0303]">
       <div className="w-2 h-2 bg-[#FD0E0E] rounded-full"></div>
       No aceptado
     </div>
@@ -30,7 +29,7 @@ const NotAccepted = () => {
 
 const NotAvailable = () => {
   return (
-    <div className="flex px-2 text-nowrap  items-center gap-2 font-medium rounded-2xl p-1 w-fit bg-[#FCFE99] text-[#000000]">
+    <div className="flex px-2 text-nowrap items-center gap-2 font-medium rounded-2xl p-1 w-fit bg-[#FCFE99] text-[#000000]">
       <div className="w-2 h-2 bg-[#B3AC14] rounded-full"></div>
       No entregado
     </div>
@@ -39,7 +38,7 @@ const NotAvailable = () => {
 
 const CategoryNotApply = () => {
   return (
-    <div className="flex px-2 text-nowrap  items-center gap-2 font-medium rounded-2xl p-1 w-fit bg-[#0D08FF] text-[#FFFFFF]">
+    <div className="flex px-2 text-nowrap items-center gap-2 font-medium rounded-2xl p-1 w-fit bg-[#0D08FF] text-[#FFFFFF]">
       <div className="w-2 h-2 bg-[#FFFFFF] rounded-full"></div>
       No corresponde 
     </div>
@@ -48,7 +47,7 @@ const CategoryNotApply = () => {
 
 const SecondMark = () => {
   return (
-    <div className="flex px-2 text-nowrap  items-center gap-2 font-medium rounded-2xl p-1 w-fit bg-[#BDE7FF] text-[#0D08FC]">
+    <div className="flex px-2 text-nowrap items-center gap-2 font-medium rounded-2xl p-1 w-fit bg-[#BDE7FF] text-[#0D08FC]">
       <div className="w-2 h-2 bg-[#0D08FC] rounded-full"></div>
       Segunda marca
     </div>
@@ -57,7 +56,7 @@ const SecondMark = () => {
 
 const PendingVerification = () => {
   return (
-    <div className="flex px-2 text-nowrap  shadow  items-center gap-2 font-medium rounded-2xl p-1 w-fit bg-[#FFFFFF] text-[#000000]">
+    <div className="flex px-2 text-nowrap shadow items-center gap-2 font-medium rounded-2xl p-1 w-fit bg-[#FFFFFF] text-[#000000]">
       <div className="w-2 h-2 bg-[#000000] rounded-full"></div>
       Pendiente
     </div>
@@ -66,7 +65,7 @@ const PendingVerification = () => {
 
 const Sold = () => {
   return (
-    <div className="flex px-2 text-nowrap  items-center gap-2 font-medium rounded-2xl p-1 w-fit bg-[#ECFDF3] text-[#027A48]">
+    <div className="flex px-2 text-nowrap items-center gap-2 font-medium rounded-2xl p-1 w-fit bg-[#ECFDF3] text-[#027A48]">
       <div className="w-2 h-2 bg-[#12B76A] rounded-full"></div>
       Vendido
     </div>
@@ -75,9 +74,18 @@ const Sold = () => {
 
 const SoldOnClearance = () => {
   return (
-    <div className="flex px-2 text-nowrap  items-center gap-2 font-medium rounded-2xl p-1 w-fit bg-primary-light text-[#027A48]">
+    <div className="flex px-2 text-nowrap items-center gap-2 font-medium rounded-2xl p-1 w-fit bg-primary-light text-[#027A48]">
       <div className="w-2 h-2 bg-[#12B76A] rounded-full"></div>
       Vendido en liquidación
+    </div>
+  );
+};
+
+const SoldPostFair = () => {
+  return (
+    <div className="flex px-2 text-nowrap items-center gap-2 font-medium rounded-2xl p-1 w-fit bg-[#E0E7FF] text-[#4338CA]">
+      <div className="w-2 h-2 bg-[#4338CA] rounded-full"></div>
+      Vendido Post-feria
     </div>
   );
 };
@@ -122,8 +130,8 @@ export const Badge: React.FC<BadgeProps> = ({ type }) => {
   switch (type) {
     case productsStatusEnum.accepted:
       return <Accepted />;
-      case productsStatusEnum.acceptedPlay:
-        return <AcceptedPlay />;      
+    case productsStatusEnum.acceptedPlay:
+      return <AcceptedPlay />;      
     case productsStatusEnum.notAccepted:
       return <NotAccepted />;
     case productsStatusEnum.notAvailable:
@@ -138,6 +146,8 @@ export const Badge: React.FC<BadgeProps> = ({ type }) => {
       return <Sold />;
     case productsStatusEnum.soldOnClearance:
       return <SoldOnClearance />;
+    case "sold_post_fair": // Caso para ventas fuera de feria
+      return <SoldPostFair />;
     case productsStatusEnum.unsold:
       return <Unsold />;
     case statusGeneralEnum.active:
