@@ -543,7 +543,7 @@ const applyLiquidation = (price: number) => {
           <tr
             key={product.id}
             className={`shadow-sm block md:table-row border-b transition-colors ${
-              product.status === "sold_post_fair" ? "bg-[#e0f7fa]" : "bg-[#f1fafa]"
+              (product.status as string) === "sold_post_fair" ? "bg-[#e0f7fa]" : "bg-[#f1fafa]"
             }`}
           >
             <td className="px-6 py-4 text-primary-darker font-medium block md:table-cell">
