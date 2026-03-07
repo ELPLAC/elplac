@@ -215,8 +215,8 @@ const applyLiquidation = (price: number) => {
 
   const actionsOptions = [
     { id: productsStatusEnum.sold, name: "Vendido" },
-    { id: productsStatusEnum.soldOnClearance, name: "Vendido en liquidación" },
-    { id: "sold_post_fair", name: "Vendido Post-feria" },
+    { id: productsStatusEnum.soldOnClearance, name: "Vendido Post-feria" },
+    { id: "sold_post_fair", name: "Vendido en liquidación" },
     { id: productsStatusEnum.unsold, name: "No vendido" },
   ];
 
