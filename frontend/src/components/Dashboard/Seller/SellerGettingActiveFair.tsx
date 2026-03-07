@@ -127,7 +127,7 @@ const SellerGettingActiveFair: React.FC<SellerGettingActiveFairProps> = ({
               </div>
               <div className="flex gap-2">
                 <p>Total a recibir:</p>
-                <span className="font-bold text-3xl text-green-700">${totalGanancia.toLocaleString("es-ES")}</span>
+                <span className="font-bold text-3xl font-bold">${totalGanancia.toLocaleString("es-ES")}</span>
               </div>
             </div>
 
