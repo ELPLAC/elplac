@@ -69,7 +69,7 @@ const SellerGettingActiveFair: React.FC<SellerGettingActiveFairProps> = ({
 
             {/* Productos vendidos a precio original */}
             <div className="flex flex-col gap-2">
-              <h2 className="text-2xl font-semibold">🎪 PRODUCTOS VENDIDOS A PRECIO ORIGINAL</h2>
+              <h2 className="text-2xl font-semibold">🎪 PRODUCTOS VENDIDOS EN LA FERIA</h2>
               <div className="flex gap-2">
                 <p>Cantidad:</p>
                 <span>{productsSold.length.toLocaleString("es-ES")}</span>
