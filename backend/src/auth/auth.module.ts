@@ -41,18 +41,23 @@ dotenvConfig({ path: '.env' });
     MailerModule.forRoot({
       transport: {
         host: process.env.EMAIL_HOST,
-        port: parseInt(process.env.EMAIL_PORT, 10) || 587,
-        secure: false,
+        // CAMBIO 1: Forzamos el puerto 465 (el más seguro para Gmail)
+        port: 465, 
+        // CAMBIO 2: Ponemos secure en true (requerido para el puerto 465)
+        secure: true, 
         auth: {
           user: process.env.EMAIL,
           pass: process.env.EMAIL_PASSWORD,
+        },
+        // CAMBIO 3: Agregamos TLS para evitar rechazos de certificados
+        tls: {
+          rejectUnauthorized: false,
         },
       },
       defaults: {
         from: `"FERIAS EL PLAC" <${process.env.EMAIL}>`,
       },
     }),
-  ],
   controllers: [AuthController],
   providers: [
     AuthService,
