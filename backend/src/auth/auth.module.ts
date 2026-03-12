@@ -40,19 +40,19 @@ dotenvConfig({ path: '.env' });
     ProductsModule,
     MailerModule.forRoot({
       transport: {
-        host: process.env.EMAIL_HOST,
+        host: 'smtp.gmail.com',
         port: 465, // Forzamos puerto seguro
         secure: true, // Requerido para 465
         auth: {
-          user: process.env.EMAIL,
-          pass: process.env.EMAIL_PASSWORD, // Clave de 16 letras
+          user: 'elplacarddemibebot@gmail.com',
+          pass: 'tbdindavdkveogug', // Clave de 16 letras
         },
         tls: {
           rejectUnauthorized: false, // Evita errores de certificado
         },
       },
       defaults: {
-        from: `"FERIAS EL PLAC" <${process.env.EMAIL}>`,
+        from: `"FERIAS EL PLAC" <elplacarddemibebot@gmail.com>`,
       },
     }),
   ],
