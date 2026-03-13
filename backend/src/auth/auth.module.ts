@@ -40,21 +40,16 @@ dotenvConfig({ path: '.env' });
     ProductsModule,
     MailerModule.forRoot({
       transport: {
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false, // Debe ser false para el puerto 587
+        host: process.env.EMAIL_HOST,
+        port: parseInt(process.env.EMAIL_PORT, 10) || 587,
+        secure: false,
         auth: {
-          user: 'elplacarddemibebot@gmail.com',
-          pass: 'tbdindavdkveogug', // Clave de 16 letras pegada y sin espacios
-        },
-        tls: {
-          // Esta configuración ayuda a saltar restricciones de certificados en Railway
-          ciphers: 'SSLv3',
-          rejectUnauthorized: false,
+          user: process.env.EMAIL,
+          pass: process.env.EMAIL_PASSWORD,
         },
       },
       defaults: {
-        from: '"FERIAS EL PLAC" <elplacarddemibebot@gmail.com>',
+        from: `"FERIAS EL PLAC" <${process.env.EMAIL}>`,
       },
     }),
   ],
