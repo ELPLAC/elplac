@@ -41,18 +41,20 @@ dotenvConfig({ path: '.env' });
     MailerModule.forRoot({
       transport: {
         host: 'smtp.gmail.com',
-        port: 465, // Forzamos puerto seguro
-        secure: true, // Requerido para 465
+        port: 587,
+        secure: false, // Debe ser false para el puerto 587
         auth: {
           user: 'elplacarddemibebot@gmail.com',
-          pass: 'tbdindavdkveogug', // Clave de 16 letras
+          pass: 'tbdindavdkveogug', // Clave de 16 letras pegada y sin espacios
         },
         tls: {
-          rejectUnauthorized: false, // Evita errores de certificado
+          // Esta configuración ayuda a saltar restricciones de certificados en Railway
+          ciphers: 'SSLv3',
+          rejectUnauthorized: false,
         },
       },
       defaults: {
-        from: `"FERIAS EL PLAC" <elplacarddemibebot@gmail.com>`,
+        from: '"FERIAS EL PLAC" <elplacarddemibebot@gmail.com>',
       },
     }),
   ],
