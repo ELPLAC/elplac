@@ -41,8 +41,8 @@ dotenvConfig({ path: '.env' });
     MailerModule.forRoot({
       transport: {
         host: process.env.EMAIL_HOST,
-        port: parseInt(process.env.EMAIL_PORT, 10) || 587,
-        secure: false,
+        port: parseInt(process.env.EMAIL_PORT, 10),
+        secure: process.env.EMAIL_PORT === '465',
         auth: {
           user: process.env.EMAIL,
           pass: process.env.EMAIL_PASSWORD,
