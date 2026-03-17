@@ -53,7 +53,7 @@ const SellerData: React.FC<StepProps> = ({ setVisibleStep }) => {
     <div className="flex justify-between border-t border-primary-lighter mb-6">
       <p>Participa de la liquidación:</p>
       <p className="text-gray-400 font-normal cursor-default">
-        {fairSeller?.liquidation ? "Sí" : "No"}
+        {fairSeller?.liquidation ? "Sí" : "Si"}
       </p>
     </div>
     <div className="flex justify-between border-t border-primary-lighter mb-6">
