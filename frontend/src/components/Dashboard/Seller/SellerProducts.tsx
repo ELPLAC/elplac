@@ -424,6 +424,7 @@ const SellerProducts = () => {
                         <h1 className="font-semibold text-primary-darker text-xl sm:h-[50vh] w-full">
                           <SellerProductRequestResponse
                             sellerId={userDtos?.seller?.id}
+                            productsToPreview={products}
                           />
                         </h1>
                       </div>
