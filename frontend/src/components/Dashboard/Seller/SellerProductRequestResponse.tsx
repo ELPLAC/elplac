@@ -48,10 +48,21 @@ const SellerProductRequestResponse: React.FC<ExtendedProps> = ({
     { id: "states", label: "Estado", sortable: true },
   ];
 
-  const applyLiquidation = (price: number) => {
-    const discount = price * 0.25;
-    return price - discount;
-  };
+  const applyLiquidation = (price: any) => {
+  // 1. Convertimos a número (por si viene como string)
+  // 2. Si no es un número válido, usamos 0 como respaldo
+  const priceNum = parseFloat(price);
+  
+  if (isNaN(priceNum)) {
+    return 0;
+  }
+
+  const discount = priceNum * 0.25;
+  const finalPrice = priceNum - discount;
+
+  // Retornamos el número (puedes usar .toFixed(2) al mostrarlo en el HTML)
+  return finalPrice;
+};
 
   // Priorizamos los productos que el usuario está cargando actualmente
   // Si no hay productos en carga, mostramos los que ya están en la base de datos
