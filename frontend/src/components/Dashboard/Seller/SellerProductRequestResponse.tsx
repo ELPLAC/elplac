@@ -9,9 +9,15 @@ import { Badge } from "../../Badges";
 import { useAuth } from "@/context/AuthProvider";
 import { useFair } from "@/context/FairProvider";
 
-const SellerProductRequestResponse: React.FC<
-  ISellerProductRequestTableProps
-> = ({ sellerId }) => {
+// Extendemos la interfaz para aceptar los productos locales
+interface ExtendedProps extends ISellerProductRequestTableProps {
+  productsToPreview?: any[]; // Array de productos que el usuario está editando
+}
+
+const SellerProductRequestResponse: React.FC<ExtendedProps> = ({ 
+  sellerId, 
+  productsToPreview 
+}) => {
   const [productsGetted, setProductsGetted] = useState<
     ProductsGettedBySellerId[] | null
   >(null);
@@ -19,7 +25,7 @@ const SellerProductRequestResponse: React.FC<
   const { activeFair } = useFair();
 
   useEffect(() => {
-    if (activeFair) {
+    if (activeFair && sellerId) {
       getProductsBySeller(sellerId, token)
         .then((products) => {
           const filteredProducts = products.filter(
@@ -44,9 +50,14 @@ const SellerProductRequestResponse: React.FC<
 
   const applyLiquidation = (price: number) => {
     const discount = price * 0.25;
-    const finalPrice = price - discount;
-    return finalPrice;
+    return price - discount;
   };
+
+  // Priorizamos los productos que el usuario está cargando actualmente
+  // Si no hay productos en carga, mostramos los que ya están en la base de datos
+  const displayProducts = (productsToPreview && productsToPreview.length > 0) 
+    ? productsToPreview 
+    : productsGetted;
 
   return (
     <div className="overflow-x-auto overflow-y-auto w-full">
@@ -64,34 +75,43 @@ const SellerProductRequestResponse: React.FC<
             ))}
           </tr>
         </thead>
-  
-        {productsGetted && productsGetted.length > 0 ? (
+
+        {displayProducts && displayProducts.length > 0 ? (
           <tbody className="text-[#667085]">
-            {productsGetted.map((product) => (
+            {displayProducts.map((product, index) => (
               <tr
-                key={product.id}
+                key={product.id || index}
                 className="gap-2 mt-2 border-b border-primary-light"
               >
                 <td className="px-6 py-4">
-                  <p className="text-[#027A48] font-medium bg-[#00ff9523] rounded-full p-2">
-                    #{product.code}
+                  <p className="text-[#027A48] font-medium bg-[#00ff9523] rounded-full p-2 text-center">
+                    {product.code ? `#${product.code}` : "Pendiente"}
                   </p>
                 </td>
                 <td className="px-6 py-4 text-primary-darker font-medium">
                   <p className="truncate max-w-[555px] break-words">
                     {product.description}
                   </p>
+                  {product.brand && (
+                    <span className="text-xs text-gray-500 block">Marca: {product.brand}</span>
+                  )}
                 </td>
                 <td className="px-6 py-4 text-primary-darker font-medium">
                   ${product.price}
                 </td>
                 <td className="px-6 py-4 text-primary-darker font-medium">
-                  {product.liquidation
-                    ? `$${applyLiquidation(product.price)}`
+                  {product.liquidation || product.liquidationSelected
+                    ? `$${applyLiquidation(Number(product.price))}`
                     : "No aplica"}
                 </td>
                 <td className="px-6 py-4 text-primary-darker font-medium">
-                  <Badge type={product.status} />
+                  {product.status ? (
+                    <Badge type={product.status} />
+                  ) : (
+                    <span className="text-yellow-600 bg-yellow-100 px-2 py-1 rounded text-xs">
+                      En carga
+                    </span>
+                  )}
                 </td>
               </tr>
             ))}
@@ -111,7 +131,6 @@ const SellerProductRequestResponse: React.FC<
       </table>
     </div>
   );
-  
 };
 
 export default SellerProductRequestResponse;
