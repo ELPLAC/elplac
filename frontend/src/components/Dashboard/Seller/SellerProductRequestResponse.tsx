@@ -38,7 +38,7 @@ const SellerProductRequestResponse: React.FC<ExtendedProps> = ({
         })
         .catch((error) => {});
     }
-  }, [sellerId, token, activeFair]);
+  }, [sellerId, token, activeFair, productsToPreview]);
 
   const detailsColumns = [
     { id: "code", label: "Código", sortable: true },

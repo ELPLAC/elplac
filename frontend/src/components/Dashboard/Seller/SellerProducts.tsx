@@ -151,6 +151,7 @@ const SellerProducts = () => {
     let hasError = false;
     const newErrors: Record<string, string> = {};
 
+    // 1. Validaciones de cantidad
     if (totalProducts < minProducts) {
       setError(`Debes cargar al menos ${minProducts} productos para enviar.`);
       notify(
@@ -165,6 +166,7 @@ const SellerProducts = () => {
       return;
     }
 
+    // 2. Preparación y validación de campos de los productos
     const productsToSend: Partial<ProductProps>[] = products.map((product) => {
       const { id, ...rest } = product;
       let numericPrice: number | undefined;
@@ -214,6 +216,7 @@ const SellerProducts = () => {
       return;
     }
 
+    // 3. Envío al servidor y limpieza de estados
     try {
       await createProductRequest(
         token,
@@ -221,15 +224,26 @@ const SellerProducts = () => {
         productsToSend as ProductProps[],
         infoToPost.fairId
       );
+
+      // Limpiamos el localStorage y el array de productos locales inmediatamente
+      // Esto hará que el "Resumen" deje de mostrar "Pendiente" y use los datos de la DB
+      localStorage.removeItem(`savedProducts-${userId}`);
+      setProducts([]); 
+
+      // Refrescamos la cuenta de productos desde el servidor para sincronizar
       await fetchProductCount();
 
-      localStorage.removeItem(`savedProducts-${userId}`);
-      setProducts([]);
-
+      // Cambiamos a la pestaña de RESUMEN y limpiamos errores
       setVisibleStep("RESUMEN");
       setError(null);
+      setErrors({});
+
+      notify("ToastSuccess", "¡Productos enviados con éxito!");
+      
     } catch (error: any) {
+      console.error("Error al enviar:", error);
       setError("Hubo un problema al enviar los productos.");
+      notify("ToastError", "Hubo un problema al enviar los productos.");
     }
   };
 
