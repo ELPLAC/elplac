@@ -39,7 +39,7 @@ const AdminProducts = () => {
       Marca: product.brand,
       Talle: product.size,
       Liquidacion: product.liquidation ? "Si" : "No Aplica",
-      EstadoFinal: finalStateTranslate[product.status],
+      EstadoFinal: finalStateTranslate[product.status] || product.status,
       Vendedor: product.seller.user?.name + " " + product.seller.user?.lastname,
     }));
 
@@ -58,6 +58,7 @@ const AdminProducts = () => {
     sold: "Vendido",
     soldOnClearance: "Vendido en liquidación",
     unsold: "No vendido",
+    soldPostFair: "Vendido post feria",
   };
 
   const totalProducts = products.length || 0;
