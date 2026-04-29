@@ -58,7 +58,7 @@ const AdminProducts = () => {
     sold: "Vendido",
     soldOnClearance: "Vendido en liquidación",
     unsold: "No vendido",
-    soldPostFair: "Vendido post feria",
+    sold_post_fair: "Vendido post-feria",
   };
 
   const totalProducts = products.length || 0;
