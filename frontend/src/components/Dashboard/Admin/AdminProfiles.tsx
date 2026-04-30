@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import Papa from 'papaparse';
 import { profilesEnum, UserDto, DropdownOption } from "@/types";
 import { getAllUsers } from "@/helpers/services";
 import { useAuth } from "@/context/AuthProvider";
@@ -70,19 +71,33 @@ const AdminProfiles = () => {
   ];
 
   const handleExport = () => {
-    const filename = "usuarios.csv";
-    const data = usersFiltered.map((user) => ({
+    // 1. Determinar qué datos exportar: si no hay filtros aplicados, usar la lista completa
+    const dataToExport = usersFiltered.length > 0 ? usersFiltered : users;
+
+    // 2. Validar que existan datos antes de proceder
+    if (!dataToExport || dataToExport.length === 0) {
+      alert("No hay datos disponibles para exportar.");
+      return;
+    }
+
+    const filename = "usuarios_elplac.csv";
+
+    // 3. Mapear los datos al formato del CSV
+    const data = dataToExport.map((user) => ({
       SKU: user.seller?.sku || "-",
-      Rol: user.role,
-      Nombre: `${user.name} ${user.lastname}`,
+      Rol: user.role || "-",
+      Nombre: `${user.name || ""} ${user.lastname || ""}`.trim() || "Sin nombre",
+      Email: user.email || "-",
       FechaAlta: user.registration_date
-        ? formatDate(new Date(user.registration_date))
-        : "",
+        ? new Date(user.registration_date).toLocaleDateString("es-ES")
+        : "-",
       Estado: user.statusGeneral || "Inactivo",
     }));
 
-    const csvContent = convertToCSV(data);
+    // 4. Convertir a CSV usando PapaParse (asegúrate de tener el import arriba)
+    const csvContent = Papa.unparse(data);
 
+    // 5. Descargar el archivo
     downloadCSV(csvContent, filename);
   };
 
