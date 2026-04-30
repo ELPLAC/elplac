@@ -352,41 +352,29 @@ const AdminProfiles = () => {
                               ))}
                           </ul>
                           {(() => {
-                            const products =
-                              selectedUser.seller?.products?.filter(
-                                (product: any) =>
-                                  product.fairCategory?.fair?.id ===
-                                  registration.fair?.id
-                              ) || [];
+                            const products = selectedUser.seller?.products?.filter(
+                              (product: any) => product.fairCategory?.fair?.id === registration.fair?.id
+                            ) || [];
 
-                            const sold = products.filter(
-                              (p) => p.status === "sold"
-                            );
-                            const soldOnClearance = products.filter(
-                              (p) => p.status === "soldOnClearance"
-                            );
-                            const soldPostFair = products.filter(
-                              (p) => p.status === "soldPostFair"
-                            ); // Nuevo estado
+                            // 1. Filtrar productos por su estado de venta
+                            const sold = products.filter((p: any) => p.status === "sold");
+                            const soldOnClearance = products.filter((p: any) => p.status === "soldOnClearance");
+                            const soldPostFair = products.filter((p: any) => p.status === "soldPostFair");
 
-                            const totalSold = sold.reduce(
-                              (acc, p) => acc + p.price,
-                              0
-                            );
-                            const totalClearance = soldOnClearance.reduce(
-                              (acc, p) => acc + p.price,
-                              0
-                            );
-                            const totalPostFair = soldPostFair.reduce
-                              ((acc, p) => acc + p.price, 
-                              0
-                            );
+                            // 2. Calcular montos base
+                            const totalSold = sold.reduce((acc: number, p: any) => acc + p.price, 0);
+                            const totalClearanceBase = soldOnClearance.reduce((acc: number, p: any) => acc + p.price, 0);
+                            const totalPostFair = soldPostFair.reduce((acc: number, p: any) => acc + p.price, 0);
 
-                            const seventyPercent = totalSold * 0.7;
-                            const discounted = totalClearance * 0.75;
-                            const clearanceEarnings = discounted * 0.7;
-                            const earningsPostFair = totalPostFair * 0.6;
+                            // 3. Aplicar descuentos de liquidación (25% off -> queda el 75% del valor)
+                            const discountedClearance = totalClearanceBase * 0.75;
 
+                            // 4. Calcular Ganancias (Aquí es donde fallaba el build)
+                            const earningsNormal = totalSold * 0.7;             // 70% para el vendedor
+                            const earningsClearance = discountedClearance * 0.7;   // 70% del valor ya descontado
+                            const earningsPostFair = totalPostFair * 0.6;       // 60% para el vendedor (Regla nueva)
+
+                            // 5. Totales finales
                             const totalProductsSold = sold.length + soldOnClearance.length + soldPostFair.length;
                             const totalEarnings = earningsNormal + earningsClearance + earningsPostFair;
 
