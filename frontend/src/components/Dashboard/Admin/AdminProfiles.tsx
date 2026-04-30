@@ -385,61 +385,46 @@ const AdminProfiles = () => {
                                   {registration.fair?.name}
                                 </h3>
 
-                                <div className="text-lg text-gray-800">
-                                  <div className="mb-4">
-                                    <h4 className="text-lg font-semibold mb-1">
-                                      🛍️ A precio original
-                                    </h4>
-                                    <p>Cantidad: {sold.length}</p>
-                                    <p>
-                                      Total en ventas: $
-                                      {totalSold.toLocaleString("es-ES")}
-                                    </p>
-                                    <p>
-                                      Ganancia (70%): $
-                                      {seventyPercent.toLocaleString("es-ES")}
-                                    </p>
-                                  </div>
-                                  
-                                <div className="mt-4">
-                                  <p className="font-bold flex items-center gap-2">
-                                    <span>🛍️</span> Vendido post-feria
-                                  </p>
-                                  <p className="ml-6">Cantidad: {soldPostFairCount}</p>
-                                  <p className="ml-6">Total en ventas: ${soldPostFairTotal.toLocaleString('es-AR')}</p>
-                                  <p className="ml-6">Ganancia (70%): ${soldPostFairProfit.toLocaleString('es-AR')}</p>
-                                 </div>
-                                 
-
-                                  <div className="mb-4">
-                                    <h4 className="text-lg font-semibold mb-1">
-                                      🏷️ En liquidación
-                                    </h4>
-                                    <p>Cantidad: {soldOnClearance.length}</p>
-                                    <p>
-                                      Total con descuento: $
-                                      {discounted.toLocaleString("es-ES")}
-                                    </p>
-                                    <p>
-                                      Ganancia (70%): $
-                                      {clearanceEarnings.toLocaleString(
-                                        "es-ES"
-                                      )}
+                                {/* SECCIÓN PRECIO ORIGINAL */}
+                                  <div className="mb-4 border-b border-yellow-200 pb-2">
+                                    <h4 className="text-lg font-semibold mb-1">🛍️ A precio original</h4>
+                                    <p className="text-sm">Cantidad: {sold.length}</p>
+                                    <p className="text-sm">Total ventas: ${totalSold.toLocaleString("es-ES")}</p>
+                                    {/* AQUÍ ESTABA EL ERROR: Cambié seventyPercent por earningsNormal */}
+                                    <p className="text-sm font-medium text-green-700">
+                                      Ganancia (70%): ${earningsNormal.toLocaleString("es-ES")}
                                     </p>
                                   </div>
 
-                                  <div className="border-t pt-3">
-                                    <h4 className="text-lg font-bold">
-                                      📦 Total Final
-                                    </h4>
-                                    <p>
-                                      Productos vendidos: {totalProductsSold}
-                                    </p>
-                                    <p>
-                                      Total a recibir: $
-                                      {totalEarnings.toLocaleString("es-ES")}
+                                  {/* SECCIÓN POST-FERIA */}
+                                  <div className="mb-4 border-b border-yellow-200 pb-2">
+                                    <h4 className="text-lg font-semibold mb-1">🕒 Vendido post-feria</h4>
+                                    <p className="text-sm">Cantidad: {soldPostFair.length}</p>
+                                    <p className="text-sm">Total ventas: ${totalPostFair.toLocaleString("es-ES")}</p>
+                                    <p className="text-sm font-medium text-green-700">
+                                      Ganancia (60%): ${earningsPostFair.toLocaleString("es-ES")}
                                     </p>
                                   </div>
+
+                                  {/* SECCIÓN LIQUIDACIÓN */}
+                                  <div className="mb-4 border-b border-yellow-200 pb-2">
+                                    <h4 className="text-lg font-semibold mb-1">🏷️ En liquidación</h4>
+                                    <p className="text-sm">Cantidad: {soldOnClearance.length}</p>
+                                    <p className="text-sm">Total c/desc: ${discountedClearance.toLocaleString("es-ES")}</p>
+                                    <p className="text-sm font-medium text-green-700">
+                                      Ganancia (70%): ${earningsClearance.toLocaleString("es-ES")}
+                                    </p>
+                                  </div>
+
+                                  {/* TOTALES */}
+                                  <div className="pt-1">
+                                    <h4 className="text-xl font-bold text-primary-dark">📦 Total Final</h4>
+                                    <p>Productos vendidos: <span className="font-semibold">{totalProductsSold}</span></p>
+                                    <p className="text-2xl text-primary-darker font-bold">
+                                      Total a recibir: ${totalEarnings.toLocaleString("es-ES")}
+                                    </p>
+                                  </div>
+                                
                                 </div>
                               </div>
                             );
