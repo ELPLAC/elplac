@@ -70,33 +70,19 @@ const AdminProfiles = () => {
   ];
 
   const handleExport = () => {
-    // 1. Determinar qué datos exportar: si no hay filtros aplicados, usar la lista completa
-    const dataToExport = usersFiltered.length > 0 ? usersFiltered : users;
-
-    // 2. Validar que existan datos antes de proceder
-    if (!dataToExport || dataToExport.length === 0) {
-      alert("No hay datos disponibles para exportar.");
-      return;
-    }
-
-    const filename = "usuarios_elplac.csv";
-
-    // 3. Mapear los datos al formato del CSV
-    const data = dataToExport.map((user) => ({
+    const filename = "usuarios.csv";
+    const data = usersFiltered.map((user) => ({
       SKU: user.seller?.sku || "-",
-      Rol: user.role || "-",
-      Nombre: `${user.name || ""} ${user.lastname || ""}`.trim() || "Sin nombre",
-      Email: user.email || "-",
+      Rol: user.role,
+      Nombre: `${user.name} ${user.lastname}`,
       FechaAlta: user.registration_date
-        ? new Date(user.registration_date).toLocaleDateString("es-ES")
-        : "-",
+        ? formatDate(new Date(user.registration_date))
+        : "",
       Estado: user.statusGeneral || "Inactivo",
     }));
 
-    // 4. Convertir a CSV usando PapaParse (asegúrate de tener el import arriba)
-    const csvContent = Papa.unparse(data);
+    const csvContent = convertToCSV(data);
 
-    // 5. Descargar el archivo
     downloadCSV(csvContent, filename);
   };
 
