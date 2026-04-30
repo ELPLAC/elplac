@@ -365,6 +365,9 @@ const AdminProfiles = () => {
                             const soldOnClearance = products.filter(
                               (p) => p.status === "soldOnClearance"
                             );
+                            const soldPostFair = products.filter(
+                              (p) => p.status === "soldPostFair"
+                            ); // Nuevo estado
 
                             const totalSold = sold.reduce(
                               (acc, p) => acc + p.price,
@@ -374,15 +377,18 @@ const AdminProfiles = () => {
                               (acc, p) => acc + p.price,
                               0
                             );
+                            const totalPostFair = soldPostFair.reduce
+                              ((acc, p) => acc + p.price, 
+                              0
+                            );
 
                             const seventyPercent = totalSold * 0.7;
                             const discounted = totalClearance * 0.75;
                             const clearanceEarnings = discounted * 0.7;
+                            const earningsPostFair = totalPostFair * 0.6;
 
-                            const totalProductsSold =
-                              sold.length + soldOnClearance.length;
-                            const totalEarnings =
-                              seventyPercent + clearanceEarnings;
+                            const totalProductsSold = sold.length + soldOnClearance.length + soldPostFair.length;
+                            const totalEarnings = earningsNormal + earningsClearance + earningsPostFair;
 
                             return (
                               <div className="bg-yellow-50 p-4 rounded-lg mt-4">
@@ -414,7 +420,7 @@ const AdminProfiles = () => {
                                   <p className="ml-6">Cantidad: {soldPostFairCount}</p>
                                   <p className="ml-6">Total en ventas: ${soldPostFairTotal.toLocaleString('es-AR')}</p>
                                   <p className="ml-6">Ganancia (70%): ${soldPostFairProfit.toLocaleString('es-AR')}</p>
-                                </div>
+                                 </div>
                                  
 
                                   <div className="mb-4">
