@@ -70,19 +70,33 @@ const AdminProfiles = () => {
   ];
 
   const handleExport = () => {
+    // 1. Decidimos qué exportar: si hay filtros usamos esos, si no, usamos la lista completa
+    const dataToExport = usersFiltered.length > 0 ? usersFiltered : users;
+
+    // 2. Verificamos que haya algo para descargar
+    if (dataToExport.length === 0) {
+      alert("No hay usuarios para exportar");
+      return;
+    }
+
     const filename = "usuarios.csv";
-    const data = usersFiltered.map((user) => ({
+
+    // 3. Mapeamos los datos asegurando que no haya valores null/undefined
+    const data = dataToExport.map((user) => ({
       SKU: user.seller?.sku || "-",
-      Rol: user.role,
-      Nombre: `${user.name} ${user.lastname}`,
+      Rol: user.role || "-",
+      Nombre: `${user.name || ""} ${user.lastname || ""}`.trim() || "Sin nombre",
+      Email: user.email || "-",
       FechaAlta: user.registration_date
-        ? formatDate(new Date(user.registration_date))
-        : "",
+        ? new Date(user.registration_date).toLocaleDateString("es-ES")
+        : "-",
       Estado: user.statusGeneral || "Inactivo",
     }));
 
+    // 4. Usamos tu función manual convertToCSV
     const csvContent = convertToCSV(data);
 
+    // 5. Descargamos
     downloadCSV(csvContent, filename);
   };
 
