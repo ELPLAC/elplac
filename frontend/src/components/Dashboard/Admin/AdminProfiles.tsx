@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import Papa from 'papaparse';
 import { profilesEnum, UserDto, DropdownOption } from "@/types";
 import { getAllUsers } from "@/helpers/services";
 import { useAuth } from "@/context/AuthProvider";
