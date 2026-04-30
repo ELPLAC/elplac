@@ -406,7 +406,15 @@ const AdminProfiles = () => {
                                       {seventyPercent.toLocaleString("es-ES")}
                                     </p>
                                   </div>
-
+                                  
+                                <div className="mt-4">
+                                  <p className="font-bold flex items-center gap-2">
+                                    <span>🛍️</span> Vendido post-feria
+                                  </p>
+                                  <p className="ml-6">Cantidad: {soldPostFairCount}</p>
+                                  <p className="ml-6">Total en ventas: ${soldPostFairTotal.toLocaleString('es-AR')}</p>
+                                  <p className="ml-6">Ganancia (70%): ${soldPostFairProfit.toLocaleString('es-AR')}</p>
+                                </div>
                                  
 
                                   <div className="mb-4">
