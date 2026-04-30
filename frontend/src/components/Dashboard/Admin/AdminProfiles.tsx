@@ -407,13 +407,7 @@ const AdminProfiles = () => {
                                     </p>
                                   </div>
 
-                                  {/* NUEVO BLOQUE: Vendidos post feria */}
-                                  <div className="text-left border-r border-[#5E5F60] border-opacity-50 pr-6">
-                                    <h3 className="text-[#5E5F60] text-lg">Vendidos post feria</h3>
-                                    <span className="text-[#5E5F60] text-3xl font-bold">
-                                      {soldPostFairCount}
-                                    </span>
-                                  </div>
+                                 
 
                                   <div className="mb-4">
                                     <h4 className="text-lg font-semibold mb-1">
