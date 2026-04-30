@@ -426,7 +426,6 @@ const AdminProfiles = () => {
                                   </div>
                                 
                                 </div>
-                              </div>
                             );
                           })()}
                         </div>
