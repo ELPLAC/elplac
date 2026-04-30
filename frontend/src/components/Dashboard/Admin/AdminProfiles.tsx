@@ -387,7 +387,7 @@ const AdminProfiles = () => {
 
                                 {/* SECCIÓN PRECIO ORIGINAL */}
                                   <div className="mb-4 border-b border-yellow-200 pb-2">
-                                    <h4 className="text-lg font-semibold mb-1">🛍️ A precio original</h4>
+                                    <h4 className="text-lg font-semibold mb-1">🎪 A precio original</h4>
                                     <p className="text-sm">Cantidad: {sold.length}</p>
                                     <p className="text-sm">Total ventas: ${totalSold.toLocaleString("es-ES")}</p>
                                     {/* AQUÍ ESTABA EL ERROR: Cambié seventyPercent por earningsNormal */}
@@ -398,7 +398,7 @@ const AdminProfiles = () => {
 
                                   {/* SECCIÓN POST-FERIA */}
                                   <div className="mb-4 border-b border-yellow-200 pb-2">
-                                    <h4 className="text-lg font-semibold mb-1">🕒 Vendido post-feria</h4>
+                                    <h4 className="text-lg font-semibold mb-1">🛍️ Vendido post-feria</h4>
                                     <p className="text-sm">Cantidad: {soldPostFair.length}</p>
                                     <p className="text-sm">Total ventas: ${totalPostFair.toLocaleString("es-ES")}</p>
                                     <p className="text-sm font-medium text-green-700">
