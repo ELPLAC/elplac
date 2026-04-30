@@ -84,7 +84,7 @@ const AdminProducts = () => {
   ).length;
 
   const soldPostFairCount = products.filter(
-    (product) => product.status === "sold_post_fair"
+    (product) => (product.status as string) === "sold_post_fair"
   ).length;
 
   const unSoldProducts = products.filter(
