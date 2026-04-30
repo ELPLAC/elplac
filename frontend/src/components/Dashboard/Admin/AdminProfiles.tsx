@@ -359,7 +359,7 @@ const AdminProfiles = () => {
                             // 1. Filtrar productos por su estado de venta
                             const sold = products.filter((p: any) => p.status === "sold");
                             const soldOnClearance = products.filter((p: any) => p.status === "soldOnClearance");
-                            const soldPostFair = products.filter((p: any) => p.status === "soldPostFair");
+                            const soldPostFair = products.filter((p: any) => p.status === "sold_post_fair");
 
                             // 2. Calcular montos base
                             const totalSold = sold.reduce((acc: number, p: any) => acc + p.price, 0);
