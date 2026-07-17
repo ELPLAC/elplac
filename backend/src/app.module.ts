@@ -44,7 +44,7 @@ import { AppController } from 'app.controller';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true,
+      isGlobal: tru,
       load: [typeorm],
     }),
     TypeOrmModule.forRootAsync({
