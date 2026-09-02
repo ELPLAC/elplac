@@ -152,6 +152,10 @@ export class FairsRepository {
   }
 
   async getFairById(fairId: string): Promise<Partial<Fair>> {
+    if (!fairId || fairId === 'undefined' || fairId === 'null') {
+      throw new BadRequestException('El fairId proporcionado no es válido');
+    }
+
     const fair = await this.fairRepository.findOne({
       where: { id: fairId },
       relations: [
@@ -266,6 +270,10 @@ export class FairsRepository {
   }
 
   async closeFair(fairId: string) {
+    if (!fairId || fairId === 'undefined' || fairId === 'null') {
+      throw new BadRequestException('El fairId proporcionado no es válido');
+    }
+
     const fairToClose = await this.fairRepository.findOne({
       where: { id: fairId },
       relations: {
@@ -301,30 +309,41 @@ export class FairsRepository {
   }
 
   async getProductsByIdAndFair(fairId: string, sellerId: string) {
+    // 1. Validar parámetros para prevenir el error de PostgreSQL
+    if (!fairId || fairId === 'undefined' || fairId === 'null') {
+      throw new BadRequestException('El identificador fairId no es válido o está ausente');
+    }
+
+    if (!sellerId || sellerId === 'undefined' || sellerId === 'null') {
+      throw new BadRequestException('El identificador sellerId no es válido o está ausente');
+    }
+
     const fair = await this.fairRepository.findOne({
       where: { id: fairId },
       relations: {
         fairCategories: {
           products: {
-            seller: true
-          }
-        }
-      }
+            seller: true,
+          },
+        },
+      },
     });
-  
+
     if (!fair) {
       throw new NotFoundException('Feria no encontrada');
     }
-  
-    const fairCategories = Array.isArray(fair.fairCategories) 
-      ? fair.fairCategories 
-      : [fair.fairCategories];
-  
-    const products = fairCategories.flatMap(fc =>
-      fc.products.filter(product => product.seller.id === sellerId)
+
+    const fairCategories = Array.isArray(fair.fairCategories)
+      ? fair.fairCategories
+      : fair.fairCategories
+      ? [fair.fairCategories]
+      : [];
+
+    const products = fairCategories.flatMap((fc) =>
+      (fc.products || []).filter((product) => product?.seller?.id === sellerId),
     );
-  
-    return products.map(product => ({
+
+    return products.map((product) => ({
       id: product.id,
       brand: product.brand,
       status: product.status,
@@ -332,8 +351,12 @@ export class FairsRepository {
       description: product.description,
     }));
   }
-  
+
   async editAddressFair(fairId: string, newAddressFair: Partial<FairDto>) {
+    if (!fairId || fairId === 'undefined' || fairId === 'null') {
+      throw new BadRequestException('El fairId proporcionado no es válido');
+    }
+
     const fairToEdit = await this.fairRepository.findOneBy({ id: fairId });
 
     if (!fairToEdit) throw new NotFoundException('Feria no encontrada');
@@ -344,16 +367,21 @@ export class FairsRepository {
 
     return await this.fairRepository.save(fairToEdit);
   }
+
   async updateEntryPriceBuyer(fairId: string, entryPriceBuyer: string) {
+    if (!fairId || fairId === 'undefined' || fairId === 'null') {
+      throw new BadRequestException('El fairId proporcionado no es válido');
+    }
+
     const fair = await this.fairRepository.findOne({ where: { id: fairId } });
-  
+
     if (!fair) {
       throw new NotFoundException('Feria no encontrada');
     }
-  
+
     fair.entryPriceBuyer = entryPriceBuyer;
     await this.fairRepository.save(fair);
-  
+
     return { message: 'Precio de entrada actualizado correctamente', fair };
   }
 }

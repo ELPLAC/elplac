@@ -1,4 +1,14 @@
-import { BadRequestException, Body, Controller, Get, Param, Post, Put, UseGuards} from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 import { FairsService } from '@fairs/fairs.service';
 import { FairDto } from '@fairs/fairs.dto';
 import { AuthGuard } from '@auth/auth.guard';
@@ -23,23 +33,23 @@ export class FairsController {
   }
 
   @Get(':id')
-  async getFairById(@Param('id') fairId: string) {
+  async getFairById(@Param('id', ParseUUIDPipe) fairId: string) {
     return await this.fairsService.getFairById(fairId);
   }
 
   @Roles(Role.ADMIN)
   @UseGuards(AuthGuard, RoleGuard)
   @Put('close/:id')
-  async closeFair(@Param('id') fairId: string) {
+  async closeFair(@Param('id', ParseUUIDPipe) fairId: string) {
     return await this.fairsService.closeFair(fairId);
   }
-  
+
   //@Roles(Role.ADMIN)
   //@UseGuards(AuthGuard, RoleGuard)
   @Get(':sellerId/:fairId/products')
   async getProductsByIdAndFair(
-    @Param('sellerId') sellerId: string,
-    @Param('fairId') fairId: string
+    @Param('sellerId', ParseUUIDPipe) sellerId: string,
+    @Param('fairId', ParseUUIDPipe) fairId: string,
   ) {
     return await this.fairsService.getProductsByIdAndFair(fairId, sellerId);
   }
@@ -48,16 +58,17 @@ export class FairsController {
   @UseGuards(AuthGuard, RoleGuard)
   @Put('edit/:id')
   async editAddressFair(
-    @Param('id') fairId: string,
+    @Param('id', ParseUUIDPipe) fairId: string,
     @Body() newAddressFair: Partial<FairDto>,
   ) {
     return await this.fairsService.editAddressFair(fairId, newAddressFair);
   }
+
   @Roles(Role.ADMIN)
   @UseGuards(AuthGuard, RoleGuard)
   @Put(':id/update-entry-price-buyer')
   async updateEntryPriceBuyer(
-    @Param('id') fairId: string,
+    @Param('id', ParseUUIDPipe) fairId: string,
     @Body('entryPriceBuyer') entryPriceBuyer: string,
   ) {
     if (!entryPriceBuyer) {
@@ -66,5 +77,4 @@ export class FairsController {
 
     return this.fairsService.updateEntryPriceBuyer(fairId, entryPriceBuyer);
   }
-
 }

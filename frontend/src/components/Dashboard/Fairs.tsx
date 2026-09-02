@@ -68,7 +68,7 @@ const Fairs = () => {
                     <Dropdown
                       value={selectedOption || "Elegí una opción"}
                       options={activeArray?.map((f: IFair | undefined) => ({
-                        id: "",
+                        id: f ? f.id : "",
                         name: f ? f.name : "No hay Feria disponible",
                       }))}
                       onSelect={handleSelect}
