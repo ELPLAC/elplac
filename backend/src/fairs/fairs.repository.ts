@@ -42,7 +42,7 @@ export class FairsRepository {
     fair.entryPriceSeller = fairDto.entryPriceSeller;
     fair.entryPriceBuyer = fairDto.entryPriceBuyer.toString();
     fair.entryDescription = fairDto.entryDescription;
-    fair.isActive = true;
+    //fair.isActive = true;// 
 
     const savedFair = await this.fairRepository.save(fair);
 
