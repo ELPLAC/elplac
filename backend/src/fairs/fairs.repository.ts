@@ -135,22 +135,41 @@ export class FairsRepository {
     return await this.getFairById(savedFair.id);
   }
 
-  async getAllFairs(): Promise<Fair[]> {
-    return await this.fairRepository.find({
-      relations: [
-        'fairDays',
-        'fairDays.buyerCapacities',
-        'userRegistrations',
-        'sellerRegistrations',
-        'sellerRegistrations.categoryFair.category',
-        'sellerRegistrations.seller',
-        'fairCategories',
-        'fairCategories.category',
-        'fairCategories.products',
-        'sellerRegistrations.seller.user',
-      ],
-    });
-  }
+  // fairs.repository.ts
+
+async getAllFairs(): Promise<Fair[]> {
+  return await this.fairRepository.find({
+    relations: [
+      'fairDays',
+      'fairCategories',
+      'fairCategories.category',
+    ],
+    // Trae únicamente los datos ligeros para el listado
+    select: {
+      id: true,
+      name: true,
+      address: true,
+      isActive: true,
+      entryPriceSeller: true,
+      entryPriceBuyer: true,
+      fairDays: {
+        id: true,
+        day: true,
+        startTime: true,
+        endTime: true,
+        isClosed: true,
+      },
+      fairCategories: {
+        id: true,
+        maxSellers: true,
+        category: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  });
+}
 
   async getFairById(fairId: string): Promise<Partial<Fair>> {
     if (!fairId || fairId === 'undefined' || fairId === 'null') {
