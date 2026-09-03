@@ -215,7 +215,7 @@ export class UserRepository {
       user.registrations.push(userRegistration);
       await this.userRepository.save(user);
 
-      user.statusGeneral = UserStatusGeneral.ACTIVE;
+            user.statusGeneral = UserStatusGeneral.ACTIVE;
       await this.userRepository.save(user);
 
       const token = this.jwtService.sign(
@@ -223,7 +223,9 @@ export class UserRepository {
         { secret: process.env.JWT_SECRET },
       );
 
-      await this.sendEmailInscriptionFair(user.email, token, fair);
+      this.sendEmailInscriptionFair(user.email, token, fair).catch((err) =>
+        console.error('Error enviando mail de comprador en segundo plano:', err),
+      );
 
       return {
         status: 'success',
@@ -234,6 +236,7 @@ export class UserRepository {
           selectedHour,
           selectedDay,
         },
+
       };
     } catch (error) {
       throw error;
