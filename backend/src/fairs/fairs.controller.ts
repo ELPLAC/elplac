@@ -32,33 +32,45 @@ export class FairsController {
     return await this.fairsService.getAllFairs();
   }
 
+  // 🔴 Colocamos las rutas compuestas/específicas ANTES de la ruta genérica :id
+  @Get('products/:sellerId/:fairId')
+  async getProductsByIdAndFair(
+    @Param('sellerId', new ParseUUIDPipe({ version: '4' })) sellerId: string,
+    @Param('fairId', new ParseUUIDPipe({ version: '4' })) fairId: string,
+  ) {
+    return await this.fairsService.getProductsByIdAndFair(fairId, sellerId);
+  }
+
+  // Compatibilidad con la ruta anterior por si el frontend consume :sellerId/:fairId/productss
+  @Get(':sellerId/:fairId/products')
+  async getProductsByIdAndFairLegacy(
+    @Param('sellerId', new ParseUUIDPipe({ version: '4' })) sellerId: string,
+    @Param('fairId', new ParseUUIDPipe({ version: '4' })) fairId: string,
+  ) {
+    return await this.fairsService.getProductsByIdAndFair(fairId, sellerId);
+  }
+
   @Get(':id')
-  async getFairById(@Param('id', ParseUUIDPipe) fairId: string) {
+  async getFairById(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) fairId: string,
+  ) {
     return await this.fairsService.getFairById(fairId);
   }
 
   @Roles(Role.ADMIN)
   @UseGuards(AuthGuard, RoleGuard)
   @Put('close/:id')
-  async closeFair(@Param('id', ParseUUIDPipe) fairId: string) {
-    return await this.fairsService.closeFair(fairId);
-  }
-
-  //@Roles(Role.ADMIN)
-  //@UseGuards(AuthGuard, RoleGuard)
-  @Get(':sellerId/:fairId/products')
-  async getProductsByIdAndFair(
-    @Param('sellerId', ParseUUIDPipe) sellerId: string,
-    @Param('fairId', ParseUUIDPipe) fairId: string,
+  async closeFair(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) fairId: string,
   ) {
-    return await this.fairsService.getProductsByIdAndFair(fairId, sellerId);
+    return await this.fairsService.closeFair(fairId);
   }
 
   @Roles(Role.ADMIN)
   @UseGuards(AuthGuard, RoleGuard)
   @Put('edit/:id')
   async editAddressFair(
-    @Param('id', ParseUUIDPipe) fairId: string,
+    @Param('id', new ParseUUIDPipe({ version: '4' })) fairId: string,
     @Body() newAddressFair: Partial<FairDto>,
   ) {
     return await this.fairsService.editAddressFair(fairId, newAddressFair);
@@ -68,7 +80,7 @@ export class FairsController {
   @UseGuards(AuthGuard, RoleGuard)
   @Put(':id/update-entry-price-buyer')
   async updateEntryPriceBuyer(
-    @Param('id', ParseUUIDPipe) fairId: string,
+    @Param('id', new ParseUUIDPipe({ version: '4' })) fairId: string,
     @Body('entryPriceBuyer') entryPriceBuyer: string,
   ) {
     if (!entryPriceBuyer) {
