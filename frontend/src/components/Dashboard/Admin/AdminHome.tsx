@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
 import {
   SellerRegistrations,
   UserRegistrations,
@@ -14,15 +15,20 @@ const AdminHome = () => {
   const [userCounter, setUserCounter] = useState<UserRegistrations[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
 
+  const safeFairs = Array.isArray(fairs) ? fairs : [];
 
-  const filteredFairs = fairs.filter((fair) =>
-    fair.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredFairs = safeFairs.filter((fair) =>
+    fair?.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   useEffect(() => {
     if (activeFair) {
-      const sellers = activeFair.sellerRegistrations;
-      const users = activeFair.userRegistrations;
+      const sellers = Array.isArray(activeFair.sellerRegistrations)
+        ? activeFair.sellerRegistrations
+        : [];
+      const users = Array.isArray(activeFair.userRegistrations)
+        ? activeFair.userRegistrations
+        : [];
 
       setSellerCounter(sellers);
       setUserCounter(users);
@@ -40,20 +46,20 @@ const AdminHome = () => {
                   Feria activa: {activeFair?.name || "Feria activa"}
                 </h1>
                 <div className="flex gap-4"></div>
-                <a
+                <Link
                   href="/admin/postFair"
                   className="w-full md:w-30 mt-5 mb-5 bg-white flex items-center justify-center text-primary-darker gap-2 p-2 border border-[#D0D5DD] rounded-lg hover:bg-primary-darker hover:text-white hover:shadow-md transition duration-200"
                 >
                   <FaCheckCircle />
                   Administrar feria
-                </a>
-                <a
+                </Link>
+                <Link
                   href="/admin/products"
                   className="w-full md:w-45 mb-5 bg-white flex items-center justify-center text-primary-darker gap-2 p-2 border border-[#D0D5DD] rounded-lg hover:bg-primary-darker hover:text-white hover:shadow-md transition duration-200"
                 >
                   <FaCheckCircle />
                   Ver productos
-                </a>
+                </Link>
                 <div />
                 <div className="flex flex-col md:flex-row gap-6">
                   <div>
@@ -76,13 +82,13 @@ const AdminHome = () => {
                 <h1 className="font-semibold text-primary-darker text-lg md:text-xl">
                   ¡No hay Ferias Activas! Creá una feria para comenzar...
                 </h1>
-                <a
+                <Link
                   href="/admin/fairs"
                   className="w-full md:w-45 mt-5 mb-5 bg-white flex items-center justify-center text-primary-darker gap-2 p-2 border border-[#D0D5DD] rounded-lg hover:bg-primary-darker hover:text-white hover:shadow-md transition duration-200"
                 >
-                   <FaCheckCircle />
+                  <FaCheckCircle />
                   Crear feria
-                </a>
+                </Link>
               </div>
             )}
           </div>
@@ -91,7 +97,7 @@ const AdminHome = () => {
       
       <div className="row-span-3 mb-5 col-span-2 rounded-lg bg-[#f1fafa]">
         <div className="w-full h-full flex p-4 md:p-6 flex-col overflow-y-auto max-h-[600px] md:max-h-[900px]">
-          {fairs.length > 0 ? (
+          {safeFairs.length > 0 ? (
             <>
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
                 <h1 className="font-semibold text-primary-darker text-lg md:text-xl">
@@ -122,68 +128,90 @@ const AdminHome = () => {
                 </div>
               </div>
               {filteredFairs.length > 0 ? (
-                filteredFairs.map((fair) => (
-                  <div
-                    key={fair.id}
-                    className="shadow-lg flex flex-col font-semibold rounded-lg p-4 mt-4"
-                  >
-                    <h3 className="text-[#5E5F60] text-lg border-b border-primary-default mb-2">
-                      {fair.name}
-                    </h3>
-                    <span className="text-[#5E5F60] text-lg font-normal">
-                      {fair.isActive ? "Activa" : "Cerrada"}
-                    </span>
-                    <span className="text-[#5E5F60] text-lg font-normal">
-                      {fair.sellerRegistrations.length} vendedores
-                    </span>
-                    <span className="text-[#5E5F60] text-lg font-normal">
-                      {fair.userRegistrations.length} usuarios
-                    </span>
-                    <span className="text-[#5E5F60] text-lg font-normal">
-                      {fair.fairDays.length} Días de feria
-                    </span>
-                    <div className="text-[#5E5F60] text-lg font-normal">
-                      {fair.fairCategories.map((category, index) => {
-                        const soldCount = category.products.filter(
-                          (product) => product.status === "sold"
-                        ).length;
+                filteredFairs.map((fair) => {
+                  const safeSellerRegs = Array.isArray(fair?.sellerRegistrations)
+                    ? fair.sellerRegistrations
+                    : [];
+                  const safeUserRegs = Array.isArray(fair?.userRegistrations)
+                    ? fair.userRegistrations
+                    : [];
+                  const safeFairDays = Array.isArray(fair?.fairDays)
+                    ? fair.fairDays
+                    : [];
+                  const safeFairCategories = Array.isArray(fair?.fairCategories)
+                    ? fair.fairCategories
+                    : [];
 
-                        const unsoldCount = category.products.filter(
-                          (product) => product.status === "unsold"
-                        ).length;
-
-                        const soldOnClearanceCount = category.products.filter(
-                          (product) => product.status === "soldOnClearance"
-                        ).length;
-
-                        return (
-                          <span
-                            key={`${category.category.name}-${index}`}
-                            className="block"
-                          >
-                            Categoría: {category.category.name}, {soldCount}{" "}
-                            vendidos, {unsoldCount} no vendidos,{" "}
-                            {soldOnClearanceCount} vendidos en liquidación
-                          </span>
-                        );
-                      })}
-
-                      <span className="block font-bold">
-                        Total de productos vendidos:{" "}
-                        {fair.fairCategories.reduce((total, category) => {
-                          return (
-                            total +
-                            category.products.filter(
-                              (product) =>
-                                product.status === "sold" ||
-                                product.status === "soldOnClearance"
-                            ).length
-                          );
-                        }, 0)}
+                  return (
+                    <div
+                      key={fair.id}
+                      className="shadow-lg flex flex-col font-semibold rounded-lg p-4 mt-4"
+                    >
+                      <h3 className="text-[#5E5F60] text-lg border-b border-primary-default mb-2">
+                        {fair.name}
+                      </h3>
+                      <span className="text-[#5E5F60] text-lg font-normal">
+                        {fair.isActive ? "Activa" : "Cerrada"}
                       </span>
+                      <span className="text-[#5E5F60] text-lg font-normal">
+                        {safeSellerRegs.length} vendedores
+                      </span>
+                      <span className="text-[#5E5F60] text-lg font-normal">
+                        {safeUserRegs.length} usuarios
+                      </span>
+                      <span className="text-[#5E5F60] text-lg font-normal">
+                        {safeFairDays.length} Días de feria
+                      </span>
+                      <div className="text-[#5E5F60] text-lg font-normal">
+                        {safeFairCategories.map((category, index) => {
+                          const safeProducts = Array.isArray(category?.products)
+                            ? category.products
+                            : [];
+
+                          const soldCount = safeProducts.filter(
+                            (product) => product?.status === "sold"
+                          ).length;
+
+                          const unsoldCount = safeProducts.filter(
+                            (product) => product?.status === "unsold"
+                          ).length;
+
+                          const soldOnClearanceCount = safeProducts.filter(
+                            (product) => product?.status === "soldOnClearance"
+                          ).length;
+
+                          return (
+                            <span
+                              key={`${category?.category?.name || "cat"}-${index}`}
+                              className="block"
+                            >
+                              Categoría: {category?.category?.name || "General"}, {soldCount}{" "}
+                              vendidos, {unsoldCount} no vendidos,{" "}
+                              {soldOnClearanceCount} vendidos en liquidación
+                            </span>
+                          );
+                        })}
+
+                        <span className="block font-bold">
+                          Total de productos vendidos:{" "}
+                          {safeFairCategories.reduce((total, category) => {
+                            const safeProducts = Array.isArray(category?.products)
+                              ? category.products
+                              : [];
+                            return (
+                              total +
+                              safeProducts.filter(
+                                (product) =>
+                                  product?.status === "sold" ||
+                                  product?.status === "soldOnClearance"
+                              ).length
+                            );
+                          }, 0)}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               ) : (
                 <div className="w-full h-full pb-40 text-center">
                   <h1 className="font-semibold text-primary-darker text-lg md:text-xl">
