@@ -146,40 +146,6 @@ export class FairsRepository {
     .loadRelationCountAndMap('fair.userCount', 'fair.userRegistrations')
     .getMany();
 }
-      select: {
-        id: true,
-        name: true,
-        address: true,
-        isActive: true,
-        entryPriceSeller: true,
-        entryPriceBuyer: true,
-        entryDescription: true,
-        fairDays: {
-          id: true,
-          day: true,
-          startTime: true,
-          endTime: true,
-          isClosed: true,
-          buyerCapacities: {
-            id: true,
-            hour: true,
-            capacity: true,
-          },
-        },
-        fairCategories: {
-          id: true,
-          maxProductsSeller: true,
-          minProductsSeller: true,
-          maxSellers: true,
-          maxProducts: true,
-          category: {
-            id: true,
-            name: true,
-          },
-        },
-      },
-    });
-  }
 
   async getFairById(fairId: string): Promise<Partial<Fair>> {
     if (!fairId || fairId === 'undefined' || fairId === 'null') {
