@@ -159,7 +159,10 @@ export class SellerRepository {
       user.statusGeneral = UserStatusGeneral.ACTIVE;
       await this.usersRepository.save(user);
 
-      await this.sendEmailVerification(seller.user.email);
+       this.sendEmailVerification(seller.user.email).catch((err) =>
+        console.error('Error enviando mail en segundo plano:', err),
+      );
+
       return 'Vendedor registrado correctamente';
     } catch (error) {
       if (
