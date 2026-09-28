@@ -19,18 +19,42 @@ export const FairProvider: React.FC<IFairProviderProps> = ({ children }) => {
   useEffect(() => {
     const fetchFair = async () => {
       try {
-        const res: IFair[] = await getFair();
-        if (Array.isArray(res)) {
-          setFairs(res);
-          setActiveFair(res.find((fair: IFair) => fair.isActive === true));
+        const res = await getFair();
+        
+        // ✅ Proteccion estricta contra respuestas nulas/undefined
+        const safeFairs: IFair[] = Array.isArray(res) ? res : [];
+        setFairs(safeFairs);
+
+        // ✅ Busqueda segura con optional chaining
+        const active = safeFairs.find((fair: IFair) => fair?.isActive === true);
+
+        if (active?.id) {
+          try {
+            // Cargar el detalle completo de la feria activa para obtener sus relaciones reales
+            const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+            const response = await fetch(`${API_URL}/fairs/${active.id}`);
+            
+            if (response.ok) {
+              const fullActiveFair: IFair = await response.json();
+              setActiveFair(fullActiveFair);
+            } else {
+              setActiveFair(active);
+            }
+          } catch {
+            setActiveFair(active);
+          }
         } else {
+          setActiveFair(undefined);
         }
       } catch (error) {
+        console.error("Error al obtener las ferias:", error);
+        setFairs([]);
+        setActiveFair(undefined);
       }
     };
+
     fetchFair();
-  }, [ ]);
-  
+  }, []);
 
   return (
     <FairContext.Provider
@@ -44,7 +68,8 @@ export const FairProvider: React.FC<IFairProviderProps> = ({ children }) => {
         dateSelect,
         fairSelected,
         setFairSelected,
-      }}>
+      }}
+    >
       {children}
     </FairContext.Provider>
   );
@@ -53,7 +78,7 @@ export const FairProvider: React.FC<IFairProviderProps> = ({ children }) => {
 export const useFair = () => {
   const context = useContext(FairContext);
   if (!context) {
-    throw new Error("useAuth must be used within an FairContext");
+    throw new Error("useFair must be used within a FairContext");
   }
   return context;
 };
