@@ -136,13 +136,16 @@ export class FairsRepository {
   }
 
   async getAllFairs(): Promise<Fair[]> {
-    return await this.fairRepository.find({
-      relations: [
-        'fairDays',
-        'fairDays.buyerCapacities',
-        'fairCategories',
-        'fairCategories.category',
-      ],
+  return await this.fairRepository
+    .createQueryBuilder('fair')
+    .leftJoinAndSelect('fair.fairDays', 'fairDays')
+    .leftJoinAndSelect('fairDays.buyerCapacities', 'buyerCapacities')
+    .leftJoinAndSelect('fair.fairCategories', 'fairCategories')
+    .leftJoinAndSelect('fairCategories.category', 'category')
+    .loadRelationCountAndMap('fair.sellerCount', 'fair.sellerRegistrations')
+    .loadRelationCountAndMap('fair.userCount', 'fair.userRegistrations')
+    .getMany();
+}
       select: {
         id: true,
         name: true,
