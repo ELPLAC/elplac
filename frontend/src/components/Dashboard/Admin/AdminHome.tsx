@@ -65,14 +65,14 @@ const AdminHome = () => {
                   <div>
                     <h3 className="text-[#5E5F60] text-lg">Usuarios</h3>
                     <span className="text-[#5E5F60] text-2xl md:text-3xl font-bold">
-                      {userCounter?.length || 0}
+                      {(activeFair as any)?.userCount ?? userCounter?.length ?? 0}
                     </span>
                   </div>
                   <div className="text-[#5E5F60] text-2xl md:text-3xl font-bold"></div>
                   <div>
                     <h3 className="text-[#5E5F60] text-lg">Vendedores</h3>
                     <span className="text-[#5E5F60] text-2xl md:text-3xl font-bold">
-                      {sellerCounter?.length || 0}
+                      {(activeFair as any)?.sellerCount ?? sellerCounter?.length ?? 0}
                     </span>
                   </div>
                 </div>
@@ -154,10 +154,10 @@ const AdminHome = () => {
                         {fair.isActive ? "Activa" : "Cerrada"}
                       </span>
                       <span className="text-[#5E5F60] text-lg font-normal">
-                        {safeSellerRegs.length} vendedores
+                        {(fair as any)?.sellerCount ?? safeSellerRegs.length} vendedores
                       </span>
                       <span className="text-[#5E5F60] text-lg font-normal">
-                        {safeUserRegs.length} usuarios
+                        {(fair as any)?.userCount ?? safeUserRegs.length} usuarios
                       </span>
                       <span className="text-[#5E5F60] text-lg font-normal">
                         {safeFairDays.length} Días de feria
