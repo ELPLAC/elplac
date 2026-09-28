@@ -140,15 +140,47 @@ export class FairsRepository {
       relations: [
         'fairDays',
         'fairDays.buyerCapacities',
-        'userRegistrations',
-        'sellerRegistrations',
-        'sellerRegistrations.categoryFair.category',
-        'sellerRegistrations.seller',
+        //'userRegistrations',//
+        //'sellerRegistrations',
+        //'sellerRegistrations.categoryFair.category',
+        //'sellerRegistrations.seller',
         'fairCategories',
         'fairCategories.category',
-        'fairCategories.products',
-        'sellerRegistrations.seller.user',
+        //'fairCategories.products',
+        //'sellerRegistrations.seller.user',
       ],
+      select: { 
+        id: true,
+        name: true,
+        address: true,
+        isActive: true,
+        entryPriceSeller: true,
+        entryPriceBuyer: true,
+        entryDescription: true,
+        fairDays: {
+          id: true,
+          day: true,
+          startTime: true,
+          endTime: true,
+          isClosed: true,
+          buyerCapacities: {
+            id: true,
+            hour: true,
+            capacity: true,
+          },
+        },
+        fairCategories: {
+          id: true,
+          maxProductsSeller: true,
+          minProductsSeller: true,
+          maxSellers: true,
+          maxProducts: true,
+          category: {
+            id: true,
+            name: true,
+          },
+        },
+      },
     });
   }
 
