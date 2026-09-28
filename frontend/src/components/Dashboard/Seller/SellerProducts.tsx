@@ -125,7 +125,7 @@ const SellerProducts = () => {
       try {
         const isUserRegistered =
           sellerDtos?.status === "active" &&
-          sellerDtos?.registrations &&
+          Array.isArray(sellerDtos?.registrations) &&
           sellerDtos.registrations.length > 0 &&
           sellerDtos.registrations.some(
             (registration) => registration.fair.id === activeFair?.id
@@ -143,6 +143,7 @@ const SellerProducts = () => {
           }, 300);
         }
       } catch (error) {
+        console.error("Error al verificar el registro del usuario:", error);
         setIsLoading(false);
       }
     };

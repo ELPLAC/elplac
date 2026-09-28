@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import Link from "next/link";
 import SidebarDashboard from "./SidebarDashboard";
 import { useProfile } from "@/context/ProfileProvider";
 import Dropdown from "../Dropdown";
@@ -41,6 +42,24 @@ const Fairs = () => {
   const isSellerInactive = userDtos?.seller?.status === "no_active";
   const isUserInactive = userDtos?.statusGeneral === "inactive";
 
+  // Opciones seguras para el Dropdown de ferias
+  const fairOptions = activeArray
+    ?.filter((f): f is IFair => Boolean(f && f.id))
+    .map((f: IFair) => ({
+      id: f.id,
+      name: f.name,
+    }));
+
+  const dropdownFairOptions =
+    fairOptions && fairOptions.length > 0
+      ? fairOptions
+      : [{ id: "", name: "No hay Feria disponible" }];
+
+  // Registros seguros para evitar crashes
+  const sellerRegistrations = Array.isArray(userDtos?.seller?.registrations)
+    ? userDtos.seller.registrations
+    : [];
+
   return (
     <div className="bg-secondary-lighter h-full">
       <div className="w-full h-32 flex items-center bg-primary-lighter">
@@ -67,10 +86,7 @@ const Fairs = () => {
                     </h2>
                     <Dropdown
                       value={selectedOption || "Elegí una opción"}
-                      options={activeArray?.map((f: IFair | undefined) => ({
-                        id: f ? f.id : "",
-                        name: f ? f.name : "No hay Feria disponible",
-                      }))}
+                      options={dropdownFairOptions}
                       onSelect={handleSelect}
                       className="lg:w-full z-20"
                     />
@@ -79,12 +95,15 @@ const Fairs = () => {
                     </h2>
                     <Dropdown
                       value={selectedOptionCategory || "Elegí una opción"}
-                      options={categoriesArray
-                        ?.filter((c: FairCategories) => c.maxSellers > 0)
-                        .map((c: FairCategories) => ({
-                          id: c.id,
-                          name: c.category?.name || "Categoría no disponible",
-                        }))}
+                      options={
+                        categoriesArray
+                          ?.filter((c: FairCategories) => c.maxSellers > 0)
+                          .map((c: FairCategories) => ({
+                            id: c.id,
+                            name:
+                              c.category?.name || "Categoría no disponible",
+                          })) || []
+                      }
                       onSelect={handleSelectCategory}
                       className="lg:w-full"
                     />
@@ -107,7 +126,8 @@ const Fairs = () => {
                         ¿Participás de la liquidación?
                       </p>
                       <p className="text-red-600 text-sm font-medium mt-2">
-                       La participación en la liquidación es obligatoria para poder inscribirte.
+                        La participación en la liquidación es obligatoria para
+                        poder inscribirte.
                       </p>
                       <p className="text-primary-darker text-sm sm:text-base px-4 py-2 rounded-md max-w-lg mx-auto">
                         Al sumarte, tus precios se reducen un 25%, y recibirás
@@ -117,10 +137,7 @@ const Fairs = () => {
 
                     <Dropdown
                       value={salesChecked || ""}
-                      options={[
-                        { id: "1", name: "si" },
-                        
-                      ]}
+                      options={[{ id: "1", name: "si" }]}
                       onSelect={handleDropdownChange}
                       className="lg:w-full"
                     />
@@ -135,8 +152,7 @@ const Fairs = () => {
                         href={fairDescription || "#"}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-600 shadow-md rounded-lg h-full block 
-                   overflow-auto break-words p-4 hover:underline hover:text-primary-darker-dark"
+                        className="text-blue-600 shadow-md rounded-lg h-full block overflow-auto break-words p-4 hover:underline hover:text-primary-darker-dark"
                       >
                         {fairDescription || "Selecciona una feria"}
                       </a>
@@ -168,9 +184,12 @@ const Fairs = () => {
                 ¡Ya te registraste para vender! 🎉
               </h1>
               <div className="bg-transparent w-full sm:w-2/3 lg:w-1/3 shadow-lg rounded-lg p-6">
-                {userDtos?.seller?.registrations
-                  ?.filter(
-                    (fairRegistred) => fairRegistred.fair?.id === activeFair?.id
+                {sellerRegistrations
+                  .filter(
+                    (fairRegistred) =>
+                      fairRegistred?.fair?.id &&
+                      activeFair?.id &&
+                      fairRegistred.fair.id === activeFair.id
                   )
                   .map((fairRegistred) => (
                     <div
@@ -184,12 +203,12 @@ const Fairs = () => {
                         * Ve a la pestaña de productos y comienza a cargar tus
                         artículos
                       </p>
-                      <a
+                      <Link
                         href="/dashboard/products"
                         className="mt-4 px-4 py-2 w-fit m-auto text-white rounded-md hover:bg-primary-dark bg-primary-darker text-center"
                       >
                         Ir ahora
-                      </a>
+                      </Link>
                     </div>
                   ))}
               </div>
