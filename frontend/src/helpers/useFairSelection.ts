@@ -17,10 +17,23 @@ const useFairSelection = () => {
 
   useEffect(() => {
     if (selectedOption) {
-      const fairSelectedPerUser = fairs.find((f) => f.name === selectedOption);
+      // ✅ Garantizamos que fairs sea un arreglo antes de invocar .find()
+      const safeFairs = Array.isArray(fairs) ? fairs : [];
+      const fairSelectedPerUser = safeFairs.find(
+        (f) => f && f.name === selectedOption
+      );
+
       if (fairSelectedPerUser) {
-        setCategoriesArray(fairSelectedPerUser?.fairCategories);
-        setFairDescription(fairSelectedPerUser?.entryDescription);
+        // ✅ Aseguramos que fairCategories sea un arreglo válido
+        const safeCategories = Array.isArray(fairSelectedPerUser?.fairCategories)
+          ? fairSelectedPerUser.fairCategories
+          : [];
+
+        setCategoriesArray(safeCategories);
+        setFairDescription(fairSelectedPerUser?.entryDescription || null);
+      } else {
+        setCategoriesArray([]);
+        setFairDescription(null);
       }
     } else {
       setCategoriesArray(null);
@@ -29,12 +42,16 @@ const useFairSelection = () => {
   }, [selectedOption, fairs]);
 
   const handleSelect = (option: DropdownOption) => {
-    setSelectedOption(option.name);
+    if (option?.name) {
+      setSelectedOption(option.name);
+    }
   };
 
   const handleSelectCategory = (option: { id: string; name: string }) => {
-    setSelectedOptionCategory(option.name);
-    console.log(option.name);
+    if (option?.name) {
+      setSelectedOptionCategory(option.name);
+      console.log(option.name);
+    }
   };
 
   return {
