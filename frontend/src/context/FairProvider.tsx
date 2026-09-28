@@ -1,6 +1,6 @@
 "use client";
 import { getFair } from "@/helpers/services";
-import { URL } from "@/envs"; // O la ruta correcta donde tengas envs.ts (ej: "@/envs")
+import { URL } from "@/envs";
 import {
   IFair,
   IFairContext,
@@ -22,11 +22,11 @@ export const FairProvider: React.FC<IFairProviderProps> = ({ children }) => {
       try {
         const res = await getFair();
         
-        // Proteccion estricta contra respuestas nulas/undefined
+        // Protección estricta contra respuestas nulas/undefined
         const safeFairs: IFair[] = Array.isArray(res) ? res : [];
         setFairs(safeFairs);
 
-        // Busqueda segura de feria activa
+        // Búsqueda segura de feria activa
         const active = safeFairs.find((fair: IFair) => fair?.isActive === true);
 
         if (active?.id) {
