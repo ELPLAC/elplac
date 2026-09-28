@@ -42,7 +42,7 @@ export class FairsRepository {
     fair.entryPriceSeller = fairDto.entryPriceSeller;
     fair.entryPriceBuyer = fairDto.entryPriceBuyer.toString();
     fair.entryDescription = fairDto.entryDescription;
-    //fair.isActive = true;// 
+    fair.isActive = true; // ✅ Activado para que aparezca en el panel de inmediato
 
     const savedFair = await this.fairRepository.save(fair);
 
@@ -140,16 +140,10 @@ export class FairsRepository {
       relations: [
         'fairDays',
         'fairDays.buyerCapacities',
-        //'userRegistrations',//
-        //'sellerRegistrations',
-        //'sellerRegistrations.categoryFair.category',
-        //'sellerRegistrations.seller',
         'fairCategories',
         'fairCategories.category',
-        //'fairCategories.products',
-        //'sellerRegistrations.seller.user',
       ],
-      select: { 
+      select: {
         id: true,
         name: true,
         address: true,
@@ -342,7 +336,6 @@ export class FairsRepository {
   }
 
   async getProductsByIdAndFair(fairId: string, sellerId: string) {
-    // 1. Validar parámetros para prevenir el error de PostgreSQL
     if (!fairId || fairId === 'undefined' || fairId === 'null') {
       throw new BadRequestException('El identificador fairId no es válido o está ausente');
     }
