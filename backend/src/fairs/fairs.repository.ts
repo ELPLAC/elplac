@@ -42,7 +42,7 @@ export class FairsRepository {
     fair.entryPriceSeller = fairDto.entryPriceSeller;
     fair.entryPriceBuyer = fairDto.entryPriceBuyer.toString();
     fair.entryDescription = fairDto.entryDescription;
-    fair.isActive = true; // ✅ Activado para que aparezca en el panel de inmediato
+    fair.isActive = true;
 
     const savedFair = await this.fairRepository.save(fair);
 
@@ -136,85 +136,111 @@ export class FairsRepository {
   }
 
   async getAllFairs(): Promise<Fair[]> {
-  return await this.fairRepository
-    .createQueryBuilder('fair')
-    .leftJoinAndSelect('fair.fairDays', 'fairDays')
-    .leftJoinAndSelect('fairDays.buyerCapacities', 'buyerCapacities')
-    .leftJoinAndSelect('fair.fairCategories', 'fairCategories')
-    .leftJoinAndSelect('fairCategories.category', 'category')
-    .loadRelationCountAndMap('fair.sellerCount', 'fair.sellerRegistrations')
-    .loadRelationCountAndMap('fair.userCount', 'fair.userRegistrations')
-    .getMany();
-}
+    return await this.fairRepository
+      .createQueryBuilder('fair')
+      .leftJoinAndSelect('fair.fairDays', 'fairDays')
+      .leftJoinAndSelect('fairDays.buyerCapacities', 'buyerCapacities')
+      .leftJoinAndSelect('fair.fairCategories', 'fairCategories')
+      .leftJoinAndSelect('fairCategories.category', 'category')
+      .loadRelationCountAndMap('fair.sellerCount', 'fair.sellerRegistrations')
+      .loadRelationCountAndMap('fair.userCount', 'fair.userRegistrations')
+      .getMany();
+  }
 
   async getFairById(fairId: string): Promise<Partial<Fair>> {
     if (!fairId || fairId === 'undefined' || fairId === 'null') {
       throw new BadRequestException('El fairId proporcionado no es válido');
     }
 
-    const fair = await this.fairRepository.findOne({
-      where: { id: fairId },
-      relations: [
-        'fairDays',
-        'fairDays.buyerCapacities',
-        'userRegistrations',
-        'sellerRegistrations.categoryFair.category',
-        'sellerRegistrations.seller.user',
-        'fairCategories.category',
-        'fairCategories.products',
-        'productRequests',
-      ],
-      select: {
-        id: true,
-        name: true,
-        address: true,
-        entryPriceSeller: true,
-        entryPriceBuyer: true,
-        isActive: true,
-        entryDescription: true,
-        fairDays: {
+    try {
+      const fair = await this.fairRepository.findOne({
+        where: { id: fairId },
+        relations: [
+          'fairDays',
+          'fairDays.buyerCapacities',
+          'userRegistrations',
+          'userRegistrations.user',
+          'sellerRegistrations',
+          'sellerRegistrations.seller',
+          'sellerRegistrations.seller.user',
+          'sellerRegistrations.categoryFair',
+          'sellerRegistrations.categoryFair.category',
+          'sellerRegistrations.categoryFair.products',
+          'fairCategories',
+          'fairCategories.category',
+          'fairCategories.products',
+          'productRequests',
+        ],
+        select: {
           id: true,
-          day: true,
-          startTime: true,
-          endTime: true,
-          isClosed: true,
-          buyerCapacities: {
+          name: true,
+          address: true,
+          entryPriceSeller: true,
+          entryPriceBuyer: true,
+          isActive: true,
+          entryDescription: true,
+          fairDays: {
             id: true,
-            hour: true,
-            capacity: true,
-          },
-        },
-        userRegistrations: {
-          id: true,
-          registrationDate: true,
-          entryFee: true,
-          registrationDay: true,
-          registrationHour: true,
-          user: {
-            id: true,
-            email: true,
-            name: true,
-            lastname: true,
-            dni: true,
-            role: true,
-            statusGeneral: true,
-          },
-        },
-        sellerRegistrations: {
-          id: true,
-          registrationDate: true,
-          entryFee: true,
-          liquidation: true,
-          seller: {
-            id: true,
-            status: true,
-            user: {
+            day: true,
+            startTime: true,
+            endTime: true,
+            isClosed: true,
+            buyerCapacities: {
               id: true,
-              name: true,
-              email: true,
+              hour: true,
+              capacity: true,
             },
           },
-          categoryFair: {
+          userRegistrations: {
+            id: true,
+            registrationDate: true,
+            entryFee: true,
+            registrationDay: true,
+            registrationHour: true,
+            user: {
+              id: true,
+              email: true,
+              name: true,
+              lastname: true,
+              dni: true,
+              role: true,
+              statusGeneral: true,
+            },
+          },
+          sellerRegistrations: {
+            id: true,
+            registrationDate: true,
+            entryFee: true,
+            liquidation: true,
+            seller: {
+              id: true,
+              status: true,
+              user: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+            categoryFair: {
+              id: true,
+              maxProducts: true,
+              minProductsSeller: true,
+              maxProductsSeller: true,
+              maxSellers: true,
+              products: {
+                id: true,
+                brand: true,
+                status: true,
+                price: true,
+                description: true,
+              },
+              category: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+          fairCategories: {
             id: true,
             maxProducts: true,
             minProductsSeller: true,
@@ -232,33 +258,25 @@ export class FairsRepository {
               name: true,
             },
           },
-        },
-        fairCategories: {
-          id: true,
-          maxProducts: true,
-          minProductsSeller: true,
-          maxProductsSeller: true,
-          maxSellers: true,
-          products: {
+          productRequests: {
             id: true,
-            brand: true,
             status: true,
-            price: true,
-            description: true,
-          },
-          category: {
-            id: true,
-            name: true,
           },
         },
-        productRequests: {
-          id: true,
-          status: true,
-        },
-      },
-    });
-    if (!fair) throw new NotFoundException('Feria no encontrada');
-    return fair;
+      });
+
+      if (!fair) throw new NotFoundException('Feria no encontrada');
+      return fair;
+    } catch (error) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      ) {
+        throw error;
+      }
+      console.error(`Error en getFairById (${fairId}):`, error);
+      throw new BadRequestException('Error al consultar la feria especificada');
+    }
   }
 
   async saveFair(fair: Fair) {
