@@ -146,7 +146,7 @@ export class FairsRepository {
       .loadRelationCountAndMap('fair.userCount', 'fair.userRegistrations')
       .getMany();
   }
-  
+
   async getFairById(fairId: string): Promise<Partial<Fair>> {
     if (!fairId || fairId === 'undefined' || fairId === 'null') {
       throw new BadRequestException('El fairId proporcionado no es válido');
@@ -165,10 +165,8 @@ export class FairsRepository {
           'sellerRegistrations.seller.user',
           'sellerRegistrations.categoryFair',
           'sellerRegistrations.categoryFair.category',
-          'sellerRegistrations.categoryFair.products',
           'fairCategories',
           'fairCategories.category',
-          'fairCategories.products',
           'productRequests',
         ],
         select: {
@@ -227,13 +225,6 @@ export class FairsRepository {
               minProductsSeller: true,
               maxProductsSeller: true,
               maxSellers: true,
-              products: {
-                id: true,
-                brand: true,
-                status: true,
-                price: true,
-                description: true,
-              },
               category: {
                 id: true,
                 name: true,
@@ -246,13 +237,6 @@ export class FairsRepository {
             minProductsSeller: true,
             maxProductsSeller: true,
             maxSellers: true,
-            products: {
-              id: true,
-              brand: true,
-              status: true,
-              price: true,
-              description: true,
-            },
             category: {
               id: true,
               name: true,
