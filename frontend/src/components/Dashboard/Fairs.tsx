@@ -47,7 +47,7 @@ const Fairs = () => {
     ?.filter((f): f is IFair => Boolean(f && f.id))
     .map((f: IFair) => ({
       id: f.id,
-      name: f.name,
+      name: f.name || "Feria sin nombre",
     }));
 
   const dropdownFairOptions =
@@ -55,7 +55,18 @@ const Fairs = () => {
       ? fairOptions
       : [{ id: "", name: "No hay Feria disponible" }];
 
-  // Registros seguros para evitar crashes
+  // Garantizar que las listas sean arreglos iterables seguros
+  const safeCategoriesArray = Array.isArray(categoriesArray)
+    ? categoriesArray
+    : [];
+
+  const safeCategoryOptions = safeCategoriesArray
+    .filter((c: FairCategories) => c && c.maxSellers > 0)
+    .map((c: FairCategories) => ({
+      id: c.id || "",
+      name: c.category?.name || "Categoría no disponible",
+    }));
+
   const sellerRegistrations = Array.isArray(userDtos?.seller?.registrations)
     ? userDtos.seller.registrations
     : [];
@@ -95,25 +106,17 @@ const Fairs = () => {
                     </h2>
                     <Dropdown
                       value={selectedOptionCategory || "Elegí una opción"}
-                      options={
-                        categoriesArray
-                          ?.filter((c: FairCategories) => c.maxSellers > 0)
-                          .map((c: FairCategories) => ({
-                            id: c.id,
-                            name:
-                              c.category?.name || "Categoría no disponible",
-                          })) || []
-                      }
+                      options={safeCategoryOptions}
                       onSelect={handleSelectCategory}
                       className="lg:w-full"
                     />
 
                     <div className="mt-2">
-                      {categoriesArray?.map((c: FairCategories) => (
-                        <div key={c.id} className="text-sm text-gray-600">
+                      {safeCategoriesArray.map((c: FairCategories, idx: number) => (
+                        <div key={c?.id || idx} className="text-sm text-gray-600">
                           <p>
-                            {c.category?.name}:{" "}
-                            {c.maxSellers > 0
+                            {c?.category?.name || "Categoría"}:{" "}
+                            {c?.maxSellers && c.maxSellers > 0
                               ? `${c.maxSellers} cupos`
                               : "Sin cupos"}
                           </p>
@@ -193,11 +196,11 @@ const Fairs = () => {
                   )
                   .map((fairRegistred) => (
                     <div
-                      key={fairRegistred.fair?.id}
+                      key={fairRegistred?.fair?.id || fairRegistred?.id}
                       className="flex justify-between flex-col gap-4 text-lg"
                     >
                       <p className="text-xl mt-2">
-                        <strong>Feria:</strong> {fairRegistred.fair?.name}
+                        <strong>Feria:</strong> {fairRegistred?.fair?.name || "Feria actual"}
                       </p>
                       <p className="text-xl mt-2">
                         * Ve a la pestaña de productos y comienza a cargar tus
