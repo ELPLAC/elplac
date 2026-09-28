@@ -41,7 +41,7 @@ export class FairsController {
     return await this.fairsService.getProductsByIdAndFair(fairId, sellerId);
   }
 
-  // Compatibilidad con la ruta anterior por si el frontend consume :sellerId/:fairId/productss
+  // Compatibilidad con la ruta anterior por si el frontend consume :sellerId/:fairId/products
   @Get(':sellerId/:fairId/products')
   async getProductsByIdAndFairLegacy(
     @Param('sellerId', new ParseUUIDPipe({ version: '4' })) sellerId: string,

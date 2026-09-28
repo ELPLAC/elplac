@@ -146,7 +146,7 @@ export class FairsRepository {
       .loadRelationCountAndMap('fair.userCount', 'fair.userRegistrations')
       .getMany();
   }
-
+  
   async getFairById(fairId: string): Promise<Partial<Fair>> {
     if (!fairId || fairId === 'undefined' || fairId === 'null') {
       throw new BadRequestException('El fairId proporcionado no es válido');
