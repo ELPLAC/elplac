@@ -1,5 +1,6 @@
 "use client";
 import { getFair } from "@/helpers/services";
+import { URL } from "@/config/envs"; // O la ruta correcta donde tengas envs.ts (ej: "@/envs")
 import {
   IFair,
   IFairContext,
@@ -21,18 +22,17 @@ export const FairProvider: React.FC<IFairProviderProps> = ({ children }) => {
       try {
         const res = await getFair();
         
-        // ✅ Proteccion estricta contra respuestas nulas/undefined
+        // Proteccion estricta contra respuestas nulas/undefined
         const safeFairs: IFair[] = Array.isArray(res) ? res : [];
         setFairs(safeFairs);
 
-        // ✅ Busqueda segura con optional chaining
+        // Busqueda segura de feria activa
         const active = safeFairs.find((fair: IFair) => fair?.isActive === true);
 
         if (active?.id) {
           try {
-            // Cargar el detalle completo de la feria activa para obtener sus relaciones reales
-            const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-            const response = await fetch(`${API_URL}/fairs/${active.id}`);
+            // Usa la constante URL de envs.ts (https://elplac-production-3a9f.up.railway.app)
+            const response = await fetch(`${URL}/fairs/${active.id}`);
             
             if (response.ok) {
               const fullActiveFair: IFair = await response.json();
