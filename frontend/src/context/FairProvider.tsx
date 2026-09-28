@@ -1,6 +1,6 @@
 "use client";
 import { getFair } from "@/helpers/services";
-import { URL } from "@/config/envs"; // O la ruta correcta donde tengas envs.ts (ej: "@/envs")
+import { URL } from "@/envs"; // O la ruta correcta donde tengas envs.ts (ej: "@/envs")
 import {
   IFair,
   IFairContext,
