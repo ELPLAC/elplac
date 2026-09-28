@@ -2,8 +2,7 @@ import {
   CanActivate,
   ExecutionContext,
   Injectable,
-  InternalServerErrorException,
-  NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
@@ -13,10 +12,22 @@ export class AuthGuard implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
-    const token = request.headers.authorization?.split(' ')[1];
 
+    // 1. Omitir la validación de token si la petición es un Preflight de CORS (OPTIONS)
+    if (request.method === 'OPTIONS') {
+      return true;
+    }
+
+    const authHeader = request.headers.authorization;
+    if (!authHeader) {
+      throw new UnauthorizedException(
+        'Token no encontrado en el encabezado Authorization',
+      );
+    }
+
+    const token = authHeader.split(' ')[1];
     if (!token) {
-      throw new NotFoundException('Token no encontrado en el encabezado Authorization');
+      throw new UnauthorizedException('Formato de token inválido');
     }
 
     try {
@@ -25,10 +36,8 @@ export class AuthGuard implements CanActivate {
       request.user = payload;
       return true;
     } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
-      }
-      throw new InternalServerErrorException('Error al verificar el token JWT');
+      // 2. Usar UnauthorizedException (401) en lugar de HTTP 500 para fallos de JWT
+      throw new UnauthorizedException('Token inválido o expirado');
     }
   }
 }

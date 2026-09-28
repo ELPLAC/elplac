@@ -10,6 +10,7 @@ async function bootstrap() {
     logger: ['log', 'error', 'warn', 'debug', 'verbose'],
   });
 
+  // Habilitar CORS amplio para dominios de Vercel y Localhost
   app.enableCors({
     origin: (origin, callback) => {
       if (
@@ -19,7 +20,7 @@ async function bootstrap() {
       ) {
         callback(null, true);
       } else {
-        callback(null, true); // Fallback permisivo
+        callback(null, true); // Permite acceso si difiere la URL exacta
       }
     },
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
@@ -34,11 +35,14 @@ async function bootstrap() {
   });
 
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
-  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+  app.useGlobalInterceptors(
+    new ClassSerializerInterceptor(app.get(Reflector)),
+  );
 
   const port = process.env.PORT || 3000;
+  // Es fundamental pasar '0.0.0.0' para que Railway exponga la interfaz de red correctamente
   await app.listen(port, '0.0.0.0');
-  console.log(`Servidor activo en el puerto ${port}`);
+  console.log(`Servidor escuchando en http://0.0.0.0:${port}`);
 }
 
 bootstrap();
