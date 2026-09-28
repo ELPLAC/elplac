@@ -1,12 +1,13 @@
 "use client";
 import { getFair } from "@/helpers/services";
-import { URL } from "@/envs";
 import {
   IFair,
   IFairContext,
   IFairProviderProps,
 } from "@/types";
 import React, { createContext, useContext, useEffect, useState } from "react";
+
+const URL = process.env.NEXT_PUBLIC_API_URL ?? "https://elplac-production-3a9f.up.railway.app";
 
 const FairContext = createContext<IFairContext | undefined>(undefined);
 
